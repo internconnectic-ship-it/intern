@@ -1,6 +1,6 @@
 // src/pages/dashboard/DashboardStudent.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from "../../axios"; // ✅ ใช้ api แทน axios
 import Header from '../../components/Header';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,7 +15,7 @@ const DashboardStudent = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/job_posting');
+        const res = await api.get('/api/job_posting');
         setJobs(res.data);
         setFilteredJobs(res.data);
       } catch (err) {
@@ -25,30 +25,43 @@ const DashboardStudent = () => {
     fetchJobs();
   }, []);
 
-  const handleSearch = () => {
+  // ✅ ค้นหาอัตโนมัติ
+  useEffect(() => {
     const filtered = jobs.filter((job) => {
-      const companyMatch = job.company_name?.toLowerCase().includes(searchTerm.toLowerCase());
-      const provinceMatch = job.address?.toLowerCase().includes(province.toLowerCase());
-      const typeMatch = job.business_type?.toLowerCase().includes(jobType.toLowerCase());
+      const companyMatch = searchTerm
+        ? job.company_name?.toLowerCase().includes(searchTerm.toLowerCase())
+        : true;
+      const provinceMatch = province
+        ? job.address?.toLowerCase().includes(province.toLowerCase())
+        : true;
+      const typeMatch = jobType
+        ? job.business_type?.toLowerCase().includes(jobType.toLowerCase())
+        : true;
+
       return companyMatch && provinceMatch && typeMatch;
     });
     setFilteredJobs(filtered);
-  };
+  }, [searchTerm, province, jobType, jobs]);
 
   const handleViewMore = (id) => navigate(`/job-detail/${id}`);
 
-  const img = (logo) => `http://localhost:5000/uploads/${logo || 'default.png'}`;
+  const img = (logo) =>
+    logo
+      ? `api/uploads/${logo}`
+      : `api/uploads/default.png`;
 
   return (
     <div className="min-h-screen bg-[#9AE5F2]">
       <Header />
 
-      {/* ทำให้คอนเทนต์กว้างขึ้น และ padding กระชับ */}
       <div className="w-full max-w-screen-2xl mx-auto px-4 lg:px-8 py-8">
-        {/* หัวเรื่อง */}
         <div className="mb-4">
-          <h1 className="text-2xl font-extrabold text-[#130347]">สถานประกอบการที่เปิดรับฝึกงาน</h1>
-          <p className="text-sm mt-1 text-[#465d71]">ค้นหาจากชื่อบริษัท จังหวัด และประเภทงาน</p>
+          <h1 className="text-2xl font-extrabold text-[#130347]">
+            สถานประกอบการที่เปิดรับฝึกงาน
+          </h1>
+          <p className="text-sm mt-1 text-[#465d71]">
+            ค้นหาจากชื่อบริษัท จังหวัด และประเภทงาน
+          </p>
         </div>
 
         {/* 🔍 ช่องค้นหา */}
@@ -74,15 +87,9 @@ const DashboardStudent = () => {
             onChange={(e) => setJobType(e.target.value)}
             className="px-4 py-2 rounded-full w-40 border border-[#E6F0FF] bg-[#F8FBFF] text-[#130347] outline-none focus:ring-2 focus:ring-[#6EC7E2]"
           />
-          <button
-            onClick={handleSearch}
-            className="px-5 py-2 rounded-full bg-[#225EC4] hover:bg-[#1b55b5] text-white font-semibold shadow-sm"
-          >
-            🔍 ค้นหา
-          </button>
         </div>
 
-        {/* 🔁 รายการงาน — เพิ่มคอลัมน์ตามขนาดจอ เพื่อลดช่องว่างข้าง ๆ */}
+        {/* 🔁 รายการงาน */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
           {filteredJobs.map((job) => (
             <div
@@ -98,13 +105,16 @@ const DashboardStudent = () => {
               <div className="flex-1 space-y-1 text-[#130347]">
                 <h3 className="text-lg font-bold">{job.company_name}</h3>
                 <p className="text-sm">
-                  <span className="font-semibold text-[#465d71]">ที่อยู่:</span> {job.address}
+                  <span className="font-semibold text-[#465d71]">ที่อยู่:</span>{' '}
+                  {job.address}
                 </p>
                 <p className="text-sm">
-                  <span className="font-semibold text-[#465d71]">ตำแหน่ง:</span> {job.position}
+                  <span className="font-semibold text-[#465d71]">ตำแหน่ง:</span>{' '}
+                  {job.position}
                 </p>
                 <p className="text-sm">
-                  <span className="font-semibold text-[#465d71]">ประเภท:</span> {job.business_type}
+                  <span className="font-semibold text-[#465d71]">ประเภท:</span>{' '}
+                  {job.business_type}
                 </p>
 
                 <button

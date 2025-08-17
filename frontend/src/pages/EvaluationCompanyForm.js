@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from 'axios';
+import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 
@@ -11,9 +11,10 @@ const EvaluationCompanyForm = () => {
   const [student, setStudent] = useState(null);
   const [scores, setScores] = useState({});
   const [companyComment, setCompanyComment] = useState('');
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   useEffect(() => {
-    api.get(`/api/student/${id}`)
+    axios.get(`${API_URL}/api/student/${id}`)
       .then(res => setStudent(res.data))
       .catch(err => console.error('❌ โหลดนิสิตล้มเหลว:', err));
   }, [id]);
@@ -46,7 +47,7 @@ const EvaluationCompanyForm = () => {
 
     const totalScore = calcTotalScore();
     try {
-      await api.post('/api/evaluation/submit', {
+      await axios.post(`${API_URL}/api/evaluation/submit`, {
         student_id: id,
         company_score: totalScore,
         company_comment: companyComment,

@@ -1,6 +1,6 @@
 // src/pages/dashboard/DashboardAdminCompanies.js
 import React, { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import api from "../../axios";
 import Header from '../../components/Header';
 
 const PlaceholderLogo = ({ name }) => {
@@ -27,7 +27,7 @@ const DashboardAdminCompanies = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/admin/companies/approved');
+        const res = await api.get('/api/admin/companies/approved');
         setCompanies(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error('❌ ไม่สามารถดึงข้อมูลบริษัทได้:', err);
@@ -58,7 +58,7 @@ const DashboardAdminCompanies = () => {
   const handleDelete = (companyId) => {
     if (!window.confirm('คุณต้องการลบบริษัทนี้หรือไม่?')) return;
     axios
-      .delete(`http://localhost:5000/api/admin/delete-company/${companyId}`)
+      .delete(`/api/admin/delete-company/${companyId}`)
       .then((res) => {
         alert(res.data.message);
         setCompanies((list) => list.filter((c) => c.company_id !== companyId));
@@ -127,7 +127,7 @@ const DashboardAdminCompanies = () => {
                 <div className="flex items-start gap-4">
                   {company.company_logo ? (
                     <img
-                      src={`http://localhost:5000/uploads/${company.company_logo}`}
+                      src={`pai/uploads/${company.company_logo}`}
                       alt="Logo"
                       className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-2xl border border-[#E6F0FF] bg-white"
                     />

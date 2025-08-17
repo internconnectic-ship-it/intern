@@ -6,9 +6,10 @@ import Header from '../components/Header';
 const SupervisorDetailPage = () => {
   const { id } = useParams();
   const [supervisor, setSupervisor] = useState(null);
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/supervisor/${id}`)
+    axios.get(`${API_URL}/api/supervisor/${id}`)
       .then(res => setSupervisor(res.data))
       .catch(err => {
         console.error("❌ ไม่สามารถโหลดรายละเอียด:", err);
@@ -40,7 +41,7 @@ const SupervisorDetailPage = () => {
           <div className="flex flex-col items-center mb-6">
             {supervisor.profile_image && (
               <img
-                src={`http://localhost:5000/uploads/${supervisor.profile_image}`}
+                src={`${API_URL}/uploads/${supervisor.profile_image}`}
                 alt="รูปอาจารย์"
                 className="w-32 h-32 object-cover rounded-full border shadow"
               />

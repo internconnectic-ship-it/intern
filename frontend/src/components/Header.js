@@ -7,6 +7,7 @@ import CompanyMenu from './headers/CompanyMenu';
 import InstructorMenu from './headers/InstructorMenu';
 import AdminMenu from './headers/AdminMenu';
 import SupervisorMenu from './headers/SupervisorMenu';
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const Header = () => {
   const role = localStorage.getItem("role");
@@ -17,7 +18,7 @@ const Header = () => {
 
   useEffect(() => {
     if (role && userId) {
-      axios.get(`http://localhost:5000/api/${role}/${userId}`)
+      axios.get(`${API_URL}/api/${role}/${userId}`)
         .then(res => {
           const data = res.data;
 
@@ -78,7 +79,7 @@ const Header = () => {
       <div className="flex items-center gap-4">
         <span className="flex items-center gap-2">
           <img
-            src={`http://localhost:5000/uploads/${profileImage}`}
+            src={`/uploads/${profileImage}`}
             alt="profile"
             className="profile-image"
             width="64"

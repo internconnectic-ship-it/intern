@@ -59,7 +59,7 @@ const EvaluationCard = ({ student = {} }) => {
     navigate(`/student-detail/${student_id}`);
   };
 
-  const imgSrc = `http://localhost:5000/uploads/${profile_image || 'default.jpg'}`;
+  const imgSrc = `uploads/${profile_image || 'default.jpg'}`;
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-blue-200 p-5 mb-5 flex flex-col md:flex-row md:items-center gap-6 text-black">

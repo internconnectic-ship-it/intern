@@ -1,14 +1,14 @@
 // src/pages/dashboard/DashboardInstructor.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from "../../axios";
 import Header from '../../components/Header';
 
 const DashboardInstructor = () => {
   const [report, setReport] = useState([]);
 
   useEffect(() => {
-    axios
-      .get('http://localhost:5000/api/instructor/internship-report')
+    api
+      .get('/api/instructor/internship-report')   // ✅ ตัด http://localhost:5000 ออก
       .then(res => setReport(Array.isArray(res.data) ? res.data : []))
       .catch(err => console.error('❌ โหลดรายงานล้มเหลว:', err));
   }, []);

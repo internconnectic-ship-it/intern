@@ -1,8 +1,9 @@
+// src/pages/instructor/DashboardInstructorScores.js
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import EvaluationCard from '../../components/EvaluationCard';
-import { useNavigate } from 'react-router-dom';
+import api from "../../axios"; // ✅ ใช้ instance เดียวกับทุกหน้า
 
 const DashboardInstructorScores = () => {
   const [students, setStudents] = useState([]);
@@ -11,7 +12,7 @@ const DashboardInstructorScores = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/evaluation/all');
+        const res = await api.get('/api/evaluation/all'); // ✅ ไม่ต้องเขียน localhost
         const rows = Array.isArray(res.data) ? res.data : [];
         setStudents(rows.filter(r => r && typeof r === 'object'));
       } catch (err) {
@@ -27,7 +28,7 @@ const DashboardInstructorScores = () => {
       <Header />
       <div className="px-[5%] py-[2%]">
         <h2 className="text-2xl font-extrabold text-[#130347] mb-6">
-        ผลการประเมินนิสิต
+          ผลการประเมินนิสิต
         </h2>
 
         {students.length === 0 ? (

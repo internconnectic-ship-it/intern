@@ -1,6 +1,7 @@
+// src/pages/student/DashboardStudentStatus.js
 import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header';
-import axios from 'axios';
+import api from "../../axios";  // ✅ ใช้ axios instance ที่เราตั้ง baseURL ไว้
 import { useNavigate } from 'react-router-dom';
 
 const DashboardStudentStatus = () => {
@@ -14,8 +15,8 @@ const DashboardStudentStatus = () => {
   useEffect(() => {
     if (!studentId) return;
 
-    axios
-      .get(`http://localhost:5000/api/student/status/history/${studentId}`)
+    api
+      .get(`/api/student/status/history/${studentId}`)
       .then((res) => {
         setApplications(res.data || []);
         const confirmedMap = {};
@@ -50,14 +51,12 @@ const DashboardStudentStatus = () => {
       alert('❌ ไม่พบ job_posting_id');
       return;
     }
-    navigate(`/job-detail/${jobId}`, {
-      state: { fromStatusPage: true },
-    });
+    navigate(`/job-detail/${jobId}`, { state: { fromStatusPage: true } });
   };
 
   const handleConfirm = async (jobId) => {
     try {
-      await axios.post('http://localhost:5000/api/internship/confirm', {
+      await api.post('/api/internship/confirm', {
         student_id: studentId,
         job_posting_id: jobId,
       });
@@ -108,16 +107,9 @@ const DashboardStudentStatus = () => {
                 </thead>
                 <tbody className="text-[#130347]">
                   {applications.map((app, index) => (
-                    <tr
-                      key={index}
-                      className="hover:bg-[#F8FBFF] transition-colors"
-                    >
-                      <td className="px-4 py-3 border-b border-[#E6F0FF]">
-                        {app.company_name}
-                      </td>
-                      <td className="px-4 py-3 border-b border-[#E6F0FF]">
-                        {app.position}
-                      </td>
+                    <tr key={index} className="hover:bg-[#F8FBFF] transition-colors">
+                      <td className="px-4 py-3 border-b border-[#E6F0FF]">{app.company_name}</td>
+                      <td className="px-4 py-3 border-b border-[#E6F0FF]">{app.position}</td>
                       <td className="px-4 py-3 border-b border-[#E6F0FF]">
                         {formatDate(app.apply_date)}
                       </td>

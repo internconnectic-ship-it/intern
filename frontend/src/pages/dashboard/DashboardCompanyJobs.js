@@ -1,5 +1,6 @@
+// frontend/src/pages/company/JobPostForm.js
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from "../../axios"; // ✅ ใช้ axios instance ที่เราสร้าง
 import Header from '../../components/Header';
 
 const JobPostForm = () => {
@@ -25,22 +26,20 @@ const JobPostForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // ✅ Validation
     const phoneRegex = /^[0-9]{5,15}$/;
     if (!phoneRegex.test(job.phone_number)) {
       alert('❌ กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (เฉพาะตัวเลข 5-15 หลัก)');
       return;
     }
-
     if (parseInt(job.max_positions) < 0) {
       alert('❌ จำนวนที่รับสมัครต้องไม่ติดลบ');
       return;
     }
-
     if (parseFloat(job.compensation) < 0) {
       alert('❌ ค่าตอบแทนต้องไม่ติดลบ');
       return;
     }
-
     if (new Date(job.start_date) > new Date(job.end_date)) {
       alert('❌ วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่มรับสมัคร');
       return;
@@ -49,10 +48,11 @@ const JobPostForm = () => {
     try {
       const company_id = localStorage.getItem('companyId');
 
+      // ✅ ตัดเวลาออก เหลือแค่ YYYY-MM-DD
       const formattedStartDate = job.start_date?.slice(0, 10);
       const formattedEndDate = job.end_date?.slice(0, 10);
 
-      await axios.post(`http://localhost:5000/api/job_posting`, {
+      await api.post('/api/job_posting', {
         ...job,
         start_date: formattedStartDate,
         end_date: formattedEndDate,
@@ -86,7 +86,6 @@ const JobPostForm = () => {
 
       <div className="flex justify-center p-6">
         <div className="w-full max-w-5xl">
-          {/* หัวข้อ */}
           <h1 className="text-2xl font-extrabold text-[#130347] mb-6">
             เพิ่มประกาศงาน
           </h1>
@@ -96,6 +95,7 @@ const JobPostForm = () => {
             className="bg-white p-8 rounded-xl shadow-md"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* ฟิลด์ทั่วไป */}
               {[
                 { label: 'ตำแหน่งที่เปิดรับ', name: 'position' },
                 { label: 'ประเภทธุรกิจ', name: 'business_type' },
@@ -119,12 +119,11 @@ const JobPostForm = () => {
                 </div>
               ))}
 
-              {/* ฟิลด์ Google Maps Link พร้อมคำอธิบาย */}
+              {/* Google Maps Link */}
               <div>
                 <label className="block font-semibold mb-1 text-[#465d71]">
                   Google Maps Link
                 </label>
-                
                 <input
                   name="google_maps_link"
                   type="text"
@@ -139,18 +138,18 @@ const JobPostForm = () => {
                 </p>
               </div>
 
+              {/* ฟิลด์อื่น ๆ */}
               {[
                 { label: 'วันที่เริ่มรับสมัคร', name: 'start_date', type: 'date' },
                 { label: 'วันสิ้นสุดรับสมัคร', name: 'end_date', type: 'date' },
                 { label: 'อีเมลสำหรับติดต่อ', name: 'email', type: 'email' },
                 { label: 'เบอร์โทรศัพท์', name: 'phone_number' },
-              ].map(({ label, name, type = 'text', step }) => (
+              ].map(({ label, name, type = 'text' }) => (
                 <div key={name}>
                   <label className="block font-semibold mb-1 text-[#465d71]">{label}</label>
                   <input
                     name={name}
                     type={type}
-                    step={step}
                     value={job[name]}
                     onChange={handleChange}
                     className="w-full border rounded px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#6EC7E2]"

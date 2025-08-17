@@ -1,6 +1,6 @@
 // src/pages/dashboard/DashboardAdminApprovals.jsx
 import React, { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import api from "../../axios";   // ⬅️ ใช้ api จาก config กลาง
 import Header from '../../components/Header';
 
 const PlaceholderAvatar = ({ name }) => {
@@ -42,7 +42,7 @@ const DashboardAdminApprovals = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/admin/companies/pending');
+        const res = await api.get('/api/admin/companies/pending');
         setCompanies(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error('❌ ไม่สามารถดึงข้อมูลบริษัทที่รออนุมัติได้:', err);
@@ -65,7 +65,7 @@ const DashboardAdminApprovals = () => {
   const handleApprove = async (companyId) => {
     if (!window.confirm('ยืนยันการอนุมัติบริษัทนี้ใช่หรือไม่?')) return;
     try {
-      const res = await axios.put(`http://localhost:5000/api/admin/approve-company/${companyId}`);
+      const res = await api.put(`/api/admin/approve-company/${companyId}`);
       alert(res.data.message);
       setCompanies(list => list.filter(c => c.company_id !== companyId));
     } catch (err) {
@@ -77,7 +77,7 @@ const DashboardAdminApprovals = () => {
   const handleDelete = async (companyId) => {
     if (!window.confirm('คุณต้องการลบบริษัทนี้หรือไม่?')) return;
     try {
-      const res = await axios.delete(`http://localhost:5000/api/admin/delete-company/${companyId}`);
+      const res = await api.delete(`/api/admin/delete-company/${companyId}`);
       alert(res.data.message);
       setCompanies(list => list.filter(c => c.company_id !== companyId));
     } catch (err) {
@@ -90,9 +90,7 @@ const DashboardAdminApprovals = () => {
     <div className="min-h-screen bg-[#9AE5F2]">
       <Header />
 
-      {/* กว้างขึ้น: max-w-screen-2xl + padding กระชับ */}
       <div className="w-full max-w-screen-2xl mx-auto px-4 lg:px-8 py-10">
-        {/* หัวข้อ + ตัวนับ + ค้นหา */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-2">
           <div>
             <h1 className="text-2xl font-extrabold text-[#130347]">บริษัทที่รอการอนุมัติ</h1>
@@ -108,7 +106,6 @@ const DashboardAdminApprovals = () => {
           />
         </div>
 
-        {/* รายการบริษัท — เพิ่มคอลัมน์บนจอใหญ่เพื่อลดที่ว่างข้างๆ */}
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
           {loading ? (
             <>

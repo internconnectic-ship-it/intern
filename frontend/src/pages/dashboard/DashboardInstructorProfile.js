@@ -1,5 +1,6 @@
+// src/pages/instructor/DashboardInstructorProfile.js
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from "../../axios"; // ✅ ใช้ axios instance
 import Header from '../../components/Header';
 
 const DashboardInstructorProfile = () => {
@@ -19,7 +20,7 @@ const DashboardInstructorProfile = () => {
 
   useEffect(() => {
     if (instructorId) {
-      axios.get(`http://localhost:5000/api/instructor/${instructorId}`)
+      api.get(`/api/instructor/${instructorId}`)
         .then((res) => {
           const data = res.data;
           setForm({
@@ -58,7 +59,9 @@ const DashboardInstructorProfile = () => {
       formData.append('image', selectedFile);
 
       try {
-        const res = await axios.post('http://localhost:5000/api/upload/profile-image', formData);
+        const res = await api.post('/api/upload/profile-image', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
         profileImageFilename = res.data.filename;
       } catch (err) {
         console.error('❌ อัปโหลดรูปไม่สำเร็จ:', err);
@@ -69,7 +72,7 @@ const DashboardInstructorProfile = () => {
 
     const updatedForm = { ...form, profile_image: profileImageFilename };
 
-    axios.put(`http://localhost:5000/api/instructor/${instructorId}`, updatedForm)
+    api.put(`/api/instructor/${instructorId}`, updatedForm)
       .then(() => {
         localStorage.setItem('profile_image', profileImageFilename);
         alert('✅ บันทึกข้อมูลเรียบร้อยแล้ว');
@@ -84,25 +87,22 @@ const DashboardInstructorProfile = () => {
     <div className="min-h-screen bg-[#9AE5F2] text-[#130347] font-sans">
       <Header />
 
-      {/* คอนเทนเนอร์ภายนอกใช้เปอร์เซ็นต์ ให้หัวเรื่องอยู่นอกกล่องและชิดซ้ายตรงกับกล่อง */}
       <div className="px-[5%] py-[2%]">
         <div className="w-full max-w-4xl mx-auto">
-          {/* หัวเรื่อง (อยู่นอกกล่อง) */}
           <h2 className="text-2xl font-extrabold mb-4">
             👤 โปรไฟล์อาจารย์ประจำวิชา
           </h2>
 
-          {/* กล่องฟอร์ม */}
           <form
             onSubmit={handleSubmit}
             className="bg-white text-[#130347] p-8 rounded-2xl shadow-lg border border-[#E6F0FF]"
           >
-            {/* รูปโปรไฟล์ + อัปโหลด */}
+            {/* รูปโปรไฟล์ */}
             <div className="flex items-center gap-4 mb-6">
               <div className="w-24 h-24 rounded-full overflow-hidden ring-2 ring-[#E6F0FF] bg-[#F8FBFF] flex items-center justify-center">
                 {form.profile_image ? (
                   <img
-                    src={`http://localhost:5000/uploads/${form.profile_image}`}
+                    src={`${process.env.REACT_APP_API_URL || "http://localhost:5000"}/uploads/${form.profile_image}`}
                     alt="รูปโปรไฟล์"
                     className="w-full h-full object-cover"
                   />

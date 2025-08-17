@@ -1,8 +1,8 @@
 // src/pages/dashboard/DashboardCompanyStatus.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
+import api from "../../axios";
 
 const DashboardCompanyStatus = () => {
   const [applications, setApplications] = useState([]);
@@ -11,18 +11,17 @@ const DashboardCompanyStatus = () => {
 
   useEffect(() => {
     if (!company_id) return;
-    axios
-      .get(`http://localhost:5000/api/job_posting/applications/${company_id}`)
+    api
+      .get(`/api/job_posting/applications/${company_id}`)
       .then((res) => setApplications(Array.isArray(res.data) ? res.data : []))
       .catch((err) => console.error('❌ ดึงข้อมูลนิสิตล้มเหลว:', err));
   }, [company_id]);
 
   const handleStatusChange = async (application_id, newStatus) => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/job_posting/application/status/${application_id}`,
-        { status: newStatus }
-      );
+      await api.put(`/api/job_posting/application/status/${application_id}`, {
+        status: newStatus,
+      });
       setApplications((apps) =>
         apps.map((a) =>
           a.application_id === application_id ? { ...a, status: newStatus } : a
@@ -56,7 +55,9 @@ const DashboardCompanyStatus = () => {
                 {/* ปุ่มขวาบน */}
                 <div className="absolute right-4 top-4 flex gap-2">
                   <a
-                    href={`http://localhost:5000/uploads/resumes/${app.resume_file}`}
+                    href={`${
+                      process.env.REACT_APP_API_URL || 'http://localhost:5000'
+                    }/uploads/resumes/${app.resume_file}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold px-4 py-2 shadow-sm"
@@ -97,8 +98,12 @@ const DashboardCompanyStatus = () => {
                       ? new Date(app.apply_date).toLocaleDateString('th-TH')
                       : '-'}
                   </p>
-                  <p><strong>ตำแหน่งที่สมัคร:</strong>  {app.position}</p>
-                  <p><strong>ประเภทงาน:</strong>  {app.business_type}</p>
+                  <p>
+                    <strong>ตำแหน่งที่สมัคร:</strong> {app.position}
+                  </p>
+                  <p>
+                    <strong>ประเภทงาน:</strong> {app.business_type}
+                  </p>
                 </div>
 
                 {/* แก้ไขสถานะ ล่างขวา */}

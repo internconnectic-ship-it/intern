@@ -7,9 +7,10 @@ const JobEditPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [job, setJob] = useState(null);
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/job_posting/${id}`)
+    axios.get(`${API_URL}/api/job_posting/${id}`)
       .then(res => {
         const formatted = {
           ...res.data,
@@ -32,7 +33,7 @@ const JobEditPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/api/job_posting/${id}`, job);
+      await axios.put(`${API_URL}/api/job_posting/${id}`, job);
       alert('✅ แก้ไขประกาศเรียบร้อยแล้ว');
       navigate('/dashboard/company');
     } catch (err) {

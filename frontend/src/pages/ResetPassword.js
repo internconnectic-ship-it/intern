@@ -11,6 +11,7 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,7 +25,7 @@ const ResetPassword = () => {
     }
 
     try {
-      const res = await axios.post('/api/auth/reset-password', { token, password });
+      const res = await axios.post(`${API_URL}/api/auth/reset-password`, { token, password });
       setMessage(res.data.message);
       setTimeout(() => navigate('/login'), 2000);
     } catch (err) {

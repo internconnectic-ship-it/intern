@@ -1,6 +1,6 @@
 // src/pages/dashboard/DashboardAdminReports.jsx
 import React, { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import api from "../../axios";  // ✅ ใช้ axios instance
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -26,9 +26,9 @@ const DashboardAdminReports = () => {
     const fetchData = async () => {
       try {
         const [summaryRes, companiesRes, provincesRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/reports/summary'),
-          axios.get('http://localhost:5000/api/reports/top-companies'),
-          axios.get('http://localhost:5000/api/reports/top-provinces'),
+          api.get('/api/reports/summary'),
+          api.get('/api/reports/top-companies'),
+          api.get('/api/reports/top-provinces'),
         ]);
         setSummary(summaryRes.data || {});
         setTopCompanies(companiesRes.data || []);
@@ -88,10 +88,7 @@ const DashboardAdminReports = () => {
   return (
     <div className="min-h-screen bg-[#9AE5F2] text-[#063D8C]">
       <Header />
-
-      {/* กว้างขึ้น: ใช้ max-w-screen-2xl เพื่อลดช่องว่างด้านข้าง */}
       <div className="w-full max-w-screen-2xl mx-auto px-4 lg:px-8 py-8">
-        {/* หัวข้อ (ไม่มีกล่อง) */}
         <div className="mb-3">
           <h1 className="text-2xl font-extrabold text-[#130347]">สถิติระบบฝึกงาน</h1>
           <p className="mt-1 text-[#465d71]">

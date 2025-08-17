@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from "../../axios"; // ✅ ใช้ instance แทน axios ตรง ๆ
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 
@@ -8,9 +8,16 @@ const DashboardInstructorSupervisors = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/supervisor')
-      .then(res => setSupervisors(res.data))
-      .catch(err => console.error("❌ ไม่สามารถโหลดข้อมูลอาจารย์นิเทศ:", err));
+    const fetchData = async () => {
+      try {
+        const res = await api.get('/api/supervisor');  // ✅ baseURL อยู่ใน axios.js แล้ว
+        setSupervisors(res.data);
+      } catch (err) {
+        console.error("❌ ไม่สามารถโหลดข้อมูลอาจารย์นิเทศ:", err);
+        setSupervisors([]);
+      }
+    };
+    fetchData();
   }, []);
 
   return (

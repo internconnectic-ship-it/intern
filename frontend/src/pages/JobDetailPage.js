@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const Chip = ({ children }) => (
   <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-[#F8FBFF] border border-[#E6F0FF] text-xs font-semibold text-[#130347]">
@@ -45,7 +46,7 @@ const JobDetailPage = () => {
     setUserRole(role);
 
     axios
-      .get(`http://localhost:5000/api/job_posting/${id}`)
+      .get(`${API_URL}/api/job_posting/${id}`)
       .then((res) => setJob(res.data))
       .catch(() => {
         alert('ไม่พบข้อมูลประกาศงาน');
@@ -54,7 +55,7 @@ const JobDetailPage = () => {
 
     if (role === 'student' && student_id) {
       axios
-        .get('http://localhost:5000/api/job_posting/check-application', {
+        .get(`${API_URL}/api/job_posting/check-application`, {
           params: { student_id, job_posting_id: id },
         })
         .then((res) => setHasApplied(res.data.applied))
@@ -72,7 +73,7 @@ const JobDetailPage = () => {
     formData.append('job_posting_id', id);
 
     try {
-      await axios.post('http://localhost:5000/api/job_posting/apply', formData, {
+      await axios.post(`${API_URL}/api/job_posting/apply`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       alert('✅ ส่งใบสมัครสำเร็จแล้ว');
@@ -199,7 +200,7 @@ const JobDetailPage = () => {
                     onClick={async () => {
                       if (!window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบประกาศนี้?')) return;
                       try {
-                        await axios.delete(`http://localhost:5000/api/job_posting/${id}`);
+                        await axios.delete(`${API_URL}/api/job_posting/${id}`);
                         alert('✅ ลบประกาศเรียบร้อยแล้ว');
                         navigate('/dashboard/company');
                       } catch {

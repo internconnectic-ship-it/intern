@@ -1,6 +1,6 @@
 // frontend/src/pages/company/DashboardCompanyEvaluation.js
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from "../../axios";
 import Header from '../../components/Header';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,7 +12,7 @@ const DashboardCompanyEvaluation = () => {
     const fetchStudents = async () => {
       try {
         const company_id = localStorage.getItem('companyId');
-        const res = await axios.get(`http://localhost:5000/api/evaluation/company/students/${company_id}`);
+        const res = await api.get(`/api/evaluation/company/students/${company_id}`);
         setStudents(res.data);
       } catch (err) {
         console.error("❌ ดึงรายชื่อนิสิตล้มเหลว:", err);
@@ -49,8 +49,8 @@ const DashboardCompanyEvaluation = () => {
               <img
                 src={
                   student.profile_image
-                    ? `http://localhost:5000/uploads/${student.profile_image}`
-                    : `http://localhost:5000/uploads/default.jpg`
+                    ? `${process.env.REACT_APP_API_URL}/uploads/${student.profile_image}`
+                    : `${process.env.REACT_APP_API_URL}/uploads/default.jpg`
                 }
                 alt={student.student_name}
                 className="w-24 h-24 object-cover rounded-full border-4 border-[#6EC7E2] mb-4"

@@ -1,6 +1,6 @@
 // src/pages/dashboard/DashboardAdminProfile.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from "../../axios";    // ✅ ใช้ axios instance ที่ config แล้ว
 import Header from '../../components/Header';
 
 const DashboardAdminProfile = () => {
@@ -28,7 +28,7 @@ const DashboardAdminProfile = () => {
 
   useEffect(() => {
     if (!adminId) return;
-    axios.get(`http://localhost:5000/api/admin/${adminId}`)
+    api.get(`/api/admin/${adminId}`)
       .then(res => {
         if (res.data) setAdmin(prev => ({ ...prev, ...res.data }));
       })
@@ -54,11 +54,11 @@ const DashboardAdminProfile = () => {
       if (selectedFile) {
         const formData = new FormData();
         formData.append('image', selectedFile);
-        const res = await axios.post('http://localhost:5000/api/upload/profile-image', formData);
+        const res = await api.post('/api/upload/profile-image', formData);
         profileImageFilename = res.data.filename;
       }
       const updatedAdmin = { ...admin, profile_image: profileImageFilename };
-      await axios.put(`http://localhost:5000/api/admin/${adminId}`, updatedAdmin);
+      await api.put(`/api/admin/${adminId}`, updatedAdmin);
       localStorage.setItem('profile_image', profileImageFilename);
       alert('✅ บันทึกข้อมูลเรียบร้อยแล้ว');
     } catch (err) {
@@ -70,22 +70,18 @@ const DashboardAdminProfile = () => {
   return (
     <div className="min-h-screen bg-[#9AE5F2] text-[#063D8C]">
       <Header />
-
       <form onSubmit={handleSubmit} className="max-w-4xl mx-auto px-6 py-10">
-        {/* หัวเรื่อง (ไม่มีกล่อง) */}
         <div className="mb-4">
           <h1 className="text-2xl font-extrabold text-[#130347]">โปรไฟล์ผู้ดูแล</h1>
           {error && <p className="mt-2 text-rose-600">{error}</p>}
         </div>
 
-        {/* การ์ดฟอร์ม */}
         <div className="bg-white border border-[#E6F0FF] rounded-2xl shadow-md p-6">
-          {/* รูปโปรไฟล์ */}
           <div className="flex items-center gap-4 mb-6">
             <div className="w-24 h-24 rounded-full overflow-hidden ring-2 ring-[#E6F0FF] bg-[#F8FBFF]">
               {admin.profile_image ? (
                 <img
-                  src={`http://localhost:5000/uploads/${admin.profile_image}`}
+                  src={`${process.env.REACT_APP_API_URL || "http://localhost:5000"}/uploads/${admin.profile_image}`}
                   alt="รูปโปรไฟล์"
                   className="w-full h-full object-cover"
                 />
@@ -165,7 +161,6 @@ const DashboardAdminProfile = () => {
             </div>
           </div>
 
-          {/* ปุ่มบันทึก */}
           <button
             type="submit"
             className="mt-6 w-full rounded-full bg-[#225EC4] hover:bg-[#1b55b5] text-white py-3 font-semibold shadow-sm"

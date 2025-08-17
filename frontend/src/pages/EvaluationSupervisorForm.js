@@ -8,6 +8,7 @@ const EvaluationSupervisorForm = () => {
   const supervisorId = localStorage.getItem('supervisorId');
   const instructorId = localStorage.getItem('instructorId');
   const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   const [score, setScore] = useState({
     quality: '',
@@ -55,7 +56,7 @@ const EvaluationSupervisorForm = () => {
     }
 
     try {
-      await axios.post('http://localhost:5000/api/evaluation/submit', {
+      await axios.post(`${API_URL}/api/evaluation/submit`, {
         student_id: id,
         role: 'supervisor',
         score_quality: score.quality,

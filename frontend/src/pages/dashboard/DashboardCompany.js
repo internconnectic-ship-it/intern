@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from "../../axios";    // ✅ ใช้ instance ที่ตั้งค่า baseURL ไว้แล้ว
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 
@@ -16,7 +16,7 @@ const DashboardCompany = () => {
       return;
     }
     try {
-      const res = await axios.get(`http://localhost:5000/api/job_posting/company/${company_id}`);
+      const res = await api.get(`/api/job_posting/company/${company_id}`);
       setJobPosts(res.data);
     } catch (err) {
       console.error("❌ ไม่สามารถโหลดข้อมูลประกาศงาน:", err);
@@ -30,7 +30,7 @@ const DashboardCompany = () => {
   const handleDelete = async (jobId) => {
     if (!window.confirm('คุณต้องการลบประกาศนี้หรือไม่?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/job_posting/${jobId}`);
+      await api.delete(`/api/job_posting/${jobId}`);
       alert('✅ ลบประกาศสำเร็จ');
       fetchJobs();
     } catch (err) {
@@ -46,7 +46,7 @@ const DashboardCompany = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/api/job_posting/${editingJob.job_posting_id}`, formData);
+      await api.put(`/api/job_posting/${editingJob.job_posting_id}`, formData);
       setEditingJob(null);
       fetchJobs();
     } catch (err) {

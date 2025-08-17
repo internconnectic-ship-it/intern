@@ -5,11 +5,12 @@ import axios from 'axios';
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/api/auth/forgot-password', { email });
+      const res = await axios.post(`${API_URL}/api/auth/forgot-password`, { email });
       setMessage(res.data.message);
     } catch (err) {
       setMessage(err.response?.data?.message || 'เกิดข้อผิดพลาด');

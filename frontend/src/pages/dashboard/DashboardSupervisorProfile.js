@@ -1,6 +1,6 @@
 // src/pages/dashboard/DashboardSupervisorProfile.jsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from "../../axios";   // ✅ ใช้ axios instance
 import Header from '../../components/Header';
 
 const DashboardSupervisorProfile = () => {
@@ -21,7 +21,7 @@ const DashboardSupervisorProfile = () => {
 
   useEffect(() => {
     if (supervisorId) {
-      axios.get(`http://localhost:5000/api/supervisor/${supervisorId}`)
+      api.get(`/api/supervisor/${supervisorId}`)
         .then((res) => {
           const data = res.data;
           setForm({
@@ -60,7 +60,9 @@ const DashboardSupervisorProfile = () => {
       const formData = new FormData();
       formData.append('image', selectedFile);
       try {
-        const res = await axios.post('http://localhost:5000/api/upload/profile-image', formData);
+        const res = await api.post('/api/upload/profile-image', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
         profileImageFilename = res.data.filename;
       } catch (err) {
         console.error('❌ อัปโหลดรูปโปรไฟล์ล้มเหลว:', err);
@@ -71,7 +73,7 @@ const DashboardSupervisorProfile = () => {
 
     const updatedForm = { ...form, profile_image: profileImageFilename };
 
-    axios.put(`http://localhost:5000/api/supervisor/${supervisorId}`, updatedForm)
+    api.put(`/api/supervisor/${supervisorId}`, updatedForm)
       .then(() => {
         localStorage.setItem('profile_image', profileImageFilename);
         alert('✅ บันทึกข้อมูลเรียบร้อยแล้ว');
@@ -100,7 +102,7 @@ const DashboardSupervisorProfile = () => {
             <div className="w-24 h-24 rounded-full overflow-hidden ring-2 ring-[#E6F0FF] bg-[#F8FBFF]">
               {form.profile_image ? (
                 <img
-                  src={`http://localhost:5000/uploads/${form.profile_image}`}
+                  src={`${process.env.REACT_APP_API_URL || "http://localhost:5000"}/uploads/${form.profile_image}`}
                   alt="รูปโปรไฟล์"
                   className="w-full h-full object-cover"
                 />

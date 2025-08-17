@@ -1,21 +1,25 @@
+// src/pages/instructor/DashboardInstructorStudents.js
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Header from '../../components/Header';
 import { useNavigate } from 'react-router-dom';
+import api from "../../axios";// ✅ ใช้ axios instance เดียวกัน
 
 const DashboardInstructorStudents = () => {
   const [students, setStudents] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/instructor/students')
-      .then(res => {
+    const fetchStudents = async () => {
+      try {
+        const res = await api.get('/api/instructor/students'); // ✅ ไม่ต้องเขียน localhost
         console.log("📦 ได้ข้อมูลนิสิต:", res.data);
         setStudents(res.data);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error("❌ ไม่สามารถโหลดข้อมูลนิสิต:", err);
-      });
+      }
+    };
+
+    fetchStudents();
   }, []);
 
   const handleViewDetails = (studentId) => {

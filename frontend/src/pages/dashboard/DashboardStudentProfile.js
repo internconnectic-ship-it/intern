@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from '../../components/Header';
 
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 const DashboardStudentProfile = () => {
   const [student, setStudent] = useState({
     student_name: '',
@@ -26,26 +28,29 @@ const DashboardStudentProfile = () => {
   const studentId = localStorage.getItem('studentId');
 
   useEffect(() => {
+    if (!studentId) return;
     axios
-      .get(`http://localhost:5000/api/student/${studentId}`)
+      .get(`${API_URL}/api/student/${studentId}`)
       .then(res => setStudent(res.data || {}))
       .catch(err => console.error('❌ โหลดข้อมูลล้มเหลว', err));
   }, [studentId]);
 
   const handleChange = (e) => setStudent({ ...student, [e.target.name]: e.target.value });
   const handleImageUpload = (e) => setSelectedFile(e.target.files?.[0] || null);
-  const formatDate = (d) => (d ? d.split('T')[0] : '');
+  const formatDate = (d) => (d ? new Date(d).toISOString().split('T')[0] : '');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const gpa = parseFloat(student.gpa);
-    if (isNaN(gpa) || gpa < 0 || gpa > 4) return alert('กรุณากรอก GPA ที่อยู่ระหว่าง 0.00 ถึง 4.00');
+    // 🔎 Validation
+    if (student.gpa && (isNaN(student.gpa) || student.gpa < 0 || student.gpa > 4))
+      return alert('กรุณากรอก GPA ที่อยู่ระหว่าง 0.00 ถึง 4.00');
 
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(student.email);
-    if (!emailOk) return alert('กรุณากรอกอีเมลให้ถูกต้อง');
+    if (student.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(student.email))
+      return alert('กรุณากรอกอีเมลให้ถูกต้อง');
 
-    if (!/^\d{10}$/.test(student.phone_number)) return alert('กรุณากรอกเบอร์โทร 10 หลัก');
+    if (student.phone_number && !/^\d{10}$/.test(student.phone_number))
+      return alert('กรุณากรอกเบอร์โทร 10 หลัก');
 
     if (student.birth_date && new Date(student.birth_date) > new Date())
       return alert('วันเกิดต้องไม่เกินวันที่ปัจจุบัน');
@@ -56,12 +61,15 @@ const DashboardStudentProfile = () => {
       new Date(student.intern_start_date) > new Date(student.intern_end_date)
     ) return alert('วันที่เริ่มฝึกงานต้องไม่มากกว่าวันที่สิ้นสุด');
 
+    // 📸 Upload รูป
     let profileImageFilename = student.profile_image;
     if (selectedFile) {
       try {
         const formData = new FormData();
         formData.append('image', selectedFile);
-        const res = await axios.post('http://localhost:5000/api/upload/profile-image', formData);
+        const res = await axios.post(`${API_URL}/api/upload/profile-image`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
         profileImageFilename = res.data.filename;
       } catch (err) {
         console.error('❌ อัปโหลดรูปภาพล้มเหลว', err);
@@ -69,9 +77,10 @@ const DashboardStudentProfile = () => {
       }
     }
 
+    // 💾 Update ข้อมูล
     try {
       const updated = { ...student, profile_image: profileImageFilename };
-      await axios.put(`http://localhost:5000/api/student/${studentId}`, updated);
+      await axios.put(`${API_URL}/api/student/${studentId}`, updated);
       localStorage.setItem('profile_image', profileImageFilename || '');
       localStorage.setItem('name', updated.student_name || '');
       alert('✅ บันทึกข้อมูลเรียบร้อยแล้ว');
@@ -85,7 +94,6 @@ const DashboardStudentProfile = () => {
     <div className="min-h-screen bg-[#9AE5F2] text-[#063D8C]">
       <Header />
 
-      {/* 👉 ขยายความกว้างสูงสุด และเพิ่ม padding ด้านข้าง */}
       <form onSubmit={handleSubmit} className="w-full max-w-screen-xl mx-auto px-4 lg:px-8 py-8">
         <div className="mb-4">
           <h1 className="text-2xl font-extrabold text-[#130347]">👤 โปรไฟล์นิสิต</h1>
@@ -100,7 +108,7 @@ const DashboardStudentProfile = () => {
             <div className="w-24 h-24 rounded-full overflow-hidden ring-2 ring-[#E6F0FF] bg-[#F8FBFF]">
               {student.profile_image ? (
                 <img
-                  src={`http://localhost:5000/uploads/${student.profile_image}`}
+                  src={`${API_URL}/uploads/${student.profile_image}`}
                   alt="รูปโปรไฟล์"
                   className="w-full h-full object-cover"
                 />
@@ -116,12 +124,13 @@ const DashboardStudentProfile = () => {
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
-                className="mt-1 block w-full text-sm file:mr-3 file:rounded-full file:border-0 file:bg-[#6EC7E2] file:text-white file:px-4 file:py-2 hover:file:bg-[#4691D3]"
+                className="mt-1 block w-full text-sm file:mr-3 file:rounded-full file:border-0 
+                  file:bg-[#6EC7E2] file:text-white file:px-4 file:py-2 hover:file:bg-[#4691D3]"
               />
             </div>
           </div>
 
-          {/* ฟอร์ม: 2 คอลัมน์บน md, 3 คอลัมน์บน xl เพื่อใช้พื้นที่เต็มจอ */}
+          {/* ฟอร์ม: 2 คอลัมน์บน md, 3 คอลัมน์บน xl */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {[
               { label: 'ชื่อ', name: 'student_name' },
@@ -143,7 +152,8 @@ const DashboardStudentProfile = () => {
                   inputMode={inputMode}
                   value={student[name] || ''}
                   onChange={handleChange}
-                  className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                  className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] 
+                    px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
                 />
               </div>
             ))}
@@ -155,7 +165,8 @@ const DashboardStudentProfile = () => {
                 type="date"
                 value={formatDate(student.birth_date)}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 
+                  outline-none focus:ring-2 focus:ring-[#6EC7E2]"
               />
             </div>
 
@@ -166,7 +177,8 @@ const DashboardStudentProfile = () => {
                 name="intern_start_date"
                 value={formatDate(student.intern_start_date)}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 
+                  outline-none focus:ring-2 focus:ring-[#6EC7E2]"
               />
             </div>
 
@@ -177,11 +189,11 @@ const DashboardStudentProfile = () => {
                 name="intern_end_date"
                 value={formatDate(student.intern_end_date)}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 
+                  outline-none focus:ring-2 focus:ring-[#6EC7E2]"
               />
             </div>
 
-            {/* ทักษะพิเศษ: กินเต็มแถวบนทุกขนาดจอ */}
             <div className="md:col-span-2 xl:col-span-3">
               <label className="block text-sm font-medium text-[#225EC4]">ทักษะพิเศษ</label>
               <textarea
@@ -189,14 +201,16 @@ const DashboardStudentProfile = () => {
                 rows={3}
                 value={student.special_skills || ''}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2] resize-y"
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] 
+                  px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2] resize-y"
               />
             </div>
           </div>
 
           <button
             type="submit"
-            className="mt-6 w-full rounded-full bg-[#225EC4] hover:bg-[#1b55b5] text-white py-3 font-semibold shadow-sm"
+            className="mt-6 w-full rounded-full bg-[#225EC4] hover:bg-[#1b55b5] text-white py-3 
+              font-semibold shadow-sm"
           >
             💾 บันทึก
           </button>

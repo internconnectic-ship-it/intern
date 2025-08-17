@@ -3,13 +3,14 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 /* helpers */
 const buildImageUrl = (val) => {
   if (!val) return null;
   if (/^https?:\/\//i.test(val)) return val;
   const file = String(val).split(/[/\\]/).pop();
-  return `http://localhost:5000/uploads/${encodeURIComponent(file)}`;
+  return `${API_URL}/uploads/${encodeURIComponent(file)}`;
 };
 const fmt = (d) => (d ? String(d).split('T')[0] : '-');
 
@@ -48,7 +49,7 @@ export default function StudentDetailPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/student/${id}`);
+        const res = await axios.get(`${API_URL}/api/student/${id}`);
         setStudent(res.data || {});
       } catch (e) {
         console.error('❌ ดึงข้อมูลนิสิตผิดพลาด:', e);
