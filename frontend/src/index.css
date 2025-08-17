@@ -1,0 +1,36 @@
+/* index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ✅ รูปโปรไฟล์ใน Header */
+.profile-image {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+/* ✅ รูปกลมสำหรับที่ต้องการแบบกลม */
+.round-profile {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ccc;
+}
+
+/* ✅ รูปสี่เหลี่ยมขนาดคงที่ สำหรับหน้าแดชบอร์ดโปรไฟล์ */
+.square-profile {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+  display: block;
+  margin: 0 auto;
+}
+
+/* คุณสามารถเพิ่ม global style อื่นๆ ด้านล่างได้ตามต้องการ */
