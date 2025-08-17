@@ -15,7 +15,23 @@ const reportRoutes = require('./routes/reportRoutes');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      "http://localhost:3000",
+      "https://sparkling-brigadeiros-c96e49.netlify.app",
+      /\.netlify\.app$/   // ✅ allow ทุก subdomain ของ netlify.app
+    ];
+    if (!origin || allowedOrigins.some(o => 
+         o instanceof RegExp ? o.test(origin) : o === origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 app.use(express.json());
 
 // ✅ กำหนดเส้นทาง API
