@@ -2,8 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://internconnect-shq7.onrender.com",
-  withCredentials: true
+  baseURL: "https://internconnect-shq7.onrender.com"
 });
 
 export default api;
