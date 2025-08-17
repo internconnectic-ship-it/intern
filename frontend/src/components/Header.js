@@ -79,7 +79,7 @@ const Header = () => {
       <div className="flex items-center gap-4">
         <span className="flex items-center gap-2">
           <img
-            src={`${API_URL}/uploads/${student.profile_image}`}
+            src={`http://localhost:5000/uploads/${profileImage}`}
             alt="profile"
             className="profile-image"
             width="64"
