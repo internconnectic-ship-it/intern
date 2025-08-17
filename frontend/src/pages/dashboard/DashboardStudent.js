@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import api from "../../axios"; // ✅ ใช้ api แทน axios
 import Header from '../../components/Header';
 import { useNavigate } from 'react-router-dom';
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const DashboardStudent = () => {
   const [jobs, setJobs] = useState([]);
@@ -97,10 +98,11 @@ const DashboardStudent = () => {
               className="bg-white border border-[#E6F0FF] rounded-2xl shadow-sm p-5 flex gap-4 items-start hover:shadow-md transition"
             >
               <img
-                src={img(job.company_logo)}
+                src={`${API_URL}/uploads/${job.company_logo}`}
                 alt="logo"
                 className="w-20 h-20 object-cover rounded-2xl border border-[#E6F0FF] bg-white"
               />
+
 
               <div className="flex-1 space-y-1 text-[#130347]">
                 <h3 className="text-lg font-bold">{job.company_name}</h3>
