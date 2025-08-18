@@ -77,9 +77,10 @@ router.post('/profile', async (req, res) => {
       `INSERT INTO student (
         student_id, student_name, email, phone_number, major, faculty, university,
         gender, year_level, gpa, birth_date, age, special_skills, profile_image,
-        intern_start_date, intern_end_date, password)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        intern_start_date, intern_end_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE 
+        student_id = VAALUES(student_id),
         student_name = VALUES(student_name),
         email = VALUES(email),
         phone_number = VALUES(phone_number),
@@ -99,8 +100,7 @@ router.post('/profile', async (req, res) => {
       [
         student_id, student_name, email, phone_number, major, faculty, university,
         gender, year_level, gpa, birth_date, age, special_skills, profile_image,
-        intern_start_date, intern_end_date,
-        "default123" // 👈 ใส่ password ค่า default ไปก่อน (ถ้าไม่กรอก)
+        intern_start_date, intern_end_date
       ]
     );
       return res.json({ message: '✅ เพิ่มข้อมูลนิสิตเรียบร้อยแล้ว' });
