@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import api from "../../axios";
 import Header from '../../components/Header';
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const PlaceholderLogo = ({ name }) => {
   const initials = (name || '?')
@@ -127,7 +128,8 @@ const DashboardAdminCompanies = () => {
                 <div className="flex items-start gap-4">
                   {company.company_logo ? (
                     <img
-                      src={`api/uploads/${company.company_logo}`}
+                      //src={`${API_URL}/uploads/${job.company_logo}`}
+                      src={`${API_URL}/uploads/${company.company_logo}`}
                       alt="Logo"
                       className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-2xl border border-[#E6F0FF] bg-white"
                     />
