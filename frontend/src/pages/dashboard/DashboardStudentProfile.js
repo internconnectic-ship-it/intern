@@ -64,9 +64,9 @@ const DashboardStudentProfile = () => {
     // 📸 Upload รูป
     let profileImageFilename = student.profile_image;
     if (selectedFile) {
+      const formData = new FormData();
+      formData.append('image', selectedFile);
       try {
-        const formData = new FormData();
-        formData.append('image', selectedFile);
         const res = await axios.post(`${API_URL}/api/upload/profile-image`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
