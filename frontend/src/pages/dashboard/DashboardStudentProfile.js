@@ -79,7 +79,18 @@ const DashboardStudentProfile = () => {
 
     // 💾 Update ข้อมูล
     try {
-      const updated = { ...student, profile_image: profileImageFilename };
+      // ✅ ฟังก์ชันช่วย format date
+      const formatDate = (dateStr) => {
+        if (!dateStr) return null;
+        return dateStr.split('T')[0]; // เหลือ YYYY-MM-DD
+      };
+
+      const updated = { ...student, profile_image: profileImageFilename,
+        profile_image: profileImageFilename,
+        birth_date: formatDate(student.birth_date),          // ✅ แปลงวันเกิด
+        intern_start_date: formatDate(student.intern_start_date), // ✅ แปลงวันเริ่ม
+        intern_end_date: formatDate(student.intern_end_date)
+       };
       console.log("📤 ส่งข้อมูลอัปเดต:", updated);
       await axios.put(`${API_URL}/api/student/${studentId}`, updated);
       localStorage.setItem('profile_image', profileImageFilename || '');
