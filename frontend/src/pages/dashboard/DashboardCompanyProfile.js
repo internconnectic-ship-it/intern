@@ -110,7 +110,41 @@ const DashboardCompanyProfile = () => {
             </div>
           </div>
 
-          {/* ...ฟอร์มเหมือนเดิม... */}
+          {/* ฟอร์มข้อมูล */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium">รหัส</label>
+              <input disabled name="company_id" value={company.company_id} className="w-full border rounded px-3 py-2 bg-gray-100" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium">ชื่อ</label>
+              <input name="company_name" value={company.company_name} onChange={handleChange} className="w-full border rounded px-3 py-2" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium">ประเภทธุรกิจ</label>
+              <input name="business_type" value={company.business_type} onChange={handleChange} className="w-full border rounded px-3 py-2" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium">เว็บไซต์</label>
+              <input name="website" value={company.website} onChange={handleChange} className="w-full border rounded px-3 py-2" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium">อีเมลผู้ติดต่อ</label>
+              <input name="contact_email" value={company.contact_email} onChange={handleChange} className="w-full border rounded px-3 py-2" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium">ชื่อผู้ติดต่อ</label>
+              <input name="contact_name" value={company.contact_name} onChange={handleChange} className="w-full border rounded px-3 py-2" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium">เบอร์โทรศัพท์</label>
+              <input name="phone_number" value={company.phone_number} onChange={handleChange} className="w-full border rounded px-3 py-2" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium">ที่อยู่</label>
+              <textarea name="address" value={company.address} onChange={handleChange} rows="3" className="w-full border rounded px-3 py-2" />
+            </div>
+          </div>
 
           <button
             onClick={handleSave}
