@@ -132,10 +132,10 @@ router.get('/confirmed-students', async (req, res) => {
 
 // ✅ บันทึกการเลือกอาจารย์นิเทศลงตาราง supervisor_selection
 router.post('/assign-instructor', async (req, res) => {
-  const { student_id, instructor_id } = req.body;
+  const { student_id, supervisor_id } = req.body;
 
-  if (!student_id || !instructor_id) {
-    return res.status(400).json({ message: 'กรุณาระบุ student_id และ instructor_id' });
+  if (!student_id || !supervisor_id) {
+    return res.status(400).json({ message: 'กรุณาระบุ student_id และ supervisor_id' });
   }
 
   const selection_id = 'S' + Date.now();
@@ -152,14 +152,15 @@ router.post('/assign-instructor', async (req, res) => {
         `UPDATE supervisor_selection 
          SET supervisor_id = ?, selection_date = ? 
          WHERE student_id = ?`,
-        [instructor_id, today, student_id]
+        [supervisor_id, today, student_id]
       );
     } else {
       await db.promise().query(
         `INSERT INTO supervisor_selection 
          (selection_id, student_id, supervisor_id, selection_date)
          VALUES (?, ?, ?, ?)`,
-        [selection_id, student_id, instructor_id, today]
+
+        [selection_id, student_id, supervisor_id, today]
       );
     }
 
@@ -169,6 +170,7 @@ router.post('/assign-instructor', async (req, res) => {
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล' });
   }
 });
+
 
 // ✅ ดึงข้อมูลอาจารย์ประจำวิชา
 router.get('/:id', async (req, res) => {

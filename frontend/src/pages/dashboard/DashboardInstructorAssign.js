@@ -36,8 +36,9 @@ const DashboardInstructorAssign = () => {
     try {
       await api.post('/api/instructor/assign-instructor', {
         student_id: studentId,
-        instructor_id: instructorId,
+        supervisor_id: instructorId,  // 👈 ส่งเป็น supervisor_id
       });
+
       console.log("✅ จับคู่ supervisor สำเร็จ");
       fetchStudents();
     } catch (err) {
