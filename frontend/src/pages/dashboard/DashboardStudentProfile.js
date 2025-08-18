@@ -80,6 +80,7 @@ const DashboardStudentProfile = () => {
     // 💾 Update ข้อมูล
     try {
       const updated = { ...student, profile_image: profileImageFilename };
+      console.log("📤 ส่งข้อมูลอัปเดต:", updated);
       await axios.put(`${API_URL}/api/student/${studentId}`, updated);
       localStorage.setItem('profile_image', profileImageFilename || '');
       localStorage.setItem('name', updated.student_name || '');

@@ -154,28 +154,28 @@ router.get('/status/history/:studentId', async (req, res) => {
 });
 
 // ✅ ดึงนิสิตที่จับคู่กับอาจารย์นิเทศ พร้อมชื่อบริษัท จังหวัด
-// router.get('/by-supervisor/:supervisor_id', async (req, res) => {
-//   const { supervisor_id } = req.params;
+router.get('/by-supervisor/:supervisor_id', async (req, res) => {
+  const { supervisor_id } = req.params;
 
-//   try {
-//     const [rows] = await db.promise().query(`
-//       SELECT 
-//         s.student_id, s.student_name, s.age, s.gender, s.phone_number,
-//         s.email, s.university, s.gpa, s.profile_image,
-//         c.company_name,
-//         c.province
-//       FROM supervisor_selection ss
-//       JOIN student s ON ss.student_id = s.student_id
-//       LEFT JOIN company c ON s.current_company_id = c.company_id
-//       WHERE ss.supervisor_id = ?
-//     `, [supervisor_id]);
+  try {
+    const [rows] = await db.promise().query(`
+      SELECT 
+        s.student_id, s.student_name, s.age, s.gender, s.phone_number,
+        s.email, s.university, s.gpa, s.profile_image,
+        c.company_name,
+        c.province
+      FROM supervisor_selection ss
+      JOIN student s ON ss.student_id = s.student_id
+      LEFT JOIN company c ON s.current_company_id = c.company_id
+      WHERE ss.supervisor_id = ?
+    `, [supervisor_id]);
 
-//     res.json(rows);
-//   } catch (err) {
-//     console.error("❌ ดึงนิสิตในความดูแลล้มเหลว:", err);
-//     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูลนิสิต' });
-//   }
-// });
+    res.json(rows);
+  } catch (err) {
+    console.error("❌ ดึงนิสิตในความดูแลล้มเหลว:", err);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูลนิสิต' });
+  }
+});
 
 
 module.exports = router;
