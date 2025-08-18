@@ -127,7 +127,7 @@ const DashboardAdminCompanies = () => {
                 <div className="flex items-start gap-4">
                   {company.company_logo ? (
                     <img
-                      src={`pai/uploads/${company.company_logo}`}
+                      src={`api/uploads/${company.company_logo}`}
                       alt="Logo"
                       className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-2xl border border-[#E6F0FF] bg-white"
                     />
