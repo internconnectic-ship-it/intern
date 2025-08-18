@@ -66,8 +66,7 @@ router.post('/confirm', async (req, res) => {
         startDate,
         endDate,
         job.compensation,
-        job.job_description,
-        0
+        job.job_description
       ]
     );
 
