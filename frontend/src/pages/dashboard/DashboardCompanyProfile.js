@@ -146,6 +146,34 @@ const DashboardCompanyProfile = () => {
             </div>
           </div>
 
+          <div className="mt-4">
+            <label className="block text-sm font-medium">Google Maps Embed Link</label>
+            <label className="block font-medium text-sm text-gray-500">( กดปุ่ม "แชร์" → เลือก "ฝังแผนที่" และคัดลอกลิงก์ที่อยู่ใน iframe src="..." )</label>
+            <input
+              name="google_maps_link"
+              value={company.google_maps_link || ''}
+              onChange={handleChange}
+              placeholder="https://www.google.com/maps/embed?pb=..."
+              className="w-full border rounded px-3 py-2"
+            />
+            {mapLinkError && (
+              <p className="text-red-600 text-sm mt-1">{mapLinkError}</p>
+            )}
+          </div>
+
+          {company.google_maps_link && company.google_maps_link.startsWith('https://www.google.com/maps/embed') && (
+            <iframe
+              src={company.google_maps_link}
+              width="100%"
+              height="250"
+              style={{ border: 0, borderRadius: '10px' }}
+              allowFullScreen
+              loading="lazy"
+              title="Google Map"
+              className="mt-4"
+            ></iframe>
+          )}
+
           <button
             onClick={handleSave}
             className="w-full mt-6 py-2 rounded text-white bg-[#225EC4] hover:bg-[#063D8C]"
