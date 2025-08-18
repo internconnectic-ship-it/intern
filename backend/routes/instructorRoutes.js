@@ -134,6 +134,7 @@ router.get('/confirmed-students', async (req, res) => {
 router.post('/assign-instructor', async (req, res) => {
   const { student_id, supervisor_id } = req.body;
 
+  console.log("📩 assign-instructor req.body:", req.body);
   if (!student_id || !supervisor_id) {
     return res.status(400).json({ message: 'กรุณาระบุ student_id และ supervisor_id' });
   }
