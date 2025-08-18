@@ -76,10 +76,11 @@ router.post('/profile', async (req, res) => {
       await db.promise().query(
         `INSERT INTO student (
           student_id, student_name, email, phone_number, major, faculty, university,
-          gender, year_level, gpa, birth_date, age, special_skills, profile_image, password,
+          gender, year_level, gpa, birth_date, age, special_skills, profile_image,
           intern_start_date, intern_end_date
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE 
+          student_id = VALUES(student_id),
           student_name = VALUES(student_name),
           email = VALUES(email),
           phone_number = VALUES(phone_number),
