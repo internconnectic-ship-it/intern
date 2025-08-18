@@ -72,37 +72,36 @@ router.post('/profile', async (req, res) => {
       );
       return res.json({ message: '✅ อัปเดตข้อมูลเรียบร้อยแล้ว (จาก /profile)' });
     } else {
-      // ➕ INSERT (แก้ไขให้ตรงกับตาราง)
-    await db.promise().query(
-      `INSERT INTO student (
-        student_id, student_name, email, phone_number, major, faculty, university,
-        gender, year_level, gpa, birth_date, age, special_skills, profile_image,
-        intern_start_date, intern_end_date)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE 
-        student_id = VAALUES(student_id),
-        student_name = VALUES(student_name),
-        email = VALUES(email),
-        phone_number = VALUES(phone_number),
-        major = VALUES(major),
-        faculty = VALUES(faculty),
-        university = VALUES(university),
-        gender = VALUES(gender),
-        year_level = VALUES(year_level),
-        gpa = VALUES(gpa),
-        birth_date = VALUES(birth_date),
-        age = VALUES(age),
-        special_skills = VALUES(special_skills),
-        profile_image = VALUES(profile_image),
-        intern_start_date = VALUES(intern_start_date),
-        intern_end_date = VALUES(intern_end_date)
-      `,
-      [
-        student_id, student_name, email, phone_number, major, faculty, university,
-        gender, year_level, gpa, birth_date, age, special_skills, profile_image,
-        intern_start_date, intern_end_date
-      ]
-    );
+      // ➕ INSERT
+      await db.promise().query(
+        `INSERT INTO student (
+          student_id, student_name, email, phone_number, major, faculty, university,
+          gender, year_level, gpa, birth_date, age, special_skills, profile_image, password,
+          intern_start_date, intern_end_date
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE 
+          student_name = VALUES(student_name),
+          email = VALUES(email),
+          phone_number = VALUES(phone_number),
+          major = VALUES(major),
+          faculty = VALUES(faculty),
+          university = VALUES(university),
+          gender = VALUES(gender),
+          year_level = VALUES(year_level),
+          gpa = VALUES(gpa),
+          birth_date = VALUES(birth_date),
+          age = VALUES(age),
+          special_skills = VALUES(special_skills),
+          profile_image = VALUES(profile_image),
+          intern_start_date = VALUES(intern_start_date),
+          intern_end_date = VALUES(intern_end_date)
+        `,
+        [
+          student_id, student_name, email, phone_number, major, faculty, university,
+          gender, year_level, gpa, birth_date, age, special_skills, profile_image, '',
+          intern_start_date, intern_end_date
+        ]
+      );
       return res.json({ message: '✅ เพิ่มข้อมูลนิสิตเรียบร้อยแล้ว' });
     }
 
