@@ -1,7 +1,8 @@
 // src/pages/student/DashboardStudentStatus.js
 import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header';
-import api from "../../axios";  // ✅ ใช้ axios instance ที่เราตั้ง baseURL ไว้
+import api from "../../axios";
+// ✅ ใช้ axios instance ที่เราตั้ง baseURL ไว้
 import { useNavigate } from 'react-router-dom';
 
 const DashboardStudentStatus = () => {
@@ -56,7 +57,7 @@ const DashboardStudentStatus = () => {
 
   const handleConfirm = async (jobId) => {
     try {
-      await axios.post('/api/internship/confirm', {
+      await api.post('/api/internship/confirm', {
         student_id: studentId,
         job_posting_id: jobId,
       });
