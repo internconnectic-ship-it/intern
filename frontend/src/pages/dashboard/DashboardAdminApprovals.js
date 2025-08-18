@@ -131,8 +131,8 @@ const DashboardAdminApprovals = () => {
                     </p>
                     <div className="mt-1 text-sm space-y-0.5">
                       <p><strong className="text-[#465d71]">อีเมล:</strong> {company.email}</p>
-                      <p><strong className="text-[#465d71]">ประเภท:</strong> {company.business_type || 'ไม่ระบุ'}</p>
-                      <p><strong className="text-[#465d71]">ที่อยู่:</strong> {company.address || 'ไม่ระบุ'}</p>
+                      {/* <p><strong className="text-[#465d71]">ประเภท:</strong> {company.business_type || 'ไม่ระบุ'}</p>
+                      <p><strong className="text-[#465d71]">ที่อยู่:</strong> {company.address || 'ไม่ระบุ'}</p> */}
                     </div>
                   </div>
                 </div>
