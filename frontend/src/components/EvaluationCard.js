@@ -60,13 +60,11 @@ const EvaluationCard = ({ student = {} }) => {
     navigate(`/student-detail/${student_id}`);
   };
 
-  const imgSrc = `${API_URL}uploads/${profile_image || 'default.jpg'}`;
-
   return (
     <div className="bg-white rounded-xl shadow-lg border border-blue-200 p-5 mb-5 flex flex-col md:flex-row md:items-center gap-6 text-black">
       <div className="flex gap-5 items-start">
         <img
-          src={imgSrc}
+          src={`${API_URL}uploads/${profileImage || 'default.jpg'}`}
           alt="profile"
           className="w-24 h-24 rounded-full object-cover border-4 border-indigo-300"
         />
