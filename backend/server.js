@@ -14,6 +14,15 @@ const reportRoutes = require('./routes/reportRoutes');
 
 require('dotenv').config();
 
+console.log("📌 ENV Check:", {
+  DB_HOST: process.env.DB_HOST,
+  DB_PORT: process.env.DB_PORT,
+  DB_USER: process.env.DB_USER,
+  DB_PASSWORD: process.env.DB_PASSWORD ? "****" : "MISSING",
+  DB_NAME: process.env.DB_NAME
+});
+
+
 const app = express();
 app.use(cors({
   origin: (origin, callback) => {
