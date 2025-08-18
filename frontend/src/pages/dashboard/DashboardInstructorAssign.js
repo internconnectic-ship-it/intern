@@ -16,6 +16,7 @@ const DashboardInstructorAssign = () => {
   const fetchStudents = async () => {
     try {
       const res = await api.get('/api/instructor/confirmed-students');
+      const sorted = res.data.sort((a, b) => b.student_id.localeCompare(a.student_id));
       setStudents(res.data);
     } catch (err) {
       console.error("❌ ดึงข้อมูลนิสิตล้มเหลว:", err);
