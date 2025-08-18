@@ -156,9 +156,10 @@ router.put('/:id', async (req, res) => {
     );
     res.json({ message: '✅ อัปเดตข้อมูลเรียบร้อยแล้ว' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูลนิสิต' });
-  }
+  console.error("❌ SQL Error:", err.sqlMessage); // บอกว่า fail เพราะอะไร
+  console.error("❌ Full Error:", err);           // log เต็ม
+  res.status(500).json({ message: "เกิดข้อผิดพลาด" });
+}
 });
 
 module.exports = router;
