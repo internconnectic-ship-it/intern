@@ -62,7 +62,7 @@ const RegisterPage = () => {
       {/* ซ้าย: โลโก้ใหญ่บนพื้นฟ้า (เข้าชุด Login) */}
       <div className="flex items-center justify-center bg-[#9ae5f2]">
         <img
-          src="/uploads/InternConnectLogo2.png"
+          src="InternConnectLogo2.png"
           alt="InternConnect"
           className="w-[360px] h-[360px] object-contain drop-shadow-lg"
         />
