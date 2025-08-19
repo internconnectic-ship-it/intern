@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import api from "../../axios";  // ✅ ใช้ axios instance แทน
 import Header from '../../components/Header';
 import { useNavigate } from 'react-router-dom';
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const PlaceholderAvatar = ({ name }) => {
   const initials = (name || '?')
@@ -106,7 +107,7 @@ const DashboardSupervisorEvaluation = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {students.map((s) => {
               const hasImage = !!s.profile_image;
-              const imgSrc = hasImage ? `http://localhost:5000/uploads/${s.profile_image}` : '';
+              const imgSrc = hasImage ? `${API_URL}/uploads/${s.profile_image}` : '';
 
               return (
                 <div
