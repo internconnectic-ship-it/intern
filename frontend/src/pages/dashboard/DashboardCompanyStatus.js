@@ -6,7 +6,7 @@ import Header from '../../components/Header';
 
 const DashboardCompanyStatus = () => {
   const [applications, setApplications] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const company_id = localStorage.getItem('companyId');
 
