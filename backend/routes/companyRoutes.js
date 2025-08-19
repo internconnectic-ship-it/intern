@@ -20,30 +20,43 @@ router.get('/:id', async (req, res) => {
 });
 
 // 📌 PUT: อัปเดตข้อมูลบริษัท (พร้อมอัปโหลดรูป)
-router.put('/:id', upload.single('profile_image'), async (req, res) => {
+router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const {
-    company_name, business_type, address, google_maps_link,
-    contact_email, contact_name, phone_number, website
+    company_name,
+    business_type,
+    website,
+    contact_email,
+    contact_name,
+    phone_number,
+    address,
+    google_maps_link,
+    company_logo
   } = req.body;
-
-  const profileImageUrl = req.file ? req.file.path : req.body.profile_image;
 
   try {
     await db.promise().query(
-      `UPDATE company SET
-        company_name = ?, business_type = ?, address = ?, google_maps_link = ?, 
-        contact_email = ?, contact_name = ?, phone_number = ?, website = ?, 
-        profile_image = ?, last_updated = NOW()
+      `UPDATE company SET 
+        company_name = ?, 
+        business_type = ?, 
+        website = ?, 
+        contact_email = ?, 
+        contact_name = ?, 
+        phone_number = ?, 
+        address = ?, 
+        google_maps_link = ?, 
+        company_logo = ? 
       WHERE company_id = ?`,
-      [company_name, business_type, address, google_maps_link,
-       contact_email, contact_name, phone_number, website,
-       profileImageUrl, id]
+      [company_name, business_type, website, contact_email, contact_name,
+       phone_number, address, google_maps_link, company_logo, id]
     );
-    res.json({ message: '✅ อัปเดตข้อมูลบริษัทเรียบร้อยแล้ว', profile_image: profileImageUrl });
+
+    res.json({ message: "✅ ข้อมูลบริษัทอัปเดตเรียบร้อย" });
   } catch (err) {
-    res.status(500).json({ message: '❌ ไม่สามารถอัปเดตข้อมูลบริษัทได้', error: err.sqlMessage });
+    console.error("❌ Update failed:", err);
+    res.status(500).json({ message: "Update failed" });
   }
 });
+
 
 module.exports = router;

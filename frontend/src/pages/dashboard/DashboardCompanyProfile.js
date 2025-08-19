@@ -77,8 +77,9 @@ const DashboardCompanyProfile = () => {
         const formData = new FormData();
         formData.append('image', selectedFile);
         const res = await api.post(`${API_URL}/api/upload/profile-image`, formData);
-        logoFilename = res.data.path;
+        logoFilename = res.data.url;  // ✅ ใช้ URL จาก Cloudinary
       }
+
       const updatedCompany = { ...company, company_logo: logoFilename };
       await api.put(`${API_URL}/api/company/${companyId}`, updatedCompany);
       localStorage.setItem('company_logo', logoFilename);
