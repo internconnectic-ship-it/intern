@@ -84,7 +84,7 @@ const fetchSupervisors = async () => {
 
             {/* รูปนิสิต (ซ้ายบน) */}
             <img
-              src={`${API_URL}/uploads/${student.profile_image || 'default-profile.png'}`}
+              src={`${API_URL}/uploads/profile/${student.profile_image || 'default-profile.png'}`}
               alt={student.student_name}
               className="w-24 h-24 object-cover rounded-full border-4 border-[#9AE5F2] shadow"
             />

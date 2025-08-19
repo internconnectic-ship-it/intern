@@ -49,7 +49,7 @@ const DashboardCompanyEvaluation = () => {
               <img
                 src={
                   student.profile_image
-                    ? `${process.env.REACT_APP_API_URL}/uploads/${student.profile_image}`
+                    ? `${process.env.REACT_APP_API_URL}/uploads/profile/${student.profile_image}`
                     : `${process.env.REACT_APP_API_URL}/uploads/default.jpg`
                 }
                 alt={student.student_name}

@@ -21,7 +21,7 @@ const ForgotPassword = () => {
       {/* ซ้าย: โลโก้ใหญ่ พื้นฟ้าพาสเทล */}
       <div className="flex items-center justify-center bg-[#9ae5f2]">
         <img
-          src="/uploads/InternConnectLogo2.png"
+          src="/InternConnectLogo2.png"
           alt="InternConnect"
           className="w-[340px] h-[340px] object-contain drop-shadow-lg"
         />

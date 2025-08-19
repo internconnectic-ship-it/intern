@@ -101,7 +101,8 @@ const DashboardSupervisor = () => {
             {students.map((s) => {
               const hasImage = !!s.profile_image;
               const imgSrc = hasImage
-                ? `${API_URL}/uploads/${s.profile_image}`
+                ? `${API_URL}/uploads/profile/${s.profile_image}`
+                
                 : '';
 
               return (

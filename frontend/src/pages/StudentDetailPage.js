@@ -9,7 +9,7 @@ const buildImageUrl = (val) => {
   if (!val) return null;
   if (/^https?:\/\//i.test(val)) return val;
   const file = String(val).split(/[/\\]/).pop();
-  return `${API_URL}/uploads/${encodeURIComponent(file)}`;
+  return `${API_URL}/uploads/profile/${encodeURIComponent(file)}`;
 };
 const fmt = (d) => (d ? String(d).split('T')[0] : '-');
 
