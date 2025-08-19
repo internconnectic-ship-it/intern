@@ -15,7 +15,7 @@ const DashboardStudent = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await api.get('http://localhost:5000/api/job_posting');
+        const res = await api.get('/api/job_posting');
         setJobs(res.data);
         setFilteredJobs(res.data);
       } catch (err) {
