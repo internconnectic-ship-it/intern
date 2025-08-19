@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import api from "../../axios"; // ✅ ใช้ instance แทน axios ตรง ๆ
 import Header from '../../components/Header';
 import { useNavigate } from 'react-router-dom';
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 
 const DashboardStudent = () => {
   const [jobs, setJobs] = useState([]);
@@ -37,7 +39,7 @@ const DashboardStudent = () => {
 
   const handleViewMore = (id) => navigate(`/job-detail/${id}`);
 
-  const img = (logo) => `http://localhost:5000/uploads/${logo || 'default.png'}`;
+  const img = (logo) => `${API_URL}/uploads/${logo || 'default.png'}`;
 
   return (
     <div className="min-h-screen bg-[#9AE5F2]">
