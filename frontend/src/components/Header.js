@@ -17,34 +17,38 @@ const Header = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (role && userId) {
-      axios.get(`${API_URL}/api/${role}/${userId}`)
-        .then(res => {
-          const data = res.data;
+  if (role && userId) {
+    axios.get(`${API_URL}/api/${role}/${userId}`)
+      .then(res => {
+        const data = res.data;
 
-          // ✅ ดึงรูปภาพ
-          const image =
-            role === "company" ? data.company_logo :
-            data.profile_image;
+        // ✅ เลือกรูป
+        let image =
+          role === "company" ? data.company_logo : data.profile_image;
 
-          // ✅ ดึงชื่อ
-          const name =
-            role === "company" ? data.company_name :
-            role === "student" ? data.student_name :
-            role === "instructor" ? data.Instructor_name :
-            role === "supervisor" ? data.supervisor_name :
-            role === "admin" ? data.admin_name :
-            "ผู้ใช้";
+        // ถ้าไม่ใช่ company → รูปจะอยู่ใน uploads/profile
+        if (image && role !== "company") {
+          image = `profile/${image}`;
+        }
 
-          setProfileImage(image || "default-profile.png");
-          setUserName(name || "ผู้ใช้");
-        })
-        .catch(err => {
-          console.error("โหลดข้อมูลผู้ใช้ล้มเหลว:", err);
-          setProfileImage("default-profile.png");
-        });
-    }
-  }, [role, userId]);
+        // ✅ เลือกชื่อ
+        const name =
+          role === "company" ? data.company_name :
+          role === "student" ? data.student_name :
+          role === "instructor" ? data.Instructor_name :
+          role === "supervisor" ? data.supervisor_name :
+          role === "admin" ? data.admin_name :
+          "ผู้ใช้";
+
+        setProfileImage(image || "default-profile.png");
+        setUserName(name || "ผู้ใช้");
+      })
+      .catch(err => {
+        console.error("โหลดข้อมูลผู้ใช้ล้มเหลว:", err);
+        setProfileImage("default-profile.png");
+      });
+  }
+}, [role, userId]);
 
   const handleLogout = () => {
     localStorage.clear();
