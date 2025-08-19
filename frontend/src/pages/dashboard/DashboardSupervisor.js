@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import api from "../../axios"; // ✅ ใช้ axios instance แทน axios ตรงๆ
 import Header from '../../components/Header';
 import { useNavigate } from 'react-router-dom';
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 /** Avatar ตัวอักษรย่อ */
 const PlaceholderAvatar = ({ name }) => {
@@ -100,7 +101,7 @@ const DashboardSupervisor = () => {
             {students.map((s) => {
               const hasImage = !!s.profile_image;
               const imgSrc = hasImage
-                ? `http://localhost:5000/uploads/${s.profile_image}`
+                ? `${API_URL}/uploads/${s.profile_image}`
                 : '';
 
               return (
