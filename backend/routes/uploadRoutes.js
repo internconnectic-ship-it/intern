@@ -14,8 +14,9 @@ const upload = multer({ storage });
 
 // 📤 upload image
 router.post('/profile-image', upload.single('image'), (req, res) => {
-  const imagePath = `/uploads/profile/${req.file.filename}`;
-  res.json({ url: imagePath });
+  const imageUrl = `${req.protocol}://${req.get('host')}/uploads/profile/${req.file.filename}`;
+  res.json({ url: imageUrl, filename: req.file.filename });
 });
+
 
 module.exports = router;

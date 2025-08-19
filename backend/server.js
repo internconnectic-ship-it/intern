@@ -1,6 +1,7 @@
 // backend/server.js
 const express = require('express');
 const cors = require('cors');
+const path = require('path'); // ✅ ต้องมี
 const authRoutes = require('./routes/authRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const companyRoutes = require('./routes/companyRoutes');
@@ -28,10 +29,11 @@ app.use('/api/supervisor', supervisorRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/job_posting', jobPostRoutes); 
-app.use('/uploads', express.static('uploads')); 
 app.use('/api/internship', internshipRoutes);
 app.use('/api/evaluation', evaluationRoutes);
 app.use('/api/reports', reportRoutes);
+
+// ✅ เส้นทางไฟล์ static (สำหรับรูป/ไฟล์ upload)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 📌 log เวลา mount route change-password
