@@ -49,20 +49,19 @@ const DashboardInstructorProfile = () => {
     // --- upload image ---
   let profileImageFilename = instructor.profile_image;
   if (selectedFile) {
-    try {
-      const formData = new FormData();
-      formData.append("image", selectedFile);
-      const res = await api.post(
-        `${API_URL}/api/upload/profile-image`,
-        formData
-      );
-      // ✅ ได้แค่ชื่อไฟล์ เช่น "1724052093221.png"
-      profileImageFilename = res.data.filename;
-    } catch (err) {
-      console.error("❌ อัปโหลดรูปภาพล้มเหลว", err);
-      return alert("เกิดข้อผิดพลาดในการอัปโหลดรูป");
+      try {
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+        const res = await api.post(
+          "/api/upload/profile-image",
+          formData
+        );
+        profileImageFilename = res.data.url;
+      } catch (err) {
+        console.error("❌ อัปโหลดรูปภาพล้มเหลว", err);
+        return alert("เกิดข้อผิดพลาดในการอัปโหลดรูป");
+      }
     }
-  }
 
 
     try {

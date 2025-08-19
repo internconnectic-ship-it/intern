@@ -5,17 +5,20 @@ const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const path = require('path');
 
-// 📂 ตั้งค่า multer สำหรับเก็บรูปโปรไฟล์
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/profile");
+// ✅ Cloudinary
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const multer = require('multer');
+
+// ✅ ใช้ multer-storage-cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'internconnect/profile', // 📂 โฟลเดอร์เก็บไฟล์ใน Cloudinary
+    allowed_formats: ['jpg', 'png', 'jpeg'],
   },
-  filename: (req, file, cb) => {
-      cb(null, Date.now() + path.extname(file.originalname));
-    }
 });
 const upload = multer({ storage });
-
 /* =======================================================
    1) อนุมัติผู้ใช้งานที่มี role = company
 ======================================================= */
@@ -87,7 +90,7 @@ router.put('/:id', upload.single("profile_image"), async (req, res) => {
   const { admin_name, email, phone_number } = req.body;
 
   // ถ้ามีการอัปโหลดไฟล์ใหม่ ใช้ชื่อไฟล์จาก multer
-  const profileImage = req.file ? req.file.filename : req.body.profile_image;
+  const profileImage = req.file ? req.file.path : req.body.profile_image;
 
   try {
     const [result] = await db.promise().query(
