@@ -77,7 +77,7 @@ const DashboardCompanyProfile = () => {
         const formData = new FormData();
         formData.append('image', selectedFile);
         const res = await api.post(`${API_URL}/api/upload/profile-image`, formData);
-        logoFilename = res.data.filename;
+        logoFilename = res.data.path;
       }
       const updatedCompany = { ...company, company_logo: logoFilename };
       await api.put(`${API_URL}/api/company/${companyId}`, updatedCompany);
