@@ -30,9 +30,14 @@ router.put('/:id', async (req, res) => {
   } = req.body;
 
   try {
+    console.log("📸 profile_image ที่ได้รับ:", profile_image);
+
     const birthDate = formatDate(birth_date);
     const startDate = formatDate(intern_start_date);
     const endDate = formatDate(intern_end_date);
+
+    // 👉 ถ้าไม่มี profile_image ให้เก็บเป็น null
+    const imageToSave = profile_image ? `uploads/profile/${profile_image}` : null;
 
     await db.promise().query(
       `UPDATE student SET 
@@ -43,7 +48,7 @@ router.put('/:id', async (req, res) => {
       [
         student_name, email, phone_number, major, faculty, university,
         gender, year_level, gpa, birthDate, age, special_skills,
-        profile_image, startDate, endDate, id
+        imageToSave, startDate, endDate, id
       ]
     );
     res.json({ message: '✅ อัปเดตข้อมูลเรียบร้อยแล้ว' });
@@ -52,6 +57,7 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูลนิสิต' });
   }
 });
+
 
 // ✅ POST /student/profile → Insert หรือ Update อัตโนมัติ
 router.post('/profile', async (req, res) => {
