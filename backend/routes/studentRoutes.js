@@ -37,8 +37,8 @@ router.put('/:id', async (req, res) => {
     const endDate = formatDate(intern_end_date);
 
     // 👉 ถ้าไม่มี profile_image ให้เก็บเป็น null
-    const imageToSave = profile_image ? `uploads/profile/${profile_image}` : null;
-
+    const imageToSave = profile_image || null;
+    
     await db.promise().query(
       `UPDATE student SET 
         student_name = ?, email = ?, phone_number = ?, major = ?, faculty = ?, university = ?, 
