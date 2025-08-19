@@ -73,7 +73,7 @@ exports.register = async (req, res) => {
     } else if (role === 'supervisor') {
       await db.promise().query(
         `INSERT INTO supervisor (
-          supervisor_id, supervisor_name, email
+          supervisor_id, supervisor_name, emai  l
         ) VALUES (?, ?, ?)`,
 
         [id, name, email]
@@ -81,14 +81,14 @@ exports.register = async (req, res) => {
     } else if (role === 'admin') {
       await db.promise().query(
         `INSERT INTO admin (
-          admin_id, admin_name, email, role, phone_number, profile_image
-        ) VALUES (?, ?, ?, 'admin', '', '')`,
+          admin_id, admin_name, email, role
+        ) VALUES (?, ?, ?, 'admin')`,
 
         [id, name, email]
       );
     }
 
-    res.status(201).json({ message: '✅ สมัครสมาชิกสำเร็จ โปรดรอการอนุมัติจาก Admin' });
+    res.status(201).json({ message: '✅ สมัครสมาชิกสำเร็จ' });
 
   } catch (error) {
     console.error('❌ เกิดข้อผิดพลาดระหว่างการสมัคร:', error.sqlMessage || error.message);
