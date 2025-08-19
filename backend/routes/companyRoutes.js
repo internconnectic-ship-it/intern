@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-const upload = require('../middleware/uploadCloudinary');
 
 // 📌 GET: ข้อมูลบริษัท
 router.get('/:id', async (req, res) => {
