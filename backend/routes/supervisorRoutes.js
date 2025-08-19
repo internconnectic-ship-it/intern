@@ -30,10 +30,7 @@ router.put('/:id', async (req, res) => {
   } = req.body;
 
   try {
-    // ✅ ถ้า frontend ส่งมาเป็น URL ให้ตัดเอาเฉพาะชื่อไฟล์ เช่น "1692442435221.png"
-    if (profile_image && profile_image.includes('/')) {
-      profile_image = profile_image.split('/').pop();
-    }
+    // ✅ ถ้าเป็น Cloudinary เก็บ URL ทั้งหมดได้เลย (ไม่ต้องตัดชื่อไฟล์ออก)
 
     await db.promise().query(
       `UPDATE supervisor SET
@@ -49,7 +46,6 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการบันทึก' });
   }
 });
-
 
 // ✅ GET: ดึงข้อมูลอาจารย์นิเทศทั้งหมด
 router.get('/', async (req, res) => {
@@ -87,6 +83,5 @@ router.get('/students/:supervisor_id', async (req, res) => {
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูลนิสิต' });
   }
 });
-
 
 module.exports = router;
