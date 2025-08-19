@@ -1,10 +1,25 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const bcrypt = require('bcryptjs');
+const multer = require('multer');
+const path = require('path');
 
+// 📂 ตั้งค่า multer สำหรับเก็บรูปโปรไฟล์
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/profile");
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1E9);
+    cb(null, uniqueName + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage });
 
-
-// ✅ อนุมัติผู้ใช้งานที่มี role = company
+/* =======================================================
+   1) อนุมัติผู้ใช้งานที่มี role = company
+======================================================= */
 router.put('/approve-company/:companyId', async (req, res) => {
   const { companyId } = req.params;
   try {
@@ -14,7 +29,7 @@ router.put('/approve-company/:companyId', async (req, res) => {
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: 'ไม่พบบริษัทนี้ในระบบ หรือบริษัทไม่ได้อยู่ในสถานะรอการอนุมัติ' });
+      return res.status(404).json({ message: 'ไม่พบบริษัทนี้ในระบบ หรือไม่ได้อยู่ในสถานะรอการอนุมัติ' });
     }
 
     res.status(200).json({ message: '✅ อนุมัติบริษัทสำเร็จ' });
@@ -24,7 +39,9 @@ router.put('/approve-company/:companyId', async (req, res) => {
   }
 });
 
-// ✅ ลบบริษัท
+/* =======================================================
+   2) ลบบริษัท
+======================================================= */
 router.delete('/delete-company/:companyId', async (req, res) => {
   const { companyId } = req.params;
   try {
@@ -44,7 +61,9 @@ router.delete('/delete-company/:companyId', async (req, res) => {
   }
 });
 
-// ✅ ดึงข้อมูลแอดมินตาม ID
+/* =======================================================
+   3) ดึงข้อมูลแอดมินตาม ID
+======================================================= */
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -61,29 +80,36 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// ✅ อัปเดตข้อมูลแอดมินตาม ID
-router.put('/:id', async (req, res) => {
+/* =======================================================
+   4) อัปเดตข้อมูลแอดมิน + อัปโหลดรูป
+======================================================= */
+router.put('/:id', upload.single("profile_image"), async (req, res) => {
   const { id } = req.params;
-  const { admin_name, email, phone_number, profile_image } = req.body;
+  const { admin_name, email, phone_number } = req.body;
+
+  // ถ้ามีการอัปโหลดไฟล์ใหม่ ใช้ชื่อไฟล์จาก multer
+  const profileImage = req.file ? req.file.filename : req.body.profile_image;
 
   try {
     const [result] = await db.promise().query(
       `UPDATE admin SET admin_name = ?, email = ?, phone_number = ?, profile_image = ? WHERE admin_id = ?`,
-      [admin_name, email, phone_number, profile_image, id]
+      [admin_name, email, phone_number, profileImage, id]
     );
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'ไม่พบแอดมินนี้ในระบบ' });
     }
 
-    res.json({ message: '✅ อัปเดตข้อมูลแอดมินสำเร็จ' });
+    res.json({ message: '✅ อัปเดตข้อมูลแอดมินสำเร็จ', profile_image: profileImage });
   } catch (err) {
     console.error("❌ UPDATE admin error:", err);
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล' });
   }
 });
 
-
+/* =======================================================
+   5) ดึงบริษัทที่ได้รับการอนุมัติ
+======================================================= */
 router.get('/companies/approved', async (req, res) => {
   try {
     const [rows] = await db.promise().query(
@@ -97,10 +123,6 @@ router.get('/companies/approved', async (req, res) => {
       WHERE u.role = 'company' AND u.approval_status = 'approved'`
     );
 
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'ไม่มีบริษัทที่ได้รับการอนุมัติ' });
-    }
-
     res.json(rows);
   } catch (err) {
     console.error("❌ เกิดข้อผิดพลาดในการดึงข้อมูลบริษัทที่ได้รับการอนุมัติ:", err);
@@ -108,7 +130,9 @@ router.get('/companies/approved', async (req, res) => {
   }
 });
 
-// ✅ ดึงบริษัทที่รอการอนุมัติ
+/* =======================================================
+   6) ดึงบริษัทที่รอการอนุมัติ
+======================================================= */
 router.get('/companies/pending', async (req, res) => {
   try {
     const [rows] = await db.promise().query(
@@ -122,10 +146,6 @@ router.get('/companies/pending', async (req, res) => {
       WHERE u.role = 'company' AND u.approval_status = 'pending'`
     );
 
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'ไม่มีบริษัทที่รอการอนุมัติ' });
-    }
-
     res.json(rows);
   } catch (err) {
     console.error("❌ ดึงบริษัทที่รออนุมัติผิดพลาด:", err);
@@ -133,30 +153,32 @@ router.get('/companies/pending', async (req, res) => {
   }
 });
 
+/* =======================================================
+   7) สมัคร user ใหม่ (instructor/supervisor)
+======================================================= */
 router.post("/register", async (req, res) => {
   const { id, name, email, password, role } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // ✅ ใส่ข้อมูลลงตาราง users
     await db.promise().query(
       `INSERT INTO users (id, name, email, password, role, approval_status) VALUES (?, ?, ?, ?, ?, 'approved')`,
       [id, name, email, hashedPassword, role]
     );
 
-    // ✅ ถ้า role เป็น supervisor
     if (role === "supervisor") {
       await db.promise().query(
         `INSERT INTO supervisor (supervisor_id, supervisor_name, email) VALUES (?, ?, ?)`,
+
         [id, name, email]
       );
     }
 
-    // ✅ ถ้า role เป็น instructor
     if (role === "instructor") {
       await db.promise().query(
         `INSERT INTO instructor (Instructor_id, Instructor_name, email) VALUES (?, ?, ?)`,
+
         [id, name, email]
       );
     }
