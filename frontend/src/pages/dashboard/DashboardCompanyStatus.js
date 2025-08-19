@@ -38,9 +38,19 @@ const DashboardCompanyStatus = () => {
       <Header />
 
       <div className="w-[88%] mx-auto py-8">
-        <h1 className="text-2xl font-extrabold text-[#130347] mb-4">
-          สถานะการสมัครของนิสิต
-        </h1>
+        {/* หัวข้อ + ช่องค้นหา */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
+          <h1 className="text-2xl font-extrabold text-[#130347]">
+            สถานะการสมัครของนิสิต
+          </h1>
+          <input
+            type="text"
+            placeholder=" ช่องค้นหา"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-4 py-2 rounded-full w-64 border border-[#E6F0FF] bg-[#F8FBFF] text-[#130347] outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+          />
+        </div>
 
         {applications.length === 0 ? (
           <div className="bg-white border rounded-2xl p-10 text-center text-[#465d71]">
