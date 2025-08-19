@@ -22,16 +22,11 @@ const Header = () => {
       .then(res => {
         const data = res.data;
 
-        // ✅ เลือกรูป
+        // ✅ ดึงชื่อไฟล์รูป (ทุก role ใช้ uploads/profile)
         let image =
           role === "company" ? data.company_logo : data.profile_image;
 
-        // ถ้าไม่ใช่ company → รูปจะอยู่ใน uploads/profile
-        if (image && role !== "company") {
-          image = `profile/${image}`;
-        }
-
-        // ✅ เลือกชื่อ
+        // ✅ ดึงชื่อผู้ใช้
         const name =
           role === "company" ? data.company_name :
           role === "student" ? data.student_name :
@@ -49,6 +44,7 @@ const Header = () => {
       });
   }
 }, [role, userId]);
+
 
   const handleLogout = () => {
     localStorage.clear();
@@ -83,18 +79,14 @@ const Header = () => {
       <div className="flex items-center gap-4">
         <span className="flex items-center gap-2">
           <img
-            src={
-              profileImage === "default-profile.png"
-                ? `${API_URL}/uploads/profile/default-profile.png`
-                : role === "company"
-                ? `${API_URL}/uploads/company/${profileImage}`
-                : `${API_URL}/uploads/profile/${profileImage}`
-            }
+            src={`${API_URL}/uploads/profile/${profileImage}`}
             alt="profile"
-            className="profile-image"
-            width="64"
-            height="64"
-          />
+            className="w-12 h-12 rounded-full object-cover"
+            width="48"
+            height="48"
+          />  
+
+
           <span className="text-sm">{userName}</span>
         </span>
         <button
