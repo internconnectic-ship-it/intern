@@ -17,7 +17,12 @@ const changePasswordRoutes = require('./routes/changePasswordRoutes');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+ // app.use(cors());
+app.use(cors({
+  origin: "https://intern-connect160.netlify.app", // frontend domain
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 app.use(express.json());
 
 // ✅ กำหนดเส้นทาง API
