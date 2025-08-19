@@ -47,21 +47,23 @@ const DashboardInstructorProfile = () => {
     e.preventDefault();
 
     // --- upload image ---
-    let profileImageFilename = instructor.profile_image;
-    if (selectedFile) {
-      try {
-        const formData = new FormData();
-        formData.append("image", selectedFile);
-        const res = await api.post(
-          `${API_URL}/api/upload/profile-image`,
-          formData
-        );
-        profileImageFilename = res.data.filename;
-      } catch (err) {
-        console.error("❌ อัปโหลดรูปภาพล้มเหลว", err);
-        return alert("เกิดข้อผิดพลาดในการอัปโหลดรูป");
-      }
+  let profileImageFilename = instructor.profile_image;
+  if (selectedFile) {
+    try {
+      const formData = new FormData();
+      formData.append("image", selectedFile);
+      const res = await api.post(
+        `${API_URL}/api/upload/profile-image`,
+        formData
+      );
+      // ✅ ได้แค่ชื่อไฟล์ เช่น "1724052093221.png"
+      profileImageFilename = res.data.filename;
+    } catch (err) {
+      console.error("❌ อัปโหลดรูปภาพล้มเหลว", err);
+      return alert("เกิดข้อผิดพลาดในการอัปโหลดรูป");
     }
+  }
+
 
     try {
       // --- save profile ---
@@ -130,7 +132,7 @@ const DashboardInstructorProfile = () => {
             <div className="w-24 h-24 rounded-full overflow-hidden ring-2 ring-[#E6F0FF] bg-[#F8FBFF]">
               {instructor.profile_image ? (
                 <img
-                  src={`${API_URL}/uploads/${instructor.profile_image}`}
+                  src={`${API_URL}/uploads/profile/${instructor.profile_image}`}
                   alt="รูปโปรไฟล์"
                   className="w-full h-full object-cover"
                 />
