@@ -86,7 +86,7 @@ const DashboardStudentProfile = () => {
           "/api/upload/profile-image",
           formData
         );
-        profileImageFilename = res.data.filename;
+        profileImageFilename = res.data.url;
       } catch (err) {
         console.error("❌ อัปโหลดรูปภาพล้มเหลว", err);
         return alert("เกิดข้อผิดพลาดในการอัปโหลดรูป");
