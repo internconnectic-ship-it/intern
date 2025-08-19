@@ -6,7 +6,7 @@ const db = require('../db');
 /* =======================================================
    1) อัปเดตข้อมูลอาจารย์ประจำวิชา
 ======================================================= */
-router.put('/:id', async (req, res) => {
+router.put('/:id', upload.single('profile_image'), async (req, res) => {
   const { id } = req.params;
   const {
     Instructor_name,
@@ -14,9 +14,11 @@ router.put('/:id', async (req, res) => {
     phone_number,
     department,
     faculty,
-    position,
-    profile_image
+    position
   } = req.body;
+
+  // ถ้ามีไฟล์ → เก็บ URL จาก Cloudinary, ถ้าไม่มี → ใช้ค่าที่ส่งมา
+  const profile_image = req.file ? req.file.path : req.body.profile_image;
 
   try {
     await db.promise().query(
@@ -44,7 +46,7 @@ router.put('/:id', async (req, res) => {
 router.get('/students', async (req, res) => {
   try {
     const [rows] = await db.promise().query(
-      `SELECT student_id, student_name, email FROM student`
+      `SELECT student_id, student_name, email, profile_image FROM student`
     );
     res.json(rows);
   } catch (err) {
@@ -59,7 +61,7 @@ router.get('/students', async (req, res) => {
 router.get('/supervisors', async (req, res) => {
   try {
     const [rows] = await db.promise().query(
-      `SELECT supervisor_id, supervisor_name FROM supervisor`
+      `SELECT supervisor_id, supervisor_name, profile_image FROM supervisor`
     );
     res.json(rows);
   } catch (err) {
@@ -237,15 +239,13 @@ router.get('/confirmed-students/internship', async (req, res) => {
   }
 });
 
-
-
 /* =======================================================
    9) ดึงอาจารย์ทั้งหมด
 ======================================================= */
 router.get('/', async (req, res) => {
   try {
     const [rows] = await db.promise().query(
-      `SELECT Instructor_id, Instructor_name, email,
+      `SELECT instructor_id, instructor_name, email,
               faculty, department, phone_number, position, profile_image 
        FROM instructor`
     );
@@ -263,7 +263,7 @@ router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const [rows] = await db.promise().query(
-      "SELECT * FROM instructor WHERE Instructor_id = ?",
+      "SELECT * FROM instructor WHERE instructor_id = ?",
       [id]
     );
     if (rows.length === 0) {
