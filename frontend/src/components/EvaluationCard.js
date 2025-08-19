@@ -61,7 +61,7 @@ const EvaluationCard = ({ student = {} }) => {
     navigate(`/student-detail/${student_id}`);
   };
 
-  const imgSrc = `${API_URL}/uploads/profile/${profile_image}`
+  const imgSrc = {profile_image}
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-blue-200 p-5 mb-5 flex flex-col md:flex-row md:items-center gap-6 text-black">

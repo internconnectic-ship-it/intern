@@ -124,7 +124,7 @@ const DashboardCompanyProfile = () => {
             <img
               src={
                 company.company_logo
-                  ? `${API_URL}/uploads/profile/${company.company_logo}`
+                  ? company.company_logo
                   : '/default-profile.png'}
               alt="โลโก้บริษัท"
               className="w-20 h-20 rounded-full object-cover border-4 border-[#6EC7E2]"

@@ -40,7 +40,7 @@ const DashboardStudent = () => {
 
   const handleViewMore = (id) => navigate(`/job-detail/${id}`);
 
-  const img = (logo) => `${API_URL}/uploads/profile/${logo || 'default.png'}`;
+  const img = (logo) => {logo || 'default.png'};
 
   return (
     <div className="min-h-screen bg-[#9AE5F2]">

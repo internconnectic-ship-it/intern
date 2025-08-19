@@ -49,8 +49,8 @@ const DashboardCompanyEvaluation = () => {
               <img
                 src={
                   student.profile_image
-                    ? `${process.env.REACT_APP_API_URL}/uploads/profile/${student.profile_image}`
-                    : `${process.env.REACT_APP_API_URL}/uploads/default.jpg`
+                    ? student.profile_image   // 🌟 ใช้ URL จาก DB ตรง ๆ
+                    : "/default-profile.png"  // หรือไฟล์ default ที่ฝั่ง frontend
                 }
                 alt={student.student_name}
                 className="w-24 h-24 object-cover rounded-full border-4 border-[#6EC7E2] mb-4"

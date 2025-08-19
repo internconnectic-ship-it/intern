@@ -7,10 +7,9 @@ const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const buildImageUrl = (val) => {
   if (!val) return null;
-  if (/^https?:\/\//i.test(val)) return val;
-  const file = String(val).split(/[/\\]/).pop();
-  return `${API_URL}/uploads/profile/${encodeURIComponent(file)}`;
+  return val; // 👉 ใช้ URL จาก Cloudinary โดยตรง
 };
+
 const fmt = (d) => (d ? String(d).split('T')[0] : '-');
 
 const PlaceholderAvatar = ({ name }) => {
@@ -81,7 +80,7 @@ export default function StudentDetailPage() {
               <div className="flex items-center gap-4 mb-6">
                 {student.profile_image ? (
                   <img
-                    src={buildImageUrl(student.profile_image)}
+                    src={student.profile_image}
                     alt="profile"
                     className="w-20 h-20 rounded-full object-cover border border-[#E6F0FF]"
                     onError={(e) => (e.currentTarget.style.display = 'none')}

@@ -50,7 +50,7 @@ const DashboardAdminInstructor = () => {
                   {inst.profile_image ? (
                     <img
                       //src={`${API_URL}/uploads/${inst.profile_image}`}
-                      src={`${API_URL}/uploads/profile/${inst.profile_image}`}
+                      src={inst.profile_image}
                       alt="profile"
                       className="w-12 h-12 rounded-full mx-auto"
                     />

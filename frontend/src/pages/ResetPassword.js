@@ -50,7 +50,7 @@ const ResetPassword = () => {
       {/* ซ้าย: โลโก้ */}
       <div className="flex items-center justify-center bg-[#9ae5f2]">
         <img
-          src="InternConnectLogo2.png"
+          src="/InternConnectLogo2.png"
           alt="InternConnect"
           className="w-[360px] h-[360px] object-contain drop-shadow-lg"
         />

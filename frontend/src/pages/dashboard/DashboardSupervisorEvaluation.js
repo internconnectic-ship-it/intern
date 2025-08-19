@@ -107,7 +107,7 @@ const DashboardSupervisorEvaluation = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {students.map((s) => {
               const hasImage = !!s.profile_image;
-              const imgSrc = hasImage ? `${API_URL}/uploads/profile/${s.profile_image}` : '';
+              const imgSrc = hasImage ? s.profile_image : '';
 
               return (
                 <div
