@@ -8,7 +8,6 @@ const path = require('path');
 // ✅ Cloudinary
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const multer = require('multer');
 
 // ✅ ใช้ multer-storage-cloudinary
 const storage = new CloudinaryStorage({
