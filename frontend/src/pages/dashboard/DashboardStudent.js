@@ -26,6 +26,7 @@ const DashboardStudent = () => {
     };
     fetchJobs();
   }, []);
+  
 
   const handleSearch = () => {
     const filtered = jobs.filter((job) => {

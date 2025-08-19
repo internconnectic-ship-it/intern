@@ -1,6 +1,6 @@
 // src/pages/dashboard/DashboardCompanyStatus.jsx
 import React, { useEffect, useState } from 'react';
-import api from "../../axios"; // ✅ ใช้ instance แทน axios ตรง ๆ
+import api from "../../axios"; 
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 
@@ -34,6 +34,14 @@ const DashboardCompanyStatus = () => {
     }
   };
 
+  // ✅ filter ด้วย searchTerm
+  const filteredApps = applications.filter((app) =>
+    app.student_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    app.student_id?.toString().includes(searchTerm) ||
+    app.position?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    app.business_type?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-[#9AE5F2] text-[#063D8C]">
       <Header />
@@ -53,13 +61,13 @@ const DashboardCompanyStatus = () => {
           />
         </div>
 
-        {applications.length === 0 ? (
+        {filteredApps.length === 0 ? (
           <div className="bg-white border rounded-2xl p-10 text-center text-[#465d71]">
-            ⛳ ยังไม่มีนิสิตสมัคร
+            ⛳ ไม่พบนิสิตที่ตรงกับการค้นหา
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {applications.map((app) => (
+            {filteredApps.map((app) => (
               <div
                 key={app.application_id}
                 className="relative bg-white rounded-2xl border border-[#E6F0FF] p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between"
@@ -86,32 +94,20 @@ const DashboardCompanyStatus = () => {
 
                 {/* เนื้อหา */}
                 <div>
-                  <p>
-                    <strong>รหัสนิสิต:</strong> {app.student_id}
-                  </p>
-                  <p>
-                    <strong>ชื่อ:</strong> {app.student_name}
-                  </p>
-                  <p>
-                    <strong>อีเมล:</strong> {app.email}
-                  </p>
-                  <p>
-                    <strong>เบอร์:</strong> {app.phone_number}
-                  </p>
-                  <p>
-                    <strong>คณะ:</strong> {app.faculty}
-                  </p>
-                  <p>
-                    <strong>สาขา:</strong> {app.major}
-                  </p>
+                  <p><strong>รหัสนิสิต:</strong> {app.student_id}</p>
+                  <p><strong>ชื่อ:</strong> {app.student_name}</p>
+                  <p><strong>อีเมล:</strong> {app.email}</p>
+                  <p><strong>เบอร์:</strong> {app.phone_number}</p>
+                  <p><strong>คณะ:</strong> {app.faculty}</p>
+                  <p><strong>สาขา:</strong> {app.major}</p>
                   <p>
                     <strong>วันที่สมัคร:</strong>{' '}
                     {app.apply_date
                       ? new Date(app.apply_date).toLocaleDateString('th-TH')
                       : '-'}
                   </p>
-                  <p><strong>ตำแหน่งที่สมัคร:</strong>  {app.position}</p>
-                  <p><strong>ประเภทงาน:</strong>  {app.business_type}</p>
+                  <p><strong>ตำแหน่งที่สมัคร:</strong> {app.position}</p>
+                  <p><strong>ประเภทงาน:</strong> {app.business_type}</p>
                 </div>
 
                 {/* แก้ไขสถานะ ล่างขวา */}
