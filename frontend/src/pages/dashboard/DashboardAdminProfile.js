@@ -64,10 +64,10 @@ const DashboardAdminProfile = () => {
         const formData = new FormData();
         formData.append("image", selectedFile);
         const res = await api.post(
-          `${API_URL}/api/upload/profile-image`,
+          "/api/upload/profile-image",
           formData
         );
-        profileImageFilename = res.data.filename;
+        profileImageFilename = res.data.url;
       } catch (err) {
         console.error("❌ อัปโหลดรูปภาพล้มเหลว", err);
         return alert("เกิดข้อผิดพลาดในการอัปโหลดรูป");
