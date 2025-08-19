@@ -6,7 +6,7 @@ const db = require('../db');
 /* =======================================================
    1) อัปเดตข้อมูลอาจารย์ประจำวิชา
 ======================================================= */
-router.put('/:id', upload.single('profile_image'), async (req, res) => {
+router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const {
     Instructor_name,
