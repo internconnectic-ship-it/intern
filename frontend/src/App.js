@@ -41,6 +41,10 @@ import DashboardAdminCompanies from './pages/dashboard/DashboardAdminCompanies';
 import DashboardAdminReports from './pages/dashboard/DashboardAdminReports';
 import DashboardAdminProfile from './pages/dashboard/DashboardAdminProfile';
 import PendingApprovalPage from './pages/PendingApprovalPage';
+import DashboardRegisterByAdmin from "./pages/dashboard/DashboardRegisterByAdmin";
+import DashboardAdminInstructor from "./pages/dashboard/DashboardAdminInstructor";
+
+
 
 function App() {
   const location = useLocation();
@@ -109,7 +113,9 @@ function App() {
         <Route path="/admin/reports" element={<DashboardAdminReports />} />
         <Route path="/admin/profile" element={<DashboardAdminProfile />} /> 
         <Route path="/pending-approval" element={<PendingApprovalPage />} />
-        
+        <Route path="/admin/register-user" element={<DashboardRegisterByAdmin />} />
+        <Route path="/admin/instructors" element={<DashboardAdminInstructor />} />
+
       </Routes>
     </>
   );

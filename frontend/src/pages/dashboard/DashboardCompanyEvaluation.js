@@ -1,6 +1,6 @@
 // frontend/src/pages/company/DashboardCompanyEvaluation.js
 import React, { useEffect, useState } from 'react';
-import api from "../../axios";
+import api from "../../axios"; // ✅ ใช้ instance แทน axios ตรง ๆ
 import Header from '../../components/Header';
 import { useNavigate } from 'react-router-dom';
 

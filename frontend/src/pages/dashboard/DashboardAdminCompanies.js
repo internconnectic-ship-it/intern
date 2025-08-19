@@ -1,6 +1,6 @@
 // src/pages/dashboard/DashboardAdminCompanies.js
 import React, { useEffect, useMemo, useState } from 'react';
-import api from "../../axios";
+import api from "../../axios"; // ✅ ใช้ instance แทน axios ตรง ๆ
 import Header from '../../components/Header';
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
@@ -58,7 +58,7 @@ const DashboardAdminCompanies = () => {
 
   const handleDelete = (companyId) => {
     if (!window.confirm('คุณต้องการลบบริษัทนี้หรือไม่?')) return;
-    axios
+    api
       .delete(`/api/admin/delete-company/${companyId}`)
       .then((res) => {
         alert(res.data.message);
@@ -128,7 +128,6 @@ const DashboardAdminCompanies = () => {
                 <div className="flex items-start gap-4">
                   {company.company_logo ? (
                     <img
-                      //src={`${API_URL}/uploads/${job.company_logo}`}
                       src={`${API_URL}/uploads/${company.company_logo}`}
                       alt="Logo"
                       className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-2xl border border-[#E6F0FF] bg-white"

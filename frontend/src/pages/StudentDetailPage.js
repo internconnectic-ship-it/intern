@@ -5,12 +5,11 @@ import axios from 'axios';
 import Header from '../components/Header';
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-/* helpers */
 const buildImageUrl = (val) => {
   if (!val) return null;
   if (/^https?:\/\//i.test(val)) return val;
   const file = String(val).split(/[/\\]/).pop();
-  return `${API_URL}/uploads/${encodeURIComponent(file)}`;
+  return `http://localhost:5000/uploads/${encodeURIComponent(file)}`;
 };
 const fmt = (d) => (d ? String(d).split('T')[0] : '-');
 

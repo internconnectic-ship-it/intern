@@ -44,9 +44,9 @@ exports.register = async (req, res) => {
       await db.promise().query(
         `INSERT INTO student (
           student_id, student_name, email, phone_number, major, faculty, university, gender,
-          year_level, gpa, birth_date, age, special_skills, profile_image, password
-        ) VALUES (?, ?, ?, '', '', '', '', '', 1, 0, CURDATE(), 0, '', '', ?)`,
-        [id, name, email, hashedPassword]
+          year_level, gpa, birth_date, age, special_skills, profile_image
+        ) VALUES (?, ?, ?, '', '', '', '', '', 1, 0, CURDATE(), 0, '', '')`,
+        [id, name, email]
       );
     } 
     // สำหรับ role 'company'
@@ -54,10 +54,10 @@ exports.register = async (req, res) => {
       await db.promise().query(
         `INSERT INTO company (
           company_id, company_name, contact_email, contact_name,
-          phone_number, business_type, address, created_date, password
-        ) VALUES (?, ?, ?, '', '', '', '', CURDATE(), ?)`,
+          phone_number, business_type, address, created_date
+        ) VALUES (?, ?, ?, '', '', '', '', CURDATE())`,
 
-        [id, name, email, hashedPassword]
+        [id, name, email]
       );
     }
 
@@ -65,27 +65,26 @@ exports.register = async (req, res) => {
     else if (role === 'instructor') {
       await db.promise().query(
         `INSERT INTO instructor (
-          Instructor_id, Instructor_name, email, phone_number, department, faculty, position, profile_image, password
-        ) VALUES (?, ?, ?, '', '', '', '', '', ?)`,
+          Instructor_id, Instructor_name, email
+        ) VALUES (?, ?, ?)`,
 
-        [id, name, email, hashedPassword]
+        [id, name, email]
       );
     } else if (role === 'supervisor') {
       await db.promise().query(
         `INSERT INTO supervisor (
-          supervisor_id, supervisor_name, email, phone_number, department,
-          faculty, position, profile_image, password
-        ) VALUES (?, ?, ?, '', "", "", "", "", ?)`,
+          supervisor_id, supervisor_name, email
+        ) VALUES (?, ?, ?)`,
 
-        [id, name, email, hashedPassword]
+        [id, name, email]
       );
     } else if (role === 'admin') {
       await db.promise().query(
         `INSERT INTO admin (
-          admin_id, admin_name, email, role, phone_number, profile_image, password
-        ) VALUES (?, ?, ?, 'admin', '', '', ?)`,
+          admin_id, admin_name, email, role, phone_number, profile_image
+        ) VALUES (?, ?, ?, 'admin', '', '')`,
 
-        [id, name, email, hashedPassword]
+        [id, name, email]
       );
     }
 

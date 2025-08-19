@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import api from "../../axios";    // ✅ ใช้ instance ที่ตั้งค่า baseURL ไว้แล้ว
+import api from "../../axios"; // ✅ ใช้ instance แทน axios ตรง ๆ
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 

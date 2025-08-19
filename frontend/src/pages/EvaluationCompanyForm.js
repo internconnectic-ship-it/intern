@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 const EvaluationCompanyForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -11,7 +11,6 @@ const EvaluationCompanyForm = () => {
   const [student, setStudent] = useState(null);
   const [scores, setScores] = useState({});
   const [companyComment, setCompanyComment] = useState('');
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     axios.get(`${API_URL}/api/student/${id}`)

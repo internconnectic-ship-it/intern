@@ -1,17 +1,18 @@
 // src/pages/dashboard/DashboardInstructor.jsx
 import React, { useEffect, useState } from 'react';
-import api from "../../axios";
+import api from "../../axios"; // ✅ ใช้ instance แทน axios ตรง ๆ
 import Header from '../../components/Header';
 
 const DashboardInstructor = () => {
   const [report, setReport] = useState([]);
 
-  useEffect(() => {
-    api
-      .get('/api/instructor/internship-report')   // ✅ ตัด http://localhost:5000 ออก
-      .then(res => setReport(Array.isArray(res.data) ? res.data : []))
-      .catch(err => console.error('❌ โหลดรายงานล้มเหลว:', err));
-  }, []);
+ useEffect(() => {
+  api
+    .get('/api/instructor/internship-report/application')
+    .then(res => setReport(Array.isArray(res.data) ? res.data : []))
+    .catch(err => console.error('❌ โหลดรายงานล้มเหลว:', err));
+}, []);
+
 
   return (
     <div className="min-h-screen bg-[#9AE5F2] text-[#063D8C]">

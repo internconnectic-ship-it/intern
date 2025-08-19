@@ -10,7 +10,8 @@ const RegisterPage = () => {
     id: '',
     name: '',
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   });
 
   const navigate = useNavigate();
@@ -27,16 +28,32 @@ const RegisterPage = () => {
       return;
     }
 
+    // ✅ ตรวจสอบรหัสผ่านและยืนยันรหัสผ่าน
+    if (formData.password !== formData.confirmPassword) {
+      alert('❌ รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน');
+      return;
+    }
+
+    // ✅ ตรวจสอบความแข็งแรงรหัสผ่าน
+    const strongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+    if (!strongPassword.test(formData.password)) {
+      alert("❌ รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร และประกอบด้วย:\n- ตัวพิมพ์เล็ก\n- ตัวพิมพ์ใหญ่\n- ตัวเลข\n- อักขระพิเศษ");
+      return;
+    }
+
     try {
       await axios.post(`${API_URL}/api/auth/register`, {
-        ...formData,
+        id: formData.id,
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
         role
       });
       alert('✅ สมัครสมาชิกสำเร็จ');
       navigate('/login');
     } catch (err) {
       console.error('❌ สมัครไม่สำเร็จ:', err);
-      alert('เกิดข้อผิดพลาดในการสมัคร');
+      alert(err.response?.data?.message || 'เกิดข้อผิดพลาดในการสมัคร');
     }
   };
 
@@ -45,7 +62,7 @@ const RegisterPage = () => {
       {/* ซ้าย: โลโก้ใหญ่บนพื้นฟ้า (เข้าชุด Login) */}
       <div className="flex items-center justify-center bg-[#9ae5f2]">
         <img
-          src="/uploads/InternConnectLogo2.png"  
+          src="/uploads/InternConnectLogo2.png"
           alt="InternConnect"
           className="w-[360px] h-[360px] object-contain drop-shadow-lg"
         />
@@ -138,6 +155,22 @@ const RegisterPage = () => {
                     type="password"
                     name="password"
                     value={formData.password}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 rounded-lg border bg-white
+                               border-[#6EC7E2] focus:outline-none focus:ring-4
+                               focus:ring-[#95FCF2] focus:border-[#225EC4]"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    ยืนยันรหัสผ่าน
+                  </label>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
                     onChange={handleChange}
                     className="w-full px-3 py-2 rounded-lg border bg-white
                                border-[#6EC7E2] focus:outline-none focus:ring-4

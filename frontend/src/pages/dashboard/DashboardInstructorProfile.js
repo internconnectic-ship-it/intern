@@ -1,215 +1,241 @@
-// src/pages/instructor/DashboardInstructorProfile.js
-import React, { useState, useEffect } from 'react';
-import api from "../../axios"; // ✅ ใช้ axios instance
-import Header from '../../components/Header';
+// src/pages/dashboard/DashboardInstructorProfile.jsx
+import React, { useState, useEffect } from "react";
+import api from "../../axios"; // ✅ ใช้ instance แทน axios ตรง ๆ
+import Header from "../../components/Header";
+
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const DashboardInstructorProfile = () => {
-  const [form, setForm] = useState({
-    Instructor_id: '',
-    Instructor_name: '',
-    email: '',
-    phone_number: '',
-    department: '',
-    faculty: '',
-    position: '',
-    profile_image: ''
+  const [instructor, setInstructor] = useState({
+    Instructor_name: "",
+    email: "",
+    phone_number: "",
+    department: "",
+    faculty: "",
+    position: "",
+    profile_image: "",
+  });
+
+  // ✅ state สำหรับเปลี่ยนรหัสผ่าน
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
   const [selectedFile, setSelectedFile] = useState(null);
-  const instructorId = localStorage.getItem('instructorId');
+
+  // id จาก localStorage
+  const instructorId = localStorage.getItem("instructorId"); // ตาราง instructor
+  const userId = localStorage.getItem("id"); // ตาราง users
 
   useEffect(() => {
-    if (instructorId) {
-      api.get(`/api/instructor/${instructorId}`)
-        .then((res) => {
-          const data = res.data;
-          setForm({
-            Instructor_id: data.Instructor_id || '',
-            Instructor_name: data.Instructor_name || '',
-            email: data.email || '',
-            phone_number: data.phone_number || '',
-            department: data.department || '',
-            faculty: data.faculty || '',
-            position: data.position || '',
-            profile_image: data.profile_image || ''
-          });
-        })
-        .catch((err) => {
-          console.error('❌ โหลดข้อมูลอาจารย์ล้มเหลว:', err);
-        });
-    }
+    if (!instructorId) return;
+    api
+      .get(`${API_URL}/api/instructor/${instructorId}`)
+      .then((res) => setInstructor(res.data || {}))
+      .catch((err) => console.error("❌ โหลดข้อมูลล้มเหลว", err));
   }, [instructorId]);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    setSelectedFile(file);
-  };
+  const handleChange = (e) =>
+    setInstructor({ ...instructor, [e.target.name]: e.target.value });
+  const handlePasswordChange = (e) =>
+    setPasswordForm({ ...passwordForm, [e.target.name]: e.target.value });
+  const handleImageUpload = (e) => setSelectedFile(e.target.files?.[0] || null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let profileImageFilename = form.profile_image;
-
+    // --- upload image ---
+    let profileImageFilename = instructor.profile_image;
     if (selectedFile) {
-      const formData = new FormData();
-      formData.append('image', selectedFile);
-
       try {
-        const res = await api.post('/api/upload/profile-image', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+        const res = await api.post(
+          `${API_URL}/api/upload/profile-image`,
+          formData
+        );
         profileImageFilename = res.data.filename;
       } catch (err) {
-        console.error('❌ อัปโหลดรูปไม่สำเร็จ:', err);
-        alert('เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ');
-        return;
+        console.error("❌ อัปโหลดรูปภาพล้มเหลว", err);
+        return alert("เกิดข้อผิดพลาดในการอัปโหลดรูป");
       }
     }
 
-    const updatedForm = { ...form, profile_image: profileImageFilename };
+    try {
+      // --- save profile ---
+      const updated = { ...instructor, profile_image: profileImageFilename };
+      await api.put(`${API_URL}/api/instructor/${instructorId}`, updated);
 
-    api.put(`/api/instructor/${instructorId}`, updatedForm)
-      .then(() => {
-        localStorage.setItem('profile_image', profileImageFilename);
-        alert('✅ บันทึกข้อมูลเรียบร้อยแล้ว');
-      })
-      .catch((err) => {
-        console.error('❌ บันทึกข้อมูลล้มเหลว:', err);
-        alert('เกิดข้อผิดพลาดในการบันทึก');
-      });
+      localStorage.setItem("profile_image", profileImageFilename || "");
+      localStorage.setItem("name", updated.Instructor_name || "");
+
+      // --- password change check ---
+      if (passwordForm.newPassword) {
+        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+          return alert("❌ รหัสผ่านใหม่และยืนยันรหัสไม่ตรงกัน");
+        }
+
+        const strongPassword =
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!strongPassword.test(passwordForm.newPassword)) {
+          return alert(
+            "❌ รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร และประกอบด้วย:\n- ตัวพิมพ์เล็ก\n- ตัวพิมพ์ใหญ่\n- ตัวเลข\n- อักขระพิเศษ"
+          );
+        }
+
+        await api.post(`${API_URL}/api/change-password`, {
+          id: userId,
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        });
+
+        setPasswordForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+
+        alert("✅ บันทึกข้อมูลและเปลี่ยนรหัสผ่านเรียบร้อยแล้ว");
+      } else {
+        alert("✅ บันทึกข้อมูลเรียบร้อยแล้ว (รหัสผ่านยังคงเดิม)");
+      }
+    } catch (err) {
+      console.error("❌ เกิดข้อผิดพลาด", err);
+      alert(err.response?.data?.message || "เกิดข้อผิดพลาด");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#9AE5F2] text-[#130347] font-sans">
+    <div className="min-h-screen bg-[#9AE5F2] text-[#063D8C]">
       <Header />
 
-      <div className="px-[5%] py-[2%]">
-        <div className="w-full max-w-4xl mx-auto">
-          <h2 className="text-2xl font-extrabold mb-4">
-            👤 โปรไฟล์อาจารย์ประจำวิชา
-          </h2>
-
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white text-[#130347] p-8 rounded-2xl shadow-lg border border-[#E6F0FF]"
-          >
-            {/* รูปโปรไฟล์ */}
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-24 h-24 rounded-full overflow-hidden ring-2 ring-[#E6F0FF] bg-[#F8FBFF] flex items-center justify-center">
-                {form.profile_image ? (
-                  <img
-                    src={`${process.env.REACT_APP_API_URL || "http://localhost:5000"}/uploads/${form.profile_image}`}
-                    alt="รูปโปรไฟล์"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-sm text-[#225EC4]">ไม่มีรูป</span>
-                )}
-              </div>
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-[#225EC4]">อัปโหลดรูปโปรไฟล์</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="mt-1 block w-full text-sm
-                             file:mr-3 file:rounded-full file:border-0
-                             file:bg-[#6EC7E2] file:text-white file:px-4 file:py-2
-                             hover:file:bg-[#4691D3]"
-                />
-              </div>
-            </div>
-
-            {/* ฟิลด์ข้อมูล */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-[#225EC4]">รหัสอาจารย์</label>
-                <input
-                  name="Instructor_id"
-                  value={form.Instructor_id}
-                  disabled
-                  className="w-full rounded-xl border border-[#E6F0FF] bg-gray-100 px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[#225EC4]">ชื่อ</label>
-                <input
-                  name="Instructor_name"
-                  value={form.Instructor_name}
-                  onChange={handleChange}
-                  required
-                  className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[#225EC4]">อีเมล</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[#225EC4]">เบอร์โทร</label>
-                <input
-                  name="phone_number"
-                  value={form.phone_number}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[#225EC4]">ภาควิชา</label>
-                <input
-                  name="department"
-                  value={form.department}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[#225EC4]">คณะ</label>
-                <input
-                  name="faculty"
-                  value={form.faculty}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-[#225EC4]">ตำแหน่ง</label>
-                <input
-                  name="position"
-                  value={form.position}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
-                />
-              </div>
-            </div>
-
-            {/* ปุ่มบันทึก */}
-            <button
-              type="submit"
-              className="mt-6 w-full rounded-full bg-[#225EC4] hover:bg-[#1b55b5] text-white py-3 font-semibold shadow-sm"
-            >
-              💾 บันทึก
-            </button>
-          </form>
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-screen-xl mx-auto px-4 lg:px-8 py-8"
+      >
+        <div className="mb-4">
+          <h1 className="text-2xl font-extrabold text-[#130347]">
+            👤 โปรไฟล์อาจารย์
+          </h1>
+          <p className="text-sm text-[#465d71]">
+            อัปเดตข้อมูลส่วนตัวและช่องทางติดต่อ
+          </p>
         </div>
-      </div>
+
+        <div className="bg-white border border-[#E6F0FF] rounded-2xl shadow-sm p-6">
+          {/* รูปโปรไฟล์ */}
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-24 h-24 rounded-full overflow-hidden ring-2 ring-[#E6F0FF] bg-[#F8FBFF]">
+              {instructor.profile_image ? (
+                <img
+                  src={`${API_URL}/uploads/${instructor.profile_image}`}
+                  alt="รูปโปรไฟล์"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-[#225EC4] text-sm">
+                  ไม่มีรูป
+                </div>
+              )}
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-[#225EC4]">
+                อัปโหลดรูปโปรไฟล์
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="mt-1 block w-full text-sm file:mr-3 file:rounded-full file:border-0 file:bg-[#6EC7E2] file:text-white file:px-4 file:py-2 hover:file:bg-[#4691D3]"
+              />
+            </div>
+          </div>
+
+          {/* ฟอร์มข้อมูล */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { label: "ชื่อ", name: "Instructor_name" },
+              { label: "อีเมล", name: "email", type: "email" },
+              { label: "เบอร์โทร", name: "phone_number" },
+              { label: "ภาควิชา", name: "department" },
+              { label: "คณะ", name: "faculty" },
+              { label: "ตำแหน่ง", name: "position" },
+            ].map(({ label, name, type = "text" }) => (
+              <div key={name}>
+                <label className="block text-sm font-medium text-[#225EC4]">
+                  {label}
+                </label>
+                <input
+                  name={name}
+                  type={type}
+                  value={instructor[name] || ""}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* 🔑 เปลี่ยนรหัสผ่าน */}
+          <h2 className="text-lg font-bold text-[#130347] mt-8 mb-4">
+            🔑 เปลี่ยนรหัสผ่าน
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-[#225EC4]">
+                รหัสผ่านปัจจุบัน
+              </label>
+              <input
+                type="password"
+                name="currentPassword"
+                value={passwordForm.currentPassword}
+                onChange={handlePasswordChange}
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#225EC4]">
+                รหัสผ่านใหม่
+              </label>
+              <input
+                type="password"
+                name="newPassword"
+                value={passwordForm.newPassword}
+                onChange={handlePasswordChange}
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#225EC4]">
+                ยืนยันรหัสผ่านใหม่
+              </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={passwordForm.confirmPassword}
+                onChange={handlePasswordChange}
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-[#6d6d6d]">***หมายเหตุ***</label>
+              <span className="text-xs text-[#6d6d6d]">
+                ถ้าไม่เปลี่ยนรหัสผ่านไม่ต้องกรอกรหัสผ่านใหม่
+              </span>
+            </div>
+          </div>
+
+          {/* ปุ่มบันทึก */}
+          <button
+            type="submit"
+            className="mt-6 w-full rounded-full bg-[#225EC4] hover:bg-[#1b55b5] text-white py-3 font-semibold shadow-sm"
+          >
+            💾 บันทึก
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

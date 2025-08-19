@@ -7,7 +7,6 @@ const LoginPage = () => {
   const [form, setForm] = useState({ email: '', password: '' });
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
-  //const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000"; 
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -16,8 +15,7 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post(`/api/auth/login`, form);
-      console.log("Login Response:", res.data);
+      const res = await api.post('/api/auth/login', form);
       const { token, role, id, email, name } = res.data;
 
       localStorage.setItem('token', token);
@@ -45,7 +43,7 @@ const LoginPage = () => {
       {/* ซ้าย: โลโก้ใหญ่ + พื้นหลังโทนฟ้า #6EC7E2 */}
       <div className="flex items-center justify-center bg-[#9ae5f2]">
         <img
-          src="/InternConnectLogo2.png"  
+          src="/uploads/InternConnectLogo2.png"  
           alt="InternConnect"
           className="w-[360px] h-[360px] object-contain drop-shadow-lg"
         />

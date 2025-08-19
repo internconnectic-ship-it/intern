@@ -1,6 +1,6 @@
 // src/pages/dashboard/DashboardAdminApprovals.jsx
 import React, { useEffect, useMemo, useState } from 'react';
-import api from "../../axios";   // ⬅️ ใช้ api จาก config กลาง
+import api from "../../axios"; // ✅ ใช้ instance แทน axios ตรง ๆ
 import Header from '../../components/Header';
 
 const PlaceholderAvatar = ({ name }) => {
@@ -90,7 +90,9 @@ const DashboardAdminApprovals = () => {
     <div className="min-h-screen bg-[#9AE5F2]">
       <Header />
 
+      {/* กว้างขึ้น: max-w-screen-2xl + padding กระชับ */}
       <div className="w-full max-w-screen-2xl mx-auto px-4 lg:px-8 py-10">
+        {/* หัวข้อ + ตัวนับ + ค้นหา */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-2">
           <div>
             <h1 className="text-2xl font-extrabold text-[#130347]">บริษัทที่รอการอนุมัติ</h1>
@@ -106,6 +108,7 @@ const DashboardAdminApprovals = () => {
           />
         </div>
 
+        {/* รายการบริษัท — เพิ่มคอลัมน์บนจอใหญ่เพื่อลดที่ว่างข้างๆ */}
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
           {loading ? (
             <>
@@ -130,9 +133,8 @@ const DashboardAdminApprovals = () => {
                       <strong>ชื่อบริษัท:</strong> {company.company_name}
                     </p>
                     <div className="mt-1 text-sm space-y-0.5">
+                      <p><strong className="text-[#465d71]">รหัสบริษัท:</strong> {company.company_id}</p>
                       <p><strong className="text-[#465d71]">อีเมล:</strong> {company.email}</p>
-                      {/* <p><strong className="text-[#465d71]">ประเภท:</strong> {company.business_type || 'ไม่ระบุ'}</p>
-                      <p><strong className="text-[#465d71]">ที่อยู่:</strong> {company.address || 'ไม่ระบุ'}</p> */}
                     </div>
                   </div>
                 </div>

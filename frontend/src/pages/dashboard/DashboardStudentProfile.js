@@ -1,10 +1,10 @@
 // src/pages/dashboard/DashboardStudentProfile.jsx
+
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from "../../axios"; // ✅ ใช้ instance แทน axios ตรง ๆ
 import Header from '../../components/Header';
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-
 const DashboardStudentProfile = () => {
   const [student, setStudent] = useState({
     student_name: '',
@@ -24,81 +24,118 @@ const DashboardStudentProfile = () => {
     intern_end_date: ''
   });
 
+  // ✅ state สำหรับเปลี่ยนรหัสผ่าน
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
   const [selectedFile, setSelectedFile] = useState(null);
-  const studentId = localStorage.getItem('studentId');
+
+  // id จาก localStorage
+  const studentId = localStorage.getItem('studentId'); // สำหรับตาราง student
+  const userId = localStorage.getItem('id');       // สำหรับตาราง users
 
   useEffect(() => {
     if (!studentId) return;
-    axios
-      .get(`${API_URL}/api/student/${studentId}`)
+    api
+      .get(`/api/student/${studentId}`)
       .then(res => setStudent(res.data || {}))
       .catch(err => console.error('❌ โหลดข้อมูลล้มเหลว', err));
   }, [studentId]);
 
   const handleChange = (e) => setStudent({ ...student, [e.target.name]: e.target.value });
+  const handlePasswordChange = (e) =>
+    setPasswordForm({ ...passwordForm, [e.target.name]: e.target.value });
   const handleImageUpload = (e) => setSelectedFile(e.target.files?.[0] || null);
-  const formatDate = (d) => (d ? new Date(d).toISOString().split('T')[0] : '');
+  const formatDate = (d) => (d ? d.split('T')[0] : '');
 
+  // ✅ ฟังก์ชันบันทึกข้อมูลโปรไฟล์ + เปลี่ยนรหัสผ่าน
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 🔎 Validation
-    if (student.gpa && (isNaN(student.gpa) || student.gpa < 0 || student.gpa > 4))
-      return alert('กรุณากรอก GPA ที่อยู่ระหว่าง 0.00 ถึง 4.00');
+    // --- validate profile ---
+    const gpa = parseFloat(student.gpa);
+    if (isNaN(gpa) || gpa < 0 || gpa > 4)
+      return alert("กรุณากรอก GPA ที่อยู่ระหว่าง 0.00 ถึง 4.00");
 
-    if (student.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(student.email))
-      return alert('กรุณากรอกอีเมลให้ถูกต้อง');
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(student.email);
+    if (!emailOk) return alert("กรุณากรอกอีเมลให้ถูกต้อง");
 
-    if (student.phone_number && !/^\d{10}$/.test(student.phone_number))
-      return alert('กรุณากรอกเบอร์โทร 10 หลัก');
+    if (!/^\d{10}$/.test(student.phone_number))
+      return alert("กรุณากรอกเบอร์โทร 10 หลัก");
 
     if (student.birth_date && new Date(student.birth_date) > new Date())
-      return alert('วันเกิดต้องไม่เกินวันที่ปัจจุบัน');
+      return alert("วันเกิดต้องไม่เกินวันที่ปัจจุบัน");
 
     if (
       student.intern_start_date &&
       student.intern_end_date &&
       new Date(student.intern_start_date) > new Date(student.intern_end_date)
-    ) return alert('วันที่เริ่มฝึกงานต้องไม่มากกว่าวันที่สิ้นสุด');
+    )
+      return alert("วันที่เริ่มฝึกงานต้องไม่มากกว่าวันที่สิ้นสุด");
 
-    // 📸 Upload รูป
+    // --- upload image ---
     let profileImageFilename = student.profile_image;
     if (selectedFile) {
-      const formData = new FormData();
-      formData.append('image', selectedFile);
       try {
-        const res = await axios.post(`${API_URL}/api/upload/profile-image`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+        const res = await api.post(
+          "/api/upload/profile-image",
+          formData
+        );
         profileImageFilename = res.data.filename;
       } catch (err) {
-        console.error('❌ อัปโหลดรูปภาพล้มเหลว', err);
-        return alert('เกิดข้อผิดพลาดในการอัปโหลดรูป');
+        console.error("❌ อัปโหลดรูปภาพล้มเหลว", err);
+        return alert("เกิดข้อผิดพลาดในการอัปโหลดรูป");
       }
     }
 
-    // 💾 Update ข้อมูล
     try {
-      // ✅ ฟังก์ชันช่วย format date
-      const formatDate = (dateStr) => {
-        if (!dateStr) return null;
-        return dateStr.split('T')[0]; // เหลือ YYYY-MM-DD
-      };
+      // --- save profile ---
+      const updated = { ...student, profile_image: profileImageFilename };
+      await api.put(`/api/student/${studentId}`, updated);
+      localStorage.setItem("profile_image", profileImageFilename || "");
+      localStorage.setItem("name", updated.student_name || "");
 
-      const updated = { ...student, profile_image: profileImageFilename,
-        profile_image: profileImageFilename,
-        birth_date: formatDate(student.birth_date),          // ✅ แปลงวันเกิด
-        intern_start_date: formatDate(student.intern_start_date), // ✅ แปลงวันเริ่ม
-        intern_end_date: formatDate(student.intern_end_date)
-       };
-      console.log("📤 ส่งข้อมูลอัปเดต:", updated);
-      await axios.put(`${API_URL}/api/student/${studentId}`, updated);
-      localStorage.setItem('profile_image', profileImageFilename || '');
-      localStorage.setItem('name', updated.student_name || '');
-      alert('✅ บันทึกข้อมูลเรียบร้อยแล้ว');
+      // --- password change check ---
+      if (passwordForm.newPassword) {
+        // 1) confirm password ตรงกัน
+        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+          return alert("❌ รหัสผ่านใหม่และยืนยันรหัสไม่ตรงกัน");
+        }
+
+        // 2) ตรวจสอบความปลอดภัยของรหัสผ่าน
+        const strongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!strongPassword.test(passwordForm.newPassword)) {
+          return alert(
+            "❌ รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร และประกอบด้วย:\n- ตัวพิมพ์เล็ก\n- ตัวพิมพ์ใหญ่\n- ตัวเลข\n- อักขระพิเศษ"
+          );
+        }
+
+        // 3) ส่งเปลี่ยนรหัสผ่าน (ใช้ userId จาก users)
+       await api.post(`${API_URL}/api/change-password`, {
+        id: userId,
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword
+      });
+
+
+        setPasswordForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+
+        alert("✅ บันทึกข้อมูลและเปลี่ยนรหัสผ่านเรียบร้อยแล้ว");
+      } else {
+        alert("✅ บันทึกข้อมูลเรียบร้อยแล้ว (รหัสผ่านยังคงเดิม)");
+      }
     } catch (err) {
-      console.error('❌ บันทึกข้อมูลล้มเหลว', err);
-      alert('เกิดข้อผิดพลาด');
+      console.error("❌ เกิดข้อผิดพลาด", err);
+      alert(err.response?.data?.message || "เกิดข้อผิดพลาด");
     }
   };
 
@@ -106,6 +143,7 @@ const DashboardStudentProfile = () => {
     <div className="min-h-screen bg-[#9AE5F2] text-[#063D8C]">
       <Header />
 
+      {/* 👉 ฟอร์มโปรไฟล์ */}
       <form onSubmit={handleSubmit} className="w-full max-w-screen-xl mx-auto px-4 lg:px-8 py-8">
         <div className="mb-4">
           <h1 className="text-2xl font-extrabold text-[#130347]">👤 โปรไฟล์นิสิต</h1>
@@ -120,7 +158,7 @@ const DashboardStudentProfile = () => {
             <div className="w-24 h-24 rounded-full overflow-hidden ring-2 ring-[#E6F0FF] bg-[#F8FBFF]">
               {student.profile_image ? (
                 <img
-                  src={`${API_URL}/uploads/${student.profile_image}`}
+                  src={`http://localhost:5000/uploads/${student.profile_image}`}
                   alt="รูปโปรไฟล์"
                   className="w-full h-full object-cover"
                 />
@@ -136,13 +174,11 @@ const DashboardStudentProfile = () => {
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
-                className="mt-1 block w-full text-sm file:mr-3 file:rounded-full file:border-0 
-                  file:bg-[#6EC7E2] file:text-white file:px-4 file:py-2 hover:file:bg-[#4691D3]"
+                className="mt-1 block w-full text-sm file:mr-3 file:rounded-full file:border-0 file:bg-[#6EC7E2] file:text-white file:px-4 file:py-2 hover:file:bg-[#4691D3]"
               />
             </div>
           </div>
 
-          {/* ฟอร์ม: 2 คอลัมน์บน md, 3 คอลัมน์บน xl */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {[
               { label: 'ชื่อ', name: 'student_name' },
@@ -164,8 +200,7 @@ const DashboardStudentProfile = () => {
                   inputMode={inputMode}
                   value={student[name] || ''}
                   onChange={handleChange}
-                  className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] 
-                    px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                  className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
                 />
               </div>
             ))}
@@ -177,8 +212,7 @@ const DashboardStudentProfile = () => {
                 type="date"
                 value={formatDate(student.birth_date)}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 
-                  outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
               />
             </div>
 
@@ -189,8 +223,7 @@ const DashboardStudentProfile = () => {
                 name="intern_start_date"
                 value={formatDate(student.intern_start_date)}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 
-                  outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
               />
             </div>
 
@@ -201,11 +234,11 @@ const DashboardStudentProfile = () => {
                 name="intern_end_date"
                 value={formatDate(student.intern_end_date)}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 
-                  outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
               />
             </div>
 
+            {/* ทักษะพิเศษ */}
             <div className="md:col-span-2 xl:col-span-3">
               <label className="block text-sm font-medium text-[#225EC4]">ทักษะพิเศษ</label>
               <textarea
@@ -213,16 +246,54 @@ const DashboardStudentProfile = () => {
                 rows={3}
                 value={student.special_skills || ''}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] 
-                  px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2] resize-y"
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2] resize-y"
               />
             </div>
           </div>
 
+          {/* 👉 กล่องเปลี่ยนรหัสผ่าน */}
+          <h2 className="text-lg font-bold text-[#130347] mb-4">🔑 เปลี่ยนรหัสผ่าน</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-[#225EC4]">รหัสผ่านปัจจุบัน</label>
+              <input
+                type="password"
+                name="currentPassword"
+                value={passwordForm.currentPassword}
+                onChange={handlePasswordChange}
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#225EC4]">รหัสผ่านใหม่</label>
+              <input
+                type="password"
+                name="newPassword"
+                value={passwordForm.newPassword}
+                onChange={handlePasswordChange}
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#225EC4]">ยืนยันรหัสผ่านใหม่</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={passwordForm.confirmPassword}
+                onChange={handlePasswordChange}
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-[#6d6d6d]">***หมายเหตุ***</label>
+              <span className="text-xs text-[#6d6d6d]">ถ้าไม่เปลี่ยนรหัสผ่านไม่ต้องกรอกรหัสผ่านใหม่</span>
+            </div>
+          </div>
+
+          {/* ปุ่มบันทึก */}
           <button
             type="submit"
-            className="mt-6 w-full rounded-full bg-[#225EC4] hover:bg-[#1b55b5] text-white py-3 
-              font-semibold shadow-sm"
+            className="mt-6 w-full rounded-full bg-[#225EC4] hover:bg-[#1b55b5] text-white py-3 font-semibold shadow-sm"
           >
             💾 บันทึก
           </button>

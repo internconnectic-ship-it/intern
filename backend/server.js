@@ -1,3 +1,4 @@
+// backend/server.js
 const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
@@ -11,43 +12,18 @@ const jobPostRoutes = require('./routes/jobPostRoutes');
 const internshipRoutes = require('./routes/internshipRoutes');
 const evaluationRoutes = require('./routes/evaluationRoutes');
 const reportRoutes = require('./routes/reportRoutes');
-
+const changePasswordRoutes = require('./routes/changePasswordRoutes');
 require('dotenv').config();
 
-console.log("📌 ENV Check:", {
-  DB_HOST: process.env.DB_HOST,
-  DB_PORT: process.env.DB_PORT,
-  DB_USER: process.env.DB_USER,
-  DB_PASSWORD: process.env.DB_PASSWORD ? "****" : "MISSING",
-  DB_NAME: process.env.DB_NAME
-});
-
-
 const app = express();
-app.use(cors({
-  origin: (origin, callback) => {
-    const allowedOrigins = [
-      "http://localhost:3000",
-      "https://sparkling-brigadeiros-c96e49.netlify.app",
-      /\.netlify\.app$/   // ✅ allow ทุก subdomain ของ netlify.app
-    ];
-    if (!origin || allowedOrigins.some(o => 
-         o instanceof RegExp ? o.test(origin) : o === origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 
 // ✅ กำหนดเส้นทาง API
 app.use('/api/auth', authRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/company', companyRoutes);
-app.use('/api/instructor', instructorRoutes);
+app.use('/api/instructor', instructorRoutes); 
 app.use('/api/supervisor', supervisorRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
@@ -56,6 +32,11 @@ app.use('/uploads', express.static('uploads'));
 app.use('/api/internship', internshipRoutes);
 app.use('/api/evaluation', evaluationRoutes);
 app.use('/api/reports', reportRoutes);
+
+// 📌 log เวลา mount route change-password
+console.log("📌 changePasswordRoutes ถูกโหลดเรียบร้อย");
+app.use('/api/change-password', changePasswordRoutes);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server started on port ${PORT}`);

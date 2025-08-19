@@ -1,8 +1,8 @@
 // src/pages/dashboard/DashboardCompanyStatus.jsx
 import React, { useEffect, useState } from 'react';
+import api from "../../axios"; // ✅ ใช้ instance แทน axios ตรง ๆ
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
-import api from "../../axios";
 
 const DashboardCompanyStatus = () => {
   const [applications, setApplications] = useState([]);
@@ -19,9 +19,10 @@ const DashboardCompanyStatus = () => {
 
   const handleStatusChange = async (application_id, newStatus) => {
     try {
-      await api.put(`/api/job_posting/application/status/${application_id}`, {
-        status: newStatus,
-      });
+      await api.put(
+        `/api/job_posting/application/status/${application_id}`,
+        { status: newStatus }
+      );
       setApplications((apps) =>
         apps.map((a) =>
           a.application_id === application_id ? { ...a, status: newStatus } : a
@@ -98,12 +99,8 @@ const DashboardCompanyStatus = () => {
                       ? new Date(app.apply_date).toLocaleDateString('th-TH')
                       : '-'}
                   </p>
-                  <p>
-                    <strong>ตำแหน่งที่สมัคร:</strong> {app.position}
-                  </p>
-                  <p>
-                    <strong>ประเภทงาน:</strong> {app.business_type}
-                  </p>
+                  <p><strong>ตำแหน่งที่สมัคร:</strong>  {app.position}</p>
+                  <p><strong>ประเภทงาน:</strong>  {app.business_type}</p>
                 </div>
 
                 {/* แก้ไขสถานะ ล่างขวา */}

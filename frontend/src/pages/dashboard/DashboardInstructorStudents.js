@@ -1,4 +1,3 @@
-// src/pages/instructor/DashboardInstructorStudents.js
 import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header';
 import { useNavigate } from 'react-router-dom';
@@ -9,17 +8,14 @@ const DashboardInstructorStudents = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const res = await api.get('/api/instructor/students'); // ✅ ไม่ต้องเขียน localhost
+    api.get('/api/instructor/students')
+      .then(res => {
         console.log("📦 ได้ข้อมูลนิสิต:", res.data);
         setStudents(res.data);
-      } catch (err) {
+      })
+      .catch(err => {
         console.error("❌ ไม่สามารถโหลดข้อมูลนิสิต:", err);
-      }
-    };
-
-    fetchStudents();
+      });
   }, []);
 
   const handleViewDetails = (studentId) => {

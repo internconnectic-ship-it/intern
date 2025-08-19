@@ -11,10 +11,21 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
+  // ✅ Regex ตรวจสอบรหัสผ่าน
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // ตรวจสอบเงื่อนไขรหัสผ่าน
+    if (!passwordRegex.test(password)) {
+      setError(
+        'รหัสผ่านต้องมีอย่างน้อย 8 ตัว และมี ตัวพิมพ์เล็ก, ตัวพิมพ์ใหญ่, ตัวเลข และอักขระพิเศษ'
+      );
+      return;
+    }
 
     // ✅ ตรวจสอบว่ารหัสผ่านและยืนยันรหัสผ่านตรงกัน
     if (password !== confirmPassword) {
@@ -49,7 +60,7 @@ const ResetPassword = () => {
       <div className="flex items-center justify-center bg-white p-8">
         <div className="w-full max-w-md text-center">
           <h2 className="text-2xl font-bold text-[#063D8C] mb-2">ตั้งรหัสผ่านใหม่</h2>
-          <p className="text-sm text-[#4691D3] mb-8">
+          <p className="text-sm text-[#4691D3] mb-6">
             กรุณากรอกรหัสผ่านใหม่ของคุณ
           </p>
 
@@ -77,13 +88,21 @@ const ResetPassword = () => {
                            focus:outline-none focus:ring-4 focus:ring-[#95FCF2] focus:border-[#225EC4]"
               />
 
-              {/* แสดงข้อความ error ถ้ารหัสไม่ตรงกัน */}
+              {/* 🔑 กฎการตั้งรหัสผ่าน */}
+              <ul className="text-xs text-gray-600 list-disc pl-5 space-y-1">
+                <li>อย่างน้อย 8 ตัวอักษร</li>
+                <li>ต้องมี ตัวพิมพ์เล็ก และ ตัวพิมพ์ใหญ่</li>
+                <li>ต้องมี ตัวเลข อย่างน้อย 1 ตัว</li>
+                <li>ต้องมี อักขระพิเศษ อย่างน้อย 1 ตัว (@$!%*?&)</li>
+              </ul>
+
+              {/* แสดงข้อความ error ถ้ารหัสไม่ตรงกันหรือไม่ผ่าน regex */}
               {error && <p className="text-red-600 text-sm">{error}</p>}
 
               <button
                 type="submit"
                 className="w-full py-3 rounded-lg font-semibold
-                           bg-[#1bc7e6] hover:bg-[#4db7e8] text-white shadow-sm transition"
+                           bg-[#225EC4] hover:bg-[#1b55b5] text-white shadow-sm transition"
               >
                 รีเซ็ตรหัสผ่าน
               </button>

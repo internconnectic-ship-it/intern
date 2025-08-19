@@ -3,117 +3,153 @@ import React, { useState, useEffect } from 'react';
 import api from "../../axios";   // ✅ ใช้ axios instance
 import Header from '../../components/Header';
 
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 const DashboardSupervisorProfile = () => {
-  const [form, setForm] = useState({
-    supervisor_id: '',
-    supervisor_name: '',
-    email: '',
-    phone_number: '',
-    department: '',
-    faculty: '',
-    position: '',
-    profile_image: ''
+  const [supervisor, setSupervisor] = useState({
+    supervisor_id: "",
+    supervisor_name: "",
+    email: "",
+    phone_number: "",
+    department: "",
+    faculty: "",
+    position: "",
+    profile_image: "",
   });
 
   const [selectedFile, setSelectedFile] = useState(null);
-  const [error, setError] = useState('');
-  const supervisorId = localStorage.getItem('supervisorId');
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [error, setError] = useState("");
+
+  // ✅ id ของ supervisor และ user
+  const supervisorId = localStorage.getItem("supervisorId"); // ตาราง supervisor
+  const userId = localStorage.getItem("id"); // ตาราง users
 
   useEffect(() => {
-    if (supervisorId) {
-      api.get(`/api/supervisor/${supervisorId}`)
-        .then((res) => {
-          const data = res.data;
-          setForm({
-            supervisor_id: data.supervisor_id || '',
-            supervisor_name: data.supervisor_name || '',
-            email: data.email || '',
-            phone_number: data.phone_number || '',
-            department: data.department || '',
-            faculty: data.faculty || '',
-            position: data.position || '',
-            profile_image: data.profile_image || ''
-          });
-        })
-        .catch((err) => {
-          console.error('❌ โหลดข้อมูลอาจารย์นิเทศล้มเหลว:', err);
-          setError('เกิดข้อผิดพลาดในการโหลดข้อมูล');
-        });
-    }
+    if (!supervisorId) return;
+    api
+      .get(`${API_URL}/api/supervisor/${supervisorId}`)
+      .then((res) => setSupervisor(res.data || {}))
+      .catch((err) => {
+        console.error("❌ โหลดข้อมูล supervisor ล้มเหลว:", err);
+        setError("เกิดข้อผิดพลาดในการโหลดข้อมูล");
+      });
   }, [supervisorId]);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    setSelectedFile(file);
-  };
+  const handleChange = (e) =>
+    setSupervisor({ ...supervisor, [e.target.name]: e.target.value });
+  const handlePasswordChange = (e) =>
+    setPasswordForm({ ...passwordForm, [e.target.name]: e.target.value });
+  const handleImageUpload = (e) =>
+    setSelectedFile(e.target.files?.[0] || null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    //รูปปปปปป
-    let profileImageFilename = form.profile_image;
 
+    // --- validate ---
+    if (!/^\d{10}$/.test(supervisor.phone_number)) {
+      return alert("กรุณากรอกเบอร์โทร 10 หลัก");
+    }
+
+    // --- upload image ---
+    let profileImageFilename = supervisor.profile_image;
     if (selectedFile) {
-      const formData = new FormData();
-      formData.append('image', selectedFile);
       try {
-        const res = await api.post('/api/upload/profile-image', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+        const res = await api.post(
+          `${API_URL}/api/upload/profile-image`,
+          formData
+        );
         profileImageFilename = res.data.filename;
       } catch (err) {
-        console.error('❌ อัปโหลดรูปโปรไฟล์ล้มเหลว:', err);
-        alert('เกิดข้อผิดพลาดในการอัปโหลดรูป');
-        return;
+        console.error("❌ อัปโหลดรูปภาพล้มเหลว", err);
+        return alert("เกิดข้อผิดพลาดในการอัปโหลดรูป");
       }
     }
 
-    const updatedForm = { ...form, profile_image: profileImageFilename };
+    try {
+      // --- save profile ---
+      const updated = { ...supervisor, profile_image: profileImageFilename };
+      await api.put(`${API_URL}/api/supervisor/${supervisorId}`, updated);
 
-    api.put(`/api/supervisor/${supervisorId}`, updatedForm)
-      .then(() => {
-        localStorage.setItem('profile_image', profileImageFilename);
-        alert('✅ บันทึกข้อมูลเรียบร้อยแล้ว');
-      })
-      .catch((err) => {
-        console.error('❌ บันทึกข้อมูลล้มเหลว:', err);
-        alert('เกิดข้อผิดพลาดในการบันทึก');
-      });
+      localStorage.setItem("profile_image", profileImageFilename || "");
+      localStorage.setItem("name", updated.supervisor_name || "");
+
+      // --- password change check ---
+      if (passwordForm.newPassword) {
+        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+          return alert("❌ รหัสผ่านใหม่และยืนยันรหัสไม่ตรงกัน");
+        }
+
+        const strongPassword =
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!strongPassword.test(passwordForm.newPassword)) {
+          return alert(
+            "❌ รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร และประกอบด้วย:\n- ตัวพิมพ์เล็ก\n- ตัวพิมพ์ใหญ่\n- ตัวเลข\n- อักขระพิเศษ"
+          );
+        }
+
+        await api.post(`${API_URL}/api/change-password`, {
+          id: userId,
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        });
+
+        setPasswordForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+
+        alert("✅ บันทึกข้อมูลและเปลี่ยนรหัสผ่านเรียบร้อยแล้ว");
+      } else {
+        alert("✅ บันทึกข้อมูลเรียบร้อยแล้ว (รหัสผ่านยังคงเดิม)");
+      }
+    } catch (err) {
+      console.error("❌ บันทึกข้อมูลล้มเหลว:", err);
+      alert(err.response?.data?.message || "เกิดข้อผิดพลาดในการบันทึก");
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#9AE5F2] text-[#063D8C]">
       <Header />
-
-      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto px-6 py-10">
-        {/* หัวเรื่อง */}
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-screen-xl mx-auto px-4 lg:px-8 py-8"
+      >
         <div className="mb-4">
-          <h1 className="text-2xl font-extrabold text-[#130347]">โปรไฟล์อาจารย์นิเทศ</h1>
+          <h1 className="text-2xl font-extrabold text-[#130347]">
+            👤 โปรไฟล์อาจารย์นิเทศ
+          </h1>
           {error && <p className="mt-2 text-rose-600">{error}</p>}
         </div>
 
-        {/* การ์ดฟอร์ม */}
-        <div className="bg-white border border-[#E6F0FF] rounded-2xl shadow-md p-6">
+        <div className="bg-white border border-[#E6F0FF] rounded-2xl shadow-sm p-6">
           {/* รูปโปรไฟล์ */}
           <div className="flex items-center gap-4 mb-6">
             <div className="w-24 h-24 rounded-full overflow-hidden ring-2 ring-[#E6F0FF] bg-[#F8FBFF]">
-              {form.profile_image ? (
+              {supervisor.profile_image ? (
                 <img
-                  src={`${process.env.REACT_APP_API_URL || "http://localhost:5000"}/uploads/${form.profile_image}`}
+                  src={`${API_URL}/uploads/${supervisor.profile_image}`}
                   alt="รูปโปรไฟล์"
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-[#225EC4]">
+                <div className="w-full h-full flex items-center justify-center text-[#225EC4] text-sm">
                   ไม่มีรูป
                 </div>
               )}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-[#225EC4]">อัปโหลดรูปโปรไฟล์</label>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-[#225EC4]">
+                อัปโหลดรูปโปรไฟล์
+              </label>
               <input
                 type="file"
                 accept="image/*"
@@ -123,82 +159,80 @@ const DashboardSupervisorProfile = () => {
             </div>
           </div>
 
-          {/* ฟิลด์ข้อมูล */}
+          {/* ฟอร์มข้อมูล */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { label: "รหัสอาจารย์นิเทศ", name: "supervisor_id", disabled: true },
+              { label: "ชื่อ", name: "supervisor_name" },
+              { label: "อีเมล", name: "email", type: "email" },
+              { label: "เบอร์โทร", name: "phone_number" },
+              { label: "ภาควิชา", name: "department" },
+              { label: "คณะ", name: "faculty" },
+              { label: "ตำแหน่ง", name: "position" },
+            ].map(({ label, name, type = "text", disabled }) => (
+              <div key={name}>
+                <label className="block text-sm font-medium text-[#225EC4]">
+                  {label}
+                </label>
+                <input
+                  name={name}
+                  type={type}
+                  value={supervisor[name] || ""}
+                  onChange={handleChange}
+                  disabled={disabled}
+                  className={`w-full rounded-xl border border-[#E6F0FF] ${
+                    disabled ? "bg-gray-100" : "bg-[#F8FBFF]"
+                  } px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]`}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* เปลี่ยนรหัสผ่าน */}
+          <h2 className="text-lg font-bold text-[#130347] mt-8 mb-4">
+            🔑 เปลี่ยนรหัสผ่าน
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#225EC4]">รหัสอาจารย์</label>
+              <label className="block text-sm font-medium text-[#225EC4]">
+                รหัสผ่านปัจจุบัน
+              </label>
               <input
-                name="supervisor_id"
-                value={form.supervisor_id}
-                disabled
-                className="w-full rounded-xl border border-[#E6F0FF] bg-gray-100 px-3 py-2"
+                type="password"
+                name="currentPassword"
+                value={passwordForm.currentPassword}
+                onChange={handlePasswordChange}
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2"
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-[#225EC4]">ชื่อ</label>
+              <label className="block text-sm font-medium text-[#225EC4]">
+                รหัสผ่านใหม่
+              </label>
               <input
-                name="supervisor_name"
-                value={form.supervisor_name}
-                onChange={handleChange}
-                required
-                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                type="password"
+                name="newPassword"
+                value={passwordForm.newPassword}
+                onChange={handlePasswordChange}
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2"
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-[#225EC4]">อีเมล</label>
+              <label className="block text-sm font-medium text-[#225EC4]">
+                ยืนยันรหัสผ่านใหม่
+              </label>
               <input
-                name="email"
-                type="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                type="password"
+                name="confirmPassword"
+                value={passwordForm.confirmPassword}
+                onChange={handlePasswordChange}
+                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2"
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-[#225EC4]">เบอร์โทร</label>
-              <input
-                name="phone_number"
-                value={form.phone_number}
-                onChange={handleChange}
-                required
-                pattern="^[0-9]{10}$"
-                title="กรุณากรอกเบอร์โทร 10 หลัก"
-                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#225EC4]">ภาควิชา</label>
-              <input
-                name="department"
-                value={form.department}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#225EC4]">คณะ</label>
-              <input
-                name="faculty"
-                value={form.faculty}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#225EC4]">ตำแหน่ง</label>
-              <input
-                name="position"
-                value={form.position}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2 outline-none focus:ring-2 focus:ring-[#6EC7E2]"
-              />
+              <span className="block text-sm text-gray-500">
+                ***หมายเหตุ*** ถ้าไม่เปลี่ยนรหัสผ่านไม่ต้องกรอกรหัสผ่านใหม่
+              </span>
             </div>
           </div>
 

@@ -51,7 +51,7 @@ const DashboardSupervisorEvaluation = () => {
     (async () => {
       try {
         const supervisor_id = localStorage.getItem('supervisorId');
-        const res = await api.get(`/api/evaluation/students/${supervisor_id}`);  // ✅ ใช้ api instance
+        const res = await api.get(`/api/evaluation/students/${supervisor_id}`);
         setStudents(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error('❌ ดึงรายชื่อนิสิตล้มเหลว:', err);
@@ -69,6 +69,7 @@ const DashboardSupervisorEvaluation = () => {
       <Header />
 
       <div className="w-full max-w-screen-xl mx-auto px-4 lg:px-8 py-8">
+        {/* หัวเรื่อง */}
         <div className="mb-4">
           <h1 className="text-2xl font-extrabold text-[#130347]">ประเมินนิสิต</h1>
           <p className="text-sm text-[#465d71]">
@@ -76,6 +77,7 @@ const DashboardSupervisorEvaluation = () => {
           </p>
         </div>
 
+        {/* กริดขนาดเดียวกับ DashboardSupervisor */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {[...Array(6)].map((_, i) => (
@@ -104,8 +106,7 @@ const DashboardSupervisorEvaluation = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {students.map((s) => {
               const hasImage = !!s.profile_image;
-              const imgSrc = hasImage ? `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/uploads/${s.profile_image}` : ''; 
-              // ✅ ใช้ API_URL จาก env
+              const imgSrc = hasImage ? `http://localhost:5000/uploads/${s.profile_image}` : '';
 
               return (
                 <div
@@ -113,6 +114,7 @@ const DashboardSupervisorEvaluation = () => {
                   className="bg-white rounded-2xl border border-[#E6F0FF] p-5 shadow-sm hover:shadow-md transition"
                 >
                   <div className="flex items-start gap-4">
+                    {/* Avatar */}
                     {hasImage ? (
                       <img
                         src={imgSrc}
@@ -126,6 +128,7 @@ const DashboardSupervisorEvaluation = () => {
                       <PlaceholderAvatar name={s.student_name} />
                     )}
 
+                    {/* ชื่อ + chips */}
                     <div className="flex-1">
                       <div className="flex items-start justify-between gap-3">
                         <div>
@@ -136,17 +139,22 @@ const DashboardSupervisorEvaluation = () => {
                             รหัสนิสิต: {s.student_id || '-'}
                           </p>
                         </div>
+
+                        {/* สถานะประเมิน */}
                         <StatusBadge status={s.evaluation_status} />
                       </div>
                     </div>
                   </div>
 
+                  {/* รายละเอียดสั้น */}
                   <div className="mt-3 text-sm text-[#130347] space-y-1">
                     <p>📞 {s.phone_number || '-'}</p>
                     <p>📧 {s.email || '-'}</p>
                     <p>🏫 {s.university || '-'}</p>
+                  
                   </div>
 
+                  {/* ปุ่มประเมิน/แก้ไข */}
                   <div className="mt-4">
                     <button
                       onClick={() => handleEvaluate(s.student_id)}

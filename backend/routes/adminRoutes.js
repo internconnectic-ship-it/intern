@@ -133,4 +133,39 @@ router.get('/companies/pending', async (req, res) => {
   }
 });
 
+router.post("/register", async (req, res) => {
+  const { id, name, email, password, role } = req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // ✅ ใส่ข้อมูลลงตาราง users
+    await db.promise().query(
+      `INSERT INTO users (id, name, email, password, role, approval_status) VALUES (?, ?, ?, ?, ?, 'approved')`,
+      [id, name, email, hashedPassword, role]
+    );
+
+    // ✅ ถ้า role เป็น supervisor
+    if (role === "supervisor") {
+      await db.promise().query(
+        `INSERT INTO supervisor (supervisor_id, supervisor_name, email) VALUES (?, ?, ?)`,
+        [id, name, email]
+      );
+    }
+
+    // ✅ ถ้า role เป็น instructor
+    if (role === "instructor") {
+      await db.promise().query(
+        `INSERT INTO instructor (Instructor_id, Instructor_name, email) VALUES (?, ?, ?)`,
+        [id, name, email]
+      );
+    }
+
+    res.json({ message: `✅ สร้างบัญชี ${role} สำเร็จ` });
+  } catch (err) {
+    console.error("❌ Error สมัคร user:", err);
+    res.status(500).json({ message: "เกิดข้อผิดพลาด" });
+  }
+});
+
 module.exports = router;

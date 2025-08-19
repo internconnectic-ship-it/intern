@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const SupervisorDetailPage = () => {
   const { id } = useParams();
   const [supervisor, setSupervisor] = useState(null);
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     axios.get(`${API_URL}/api/supervisor/${id}`)
@@ -41,7 +41,7 @@ const SupervisorDetailPage = () => {
           <div className="flex flex-col items-center mb-6">
             {supervisor.profile_image && (
               <img
-                src={`${API_URL}/uploads/${supervisor.profile_image}`}
+                src={`http://localhost:5000/uploads/${supervisor.profile_image}`}
                 alt="รูปอาจารย์"
                 className="w-32 h-32 object-cover rounded-full border shadow"
               />

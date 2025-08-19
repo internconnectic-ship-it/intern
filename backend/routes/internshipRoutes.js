@@ -56,9 +56,9 @@ router.post('/confirm', async (req, res) => {
     const internship_id = `I${Date.now()}`;
     await db.promise().query(
       `INSERT INTO internship (
-        internship_id,student_id, company_id, internship_position,
+        internship_id, student_id, company_id, internship_position,
         start_date, end_date, compensation, job_description
-      ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         internship_id,
         student_id,
@@ -67,7 +67,8 @@ router.post('/confirm', async (req, res) => {
         startDate,
         endDate,
         job.compensation,
-        job.job_description
+        job.job_description,
+        0
       ]
     );
 

@@ -8,16 +8,9 @@ const DashboardInstructorSupervisors = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await api.get('/api/supervisor');  // ✅ baseURL อยู่ใน axios.js แล้ว
-        setSupervisors(res.data);
-      } catch (err) {
-        console.error("❌ ไม่สามารถโหลดข้อมูลอาจารย์นิเทศ:", err);
-        setSupervisors([]);
-      }
-    };
-    fetchData();
+    api.get('/api/supervisor')
+      .then(res => setSupervisors(res.data))
+      .catch(err => console.error("❌ ไม่สามารถโหลดข้อมูลอาจารย์นิเทศ:", err));
   }, []);
 
   return (

@@ -1,8 +1,6 @@
-// src/pages/student/DashboardStudentStatus.js
 import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header';
-import api from "../../axios";
-// ✅ ใช้ axios instance ที่เราตั้ง baseURL ไว้
+import api from "../../axios"; // ✅ ใช้ instance แทน axios ตรง ๆ
 import { useNavigate } from 'react-router-dom';
 
 const DashboardStudentStatus = () => {
@@ -52,7 +50,9 @@ const DashboardStudentStatus = () => {
       alert('❌ ไม่พบ job_posting_id');
       return;
     }
-    navigate(`/job-detail/${jobId}`, { state: { fromStatusPage: true } });
+    navigate(`/job-detail/${jobId}`, {
+      state: { fromStatusPage: true },
+    });
   };
 
   const handleConfirm = async (jobId) => {
@@ -108,9 +108,16 @@ const DashboardStudentStatus = () => {
                 </thead>
                 <tbody className="text-[#130347]">
                   {applications.map((app, index) => (
-                    <tr key={index} className="hover:bg-[#F8FBFF] transition-colors">
-                      <td className="px-4 py-3 border-b border-[#E6F0FF]">{app.company_name}</td>
-                      <td className="px-4 py-3 border-b border-[#E6F0FF]">{app.position}</td>
+                    <tr
+                      key={index}
+                      className="hover:bg-[#F8FBFF] transition-colors"
+                    >
+                      <td className="px-4 py-3 border-b border-[#E6F0FF]">
+                        {app.company_name}
+                      </td>
+                      <td className="px-4 py-3 border-b border-[#E6F0FF]">
+                        {app.position}
+                      </td>
                       <td className="px-4 py-3 border-b border-[#E6F0FF]">
                         {formatDate(app.apply_date)}
                       </td>
