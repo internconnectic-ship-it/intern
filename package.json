@@ -1,6 +1,8 @@
 {
   "dependencies": {
-    "bcrypt": "^6.0.0"
+    "bcrypt": "^6.0.0",
+    "firebase-admin": "^13.4.0",
+    "multer": "^2.0.2"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",

@@ -32,6 +32,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/api/internship', internshipRoutes);
 app.use('/api/evaluation', evaluationRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/uploads', express.static('uploads'));
 
 // 📌 log เวลา mount route change-password
 console.log("📌 changePasswordRoutes ถูกโหลดเรียบร้อย");

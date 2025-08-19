@@ -1,22 +1,21 @@
+// backend/routes/uploadRoutes.js
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const router = express.Router();
 
-// ตั้งค่า multer สำหรับเก็บไฟล์
 const storage = multer.diskStorage({
-  destination: './uploads/',
+  destination: './uploads/profile/',
   filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, unique + path.extname(file.originalname));
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
-
 const upload = multer({ storage });
 
-// 📤 อัปโหลดรูป
+// 📤 upload image
 router.post('/profile-image', upload.single('image'), (req, res) => {
-  res.json({ filename: req.file.filename });
+  const imagePath = `/uploads/profile/${req.file.filename}`;
+  res.json({ url: imagePath });
 });
 
 module.exports = router;
