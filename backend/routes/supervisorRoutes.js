@@ -24,12 +24,17 @@ router.get('/:id', async (req, res) => {
 // ✏️ PUT: แก้ไขข้อมูลอาจารย์นิเทศ
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const {
+  let {
     supervisor_name, email, phone_number, department,
     faculty, position, profile_image
   } = req.body;
 
   try {
+    // ✅ ถ้า frontend ส่งมาเป็น URL ให้ตัดเอาเฉพาะชื่อไฟล์ เช่น "1692442435221.png"
+    if (profile_image && profile_image.includes('/')) {
+      profile_image = profile_image.split('/').pop();
+    }
+
     await db.promise().query(
       `UPDATE supervisor SET
         supervisor_name = ?, email = ?, phone_number = ?, department = ?,
@@ -37,12 +42,14 @@ router.put('/:id', async (req, res) => {
       WHERE supervisor_id = ?`,
       [supervisor_name, email, phone_number, department, faculty, position, profile_image, id]
     );
+
     res.json({ message: '✅ อัปเดตข้อมูลสำเร็จ' });
   } catch (err) {
     console.error('❌ PUT supervisor error:', err);
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการบันทึก' });
   }
 });
+
 
 // ✅ GET: ดึงข้อมูลอาจารย์นิเทศทั้งหมด
 router.get('/', async (req, res) => {

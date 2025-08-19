@@ -136,7 +136,7 @@ const DashboardSupervisorProfile = () => {
             <div className="w-24 h-24 rounded-full overflow-hidden ring-2 ring-[#E6F0FF] bg-[#F8FBFF]">
               {supervisor.profile_image ? (
                 <img
-                  src={`${API_URL}/uploads/${supervisor.profile_image}`}
+                  src={`${API_URL}/uploads/profile/${instructor.profile_image}`}
                   alt="รูปโปรไฟล์"
                   className="w-full h-full object-cover"
                 />
