@@ -2,6 +2,12 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
+// ⚡ Helper แปลงวันที่เป็น YYYY-MM-DD
+function formatDate(dateString) {
+  if (!dateString) return null;
+  return dateString.split('T')[0]; // ตัดเวลาออก
+}
+
 // 🔍 ดึงข้อมูลนิสิต
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
@@ -20,10 +26,14 @@ router.put('/:id', async (req, res) => {
   const {
     student_name, email, phone_number, major, faculty, university,
     gender, year_level, gpa, birth_date, age, special_skills, profile_image,
-    intern_start_date, intern_end_date // ✅ เพิ่มตรงนี้
+    intern_start_date, intern_end_date
   } = req.body;
 
   try {
+    const birthDate = formatDate(birth_date);
+    const startDate = formatDate(intern_start_date);
+    const endDate = formatDate(intern_end_date);
+
     await db.promise().query(
       `UPDATE student SET 
         student_name = ?, email = ?, phone_number = ?, major = ?, faculty = ?, university = ?, 
@@ -32,8 +42,8 @@ router.put('/:id', async (req, res) => {
       WHERE student_id = ?`,
       [
         student_name, email, phone_number, major, faculty, university,
-        gender, year_level, gpa, birth_date, age, special_skills,
-        profile_image, intern_start_date, intern_end_date, id
+        gender, year_level, gpa, birthDate, age, special_skills,
+        profile_image, startDate, endDate, id
       ]
     );
     res.json({ message: '✅ อัปเดตข้อมูลเรียบร้อยแล้ว' });
@@ -52,6 +62,10 @@ router.post('/profile', async (req, res) => {
   } = req.body;
 
   try {
+    const birthDate = formatDate(birth_date);
+    const startDate = formatDate(intern_start_date);
+    const endDate = formatDate(intern_end_date);
+
     const [exists] = await db.promise().query(
       'SELECT * FROM student WHERE student_id = ?', [student_id]
     );
@@ -66,8 +80,8 @@ router.post('/profile', async (req, res) => {
         WHERE student_id = ?`,
         [
           student_name, email, phone_number, major, faculty, university,
-          gender, year_level, gpa, birth_date, age, special_skills,
-          profile_image, intern_start_date, intern_end_date, student_id
+          gender, year_level, gpa, birthDate, age, special_skills,
+          profile_image, startDate, endDate, student_id
         ]
       );
       return res.json({ message: '✅ อัปเดตข้อมูลเรียบร้อยแล้ว (จาก /profile)' });
@@ -98,8 +112,8 @@ router.post('/profile', async (req, res) => {
         `,
         [
           student_id, student_name, email, phone_number, major, faculty, university,
-          gender, year_level, gpa, birth_date, age, special_skills, profile_image, '',
-          intern_start_date, intern_end_date
+          gender, year_level, gpa, birthDate, age, special_skills, profile_image, '',
+          startDate, endDate
         ]
       );
       return res.json({ message: '✅ เพิ่มข้อมูลนิสิตเรียบร้อยแล้ว' });
@@ -111,6 +125,7 @@ router.post('/profile', async (req, res) => {
   }
 });
 
+// ✅ ดึงประวัติการสมัครงาน
 router.get('/status/history/:studentId', async (req, res) => {
   const { studentId } = req.params;
 
@@ -120,7 +135,7 @@ router.get('/status/history/:studentId', async (req, res) => {
         a.apply_date, 
         a.status, 
         a.job_posting_id, 
-        a.confirmed,              -- ✅ เพิ่มบรรทัดนี้
+        a.confirmed,              
         j.position, 
         c.company_name
        FROM application a
@@ -143,7 +158,7 @@ router.get('/status/history/:studentId', async (req, res) => {
       status: statusMap[row.status] || 'ไม่ทราบสถานะ',
       position: row.position,
       company_name: row.company_name,
-      confirmed: row.confirmed || 0     // ✅ เพิ่มบรรทัดนี้
+      confirmed: row.confirmed || 0
     }));
 
     res.json(result);
@@ -167,8 +182,9 @@ router.get('/by-supervisor/:supervisor_id', async (req, res) => {
       FROM supervisor_selection ss
       JOIN student s ON ss.student_id = s.student_id
       LEFT JOIN company c ON s.current_company_id = c.company_id
-      WHERE ss.supervisor_id = ?
-    `, [supervisor_id]);
+      WHERE ss.supervisor_id = ?`, 
+      [supervisor_id]
+    );
 
     res.json(rows);
   } catch (err) {
@@ -176,6 +192,5 @@ router.get('/by-supervisor/:supervisor_id', async (req, res) => {
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูลนิสิต' });
   }
 });
-
 
 module.exports = router;
