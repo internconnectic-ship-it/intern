@@ -16,8 +16,8 @@ const EvaluationCard = ({ student = {} }) => {
     company_score_pct,
     final_score,
     // 🆕 ฟิลด์ใหม่จากตาราง internship
-    start_date,
-    end_date,
+    intern_start_date,
+    intern_end_date,
   } = student || {};
 
   // --- Helpers ---
@@ -91,8 +91,8 @@ const EvaluationCard = ({ student = {} }) => {
             <p>คะแนนที่ได้ : {fmt(comp120, 0)} / 120 คะแนน</p>
 
             {/* 🆕 แสดงช่วงเวลาฝึกงาน */}
-            <p className="mt-2">วันที่เริ่มฝึกงาน: {fmtDate(start_date)}</p>
-            <p>วันที่สิ้นสุดฝึกงาน: {fmtDate(end_date)}</p>
+            <p className="mt-2">วันที่เริ่มฝึกงาน: {fmtDate(intern_start_date)}</p>
+            <p>วันที่สิ้นสุดฝึกงาน: {fmtDate(intern_end_date)}</p>
 
             <p className="mt-2 font-medium">
               สรุปรวม (เกณฑ์ผ่าน ≥ 70%) : {fScore == null ? '-' : `${fmt(fScore, 1)}%`} 
