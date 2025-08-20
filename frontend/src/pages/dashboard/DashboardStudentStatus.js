@@ -6,7 +6,8 @@ import { useNavigate } from 'react-router-dom';
 const DashboardStudentStatus = () => {
   const studentId = localStorage.getItem('studentId');
   const [applications, setApplications] = useState([]);
-  const [confirmedStatus, setConfirmedStatus] = useState({});
+  //const [confirmedStatus, setConfirmedStatus] = useState({});
+  const [hasConfirmed, setHasConfirmed] = useState(false);
   const navigate = useNavigate();
 
   const formatDate = (dateStr) => dateStr?.split('T')[0];
@@ -63,15 +64,13 @@ const DashboardStudentStatus = () => {
     });
     alert('✅ ยืนยันการฝึกงานสำเร็จ');
 
-    // ✅ อัปเดต confirmedStatus
+    setHasConfirmed(true); // ✅ set ว่ายืนยันแล้ว
     setConfirmedStatus({ [jobId]: true });
-
-    // ✅ อัปเดต applications
     setApplications((prevApps) =>
       prevApps.map((app) =>
         app.job_posting_id === jobId
-          ? { ...app, confirmed: 1 } // อันที่ยืนยัน
-          : { ...app, confirmed: -1 } // อื่น ๆ กลายเป็น -
+          ? { ...app, confirmed: 1 }
+          : { ...app, confirmed: -1 }
       )
     );
   } catch (err) {
@@ -81,7 +80,6 @@ const DashboardStudentStatus = () => {
     alert('❌ ' + message);
   }
 };
-
 
   return (
     <div className="min-h-screen bg-[#9AE5F2] text-[#063D8C]">
@@ -156,7 +154,7 @@ const DashboardStudentStatus = () => {
                             />
                             ยืนยันแล้ว
                           </span>
-                        ) : app.status === 'รับ' && app.confirmed !== -1 ? (
+                        ) : app.status === 'รับ' && !hasConfirmed ? (   // ✅ check hasConfirmed
                           <button
                             onClick={() => handleConfirm(app.job_posting_id)}
                             className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-1.5 shadow-sm"
