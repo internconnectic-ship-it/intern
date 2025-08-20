@@ -8,7 +8,8 @@ const DashboardCompanyStatus = () => {
   const [applications, setApplications] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
-  const company_id = localStorage.getItem('companyId');
+  const company_id = parseInt(localStorage.getItem('companyId'), 10);
+
 
   useEffect(() => {
     if (!company_id) return;
