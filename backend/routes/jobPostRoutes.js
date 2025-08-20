@@ -4,7 +4,9 @@ const db = require('../db');
 const multer = require('multer');
 const path = require('path');
 
-// ▶️ ตั้งค่าเก็บไฟล์ resume
+/* =======================================================
+   ▶️ ตั้งค่าเก็บไฟล์ resume
+======================================================= */
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/resumes');
@@ -38,7 +40,7 @@ router.post('/apply', upload.single('resume'), async (req, res) => {
 });
 
 /* =======================================================
-   2) เพิ่ม/แก้ไข/ลบ Job Posting
+   2) เพิ่ม / แก้ไข / ลบ Job Posting
 ======================================================= */
 // ✅ เพิ่มประกาศงานใหม่
 router.post('/', async (req, res) => {
