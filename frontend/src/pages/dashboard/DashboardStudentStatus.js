@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header';
 import api from "../../axios"; // ✅ ใช้ instance แทน axios ตรง ๆ
 import { useNavigate } from 'react-router-dom';
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 
 const DashboardStudentStatus = () => {
   const studentId = localStorage.getItem('studentId');
