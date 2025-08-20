@@ -170,11 +170,13 @@ router.post("/register", async (req, res) => {
 
     if (role === "supervisor") {
       await db.promise().query(
-        `INSERT INTO supervisor (supervisor_id, supervisor_name, email) VALUES (?, ?, ?)`,
-
+        `INSERT INTO supervisor 
+        (supervisor_id, supervisor_name, email, phone_number, department, faculty, position, profile_image) 
+        VALUES (?, ?, ?, '', '', '', '', '')`,
         [id, name, email]
       );
     }
+
 
     if (role === "instructor") {
       await db.promise().query(
