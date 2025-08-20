@@ -4,9 +4,7 @@ const db = require('../db');
 const multer = require('multer');
 const path = require('path');
 
-/* =======================================================
-   ▶️ ตั้งค่าเก็บไฟล์ resume
-======================================================= */
+// ▶️ ตั้งค่าเก็บไฟล์ resume
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/resumes');
@@ -18,9 +16,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-/* =======================================================
-   1) สมัครงาน (นักศึกษา)
-======================================================= */
+// ✅ นักศึกษาสมัครงาน
 router.post('/apply', upload.single('resume'), async (req, res) => {
   const { student_id, job_posting_id } = req.body;
   const resumePath = req.file ? req.file.filename : null;
@@ -39,9 +35,6 @@ router.post('/apply', upload.single('resume'), async (req, res) => {
   }
 });
 
-/* =======================================================
-   2) เพิ่ม / แก้ไข / ลบ Job Posting
-======================================================= */
 // ✅ เพิ่มประกาศงานใหม่
 router.post('/', async (req, res) => {
   const {
@@ -67,6 +60,70 @@ router.post('/', async (req, res) => {
   } catch (err) {
     console.error('❌ เพิ่ม job posting ล้มเหลว:', err);
     res.status(500).json({ message: 'เกิดข้อผิดพลาดขณะเพิ่มประกาศงาน', error: err.sqlMessage || err.message });
+  }
+});
+
+// ✅ ดึงประกาศงานเฉพาะบริษัท
+router.get('/company/:company_id', async (req, res) => {
+  const { company_id } = req.params;
+
+  try {
+    const [rows] = await db.promise().query(
+      'SELECT * FROM job_posting WHERE company_id = ? ORDER BY job_posting_id DESC',
+      [company_id]
+    );
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error('❌ ดึง job posting ล้มเหลว:', err);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูล', error: err.sqlMessage || err.message });
+  }
+});
+
+// ✅ ลบประกาศงาน
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // ตรวจสอบก่อนว่ามีคนสมัครแล้วหรือยัง
+    const [check] = await db.promise().query(
+      'SELECT * FROM application WHERE job_posting_id = ?',
+      [id]
+    );
+
+    if (check.length > 0) {
+      return res.status(400).json({ message: 'ไม่สามารถลบได้ เนื่องจากมีนิสิตสมัครแล้ว' });
+    }
+
+    const [result] = await db.promise().query(
+      'DELETE FROM job_posting WHERE job_posting_id = ?',
+      [id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'ไม่พบประกาศงานที่ต้องการลบ' });
+    }
+
+    res.json({ message: '✅ ลบประกาศงานเรียบร้อยแล้ว' });
+  } catch (err) {
+    console.error('❌ ลบประกาศล้มเหลว:', err);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบประกาศ', error: err.sqlMessage || err.message });
+  }
+});
+
+
+// ✅ ดึงประกาศงานทั้งหมด (พร้อมชื่อบริษัท)
+router.get('/', async (req, res) => {
+  try {
+    const [rows] = await db.promise().query(`
+      SELECT jp.*, c.company_name, c.company_logo
+      FROM job_posting jp
+      JOIN company c ON jp.company_id = c.company_id
+      ORDER BY jp.job_posting_id DESC
+    `);
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error('❌ ดึง job postings ทั้งหมดล้มเหลว:', err);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูลทั้งหมด', error: err.sqlMessage || err.message });
   }
 });
 
@@ -104,69 +161,24 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// ✅ ลบประกาศงาน
-router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    // ตรวจสอบก่อนว่ามีคนสมัครแล้วหรือยัง
-    const [check] = await db.promise().query(
-      'SELECT * FROM application WHERE job_posting_id = ?',
-      [id]
-    );
-
-    if (check.length > 0) {
-      return res.status(400).json({ message: 'ไม่สามารถลบได้ เนื่องจากมีนิสิตสมัครแล้ว' });
-    }
-
-    const [result] = await db.promise().query(
-      'DELETE FROM job_posting WHERE job_posting_id = ?',
-      [id]
-    );
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: 'ไม่พบประกาศงานที่ต้องการลบ' });
-    }
-
-    res.json({ message: '✅ ลบประกาศงานเรียบร้อยแล้ว' });
-  } catch (err) {
-    console.error('❌ ลบประกาศล้มเหลว:', err);
-    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบประกาศ', error: err.sqlMessage || err.message });
-  }
-});
-
-/* =======================================================
-   3) ดึงข้อมูล Job Posting
-======================================================= */
-// ✅ ดึงประกาศงานเฉพาะบริษัท
-router.get('/company/:company_id', async (req, res) => {
-  const { company_id } = req.params;
+// ✅ ตรวจสอบว่านิสิตเคยสมัครตำแหน่งนี้หรือยัง
+router.get('/check-application', async (req, res) => {
+  const { student_id, job_posting_id } = req.query;
 
   try {
     const [rows] = await db.promise().query(
-      'SELECT * FROM job_posting WHERE company_id = ? ORDER BY job_posting_id DESC',
-      [company_id]
+      'SELECT * FROM application WHERE student_id = ? AND job_posting_id = ?',
+      [student_id, job_posting_id]
     );
-    res.status(200).json(rows);
-  } catch (err) {
-    console.error('❌ ดึง job posting ล้มเหลว:', err);
-    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูล', error: err.sqlMessage || err.message });
-  }
-});
 
-// ✅ ดึง job postings ทั้งหมด (พร้อมชื่อบริษัท)
-router.get('/', async (req, res) => {
-  try {
-    const [rows] = await db.promise().query(`
-      SELECT jp.*, c.company_name, c.company_logo
-      FROM job_posting jp
-      JOIN company c ON jp.company_id = c.company_id
-      ORDER BY jp.job_posting_id DESC
-    `);
-    res.status(200).json(rows);
+    if (rows.length > 0) {
+      res.json({ applied: true }); // ✅ เคยสมัครแล้ว
+    } else {
+      res.json({ applied: false }); // ❌ ยังไม่เคยสมัคร
+    }
   } catch (err) {
-    console.error('❌ ดึง job postings ทั้งหมดล้มเหลว:', err);
-    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูลทั้งหมด', error: err.sqlMessage || err.message });
+    console.error('❌ ตรวจสอบการสมัครล้มเหลว:', err);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาด', error: err.message });
   }
 });
 
@@ -192,49 +204,24 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-/* =======================================================
-   4) การจัดการใบสมัคร (Application)
-======================================================= */
-// ✅ ตรวจสอบว่านิสิตเคยสมัครตำแหน่งนี้หรือยัง
-router.get('/check-application', async (req, res) => {
-  const { student_id, job_posting_id } = req.query;
-
-  try {
-    const [rows] = await db.promise().query(
-      'SELECT * FROM application WHERE student_id = ? AND job_posting_id = ?',
-      [student_id, job_posting_id]
-    );
-
-    if (rows.length > 0) {
-      res.json({ applied: true }); // ✅ เคยสมัครแล้ว
-    } else {
-      res.json({ applied: false }); // ❌ ยังไม่เคยสมัคร
-    }
-  } catch (err) {
-    console.error('❌ ตรวจสอบการสมัครล้มเหลว:', err);
-    res.status(500).json({ message: 'เกิดข้อผิดพลาด', error: err.message });
-  }
-});
-
 // ✅ ดึงข้อมูลนิสิตที่สมัครเข้ามากับบริษัทนั้น
 router.get('/applications/:company_id', async (req, res) => {
   const { company_id } = req.params;
 
   try {
     const [rows] = await db.promise().query(`
-      SELECT 
-        a.*, 
-        s.student_name, s.email, s.phone_number, s.major, s.faculty, 
-        jp.position, jp.business_type,
-        i.company_id AS confirmed_company_id,
-        i.job_posting_id AS confirmed_job_posting_id
-      FROM application a
-      JOIN job_posting jp ON a.job_posting_id = jp.job_posting_id
-      JOIN student s ON a.student_id = s.student_id
-      LEFT JOIN internship i ON a.student_id = i.student_id
-      WHERE jp.company_id = ?
-      ORDER BY a.apply_date DESC
-    `, [company_id]);
+    SELECT 
+      a.*, 
+      s.student_name, s.email, s.phone_number, s.major, s.faculty, 
+      jp.position, jp.business_type,
+      i.company_id AS confirmed_company_id
+    FROM application a
+    JOIN job_posting jp ON a.job_posting_id = jp.job_posting_id
+    JOIN student s ON a.student_id = s.student_id
+    LEFT JOIN internship i ON a.student_id = i.student_id
+    WHERE jp.company_id = ?
+    ORDER BY a.apply_date DESC
+  `, [company_id]);
 
     res.status(200).json(rows);
   } catch (err) {
@@ -264,5 +251,7 @@ router.put('/application/status/:application_id', async (req, res) => {
     res.status(500).json({ message: 'เกิดข้อผิดพลาด', error: err.message });
   }
 });
+
+
 
 module.exports = router;
