@@ -70,8 +70,8 @@ const DashboardStudentStatus = () => {
     setApplications((prev) =>
       prev.map((app) =>
         app.job_posting_id === jobId
-          ? { ...app, confirmed: 1 }
-          : { ...app, confirmed: -1 }
+          ? { ...app, confirmed: -1 }
+          : { ...app, confirmed: 1 }
       )
     );
   } catch (err) {
