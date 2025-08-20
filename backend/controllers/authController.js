@@ -73,7 +73,7 @@ exports.register = async (req, res) => {
     } else if (role === 'supervisor') {
       await db.promise().query(
         `INSERT INTO supervisor (
-          supervisor_id, supervisor_name, emai  l
+          supervisor_id, supervisor_name, email
         ) VALUES (?, ?, ?)`,
 
         [id, name, email]
