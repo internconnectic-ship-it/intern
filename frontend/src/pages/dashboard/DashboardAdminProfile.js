@@ -201,6 +201,7 @@ const DashboardAdminProfile = () => {
                 name="currentPassword"
                 value={passwordForm.currentPassword}
                 onChange={handlePasswordChange}
+                autoComplete="new-password"  
                 className="w-full rounded-xl border border-[#E6F0FF] bg-[#F8FBFF] px-3 py-2"
               />
             </div>
