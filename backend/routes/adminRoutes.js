@@ -163,25 +163,29 @@ router.post("/register", async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // insert ไปที่ users ก่อน
     await db.promise().query(
-      `INSERT INTO users (id, name, email, password, role, approval_status) VALUES (?, ?, ?, ?, ?, 'approved')`,
+      `INSERT INTO users (id, name, email, password, role, approval_status) 
+       VALUES (?, ?, ?, ?, ?, 'approved')`,
       [id, name, email, hashedPassword, role]
     );
 
+    // ถ้าเป็น supervisor
     if (role === "supervisor") {
       await db.promise().query(
         `INSERT INTO supervisor 
-        (supervisor_id, supervisor_name, email, phone_number, department, faculty, position, profile_image) 
-        VALUES (?, ?, ?, '', '', '', '', '')`,
+         (supervisor_id, supervisor_name, email) 
+         VALUES (?, ?, ?)`,
         [id, name, email]
       );
     }
 
-
+    // ถ้าเป็น instructor
     if (role === "instructor") {
       await db.promise().query(
-        `INSERT INTO instructor (Instructor_id, Instructor_name, email) VALUES (?, ?, ?)`,
-
+        `INSERT INTO instructor 
+         (Instructor_id, Instructor_name, email) 
+         VALUES (?, ?, ?)`,
         [id, name, email]
       );
     }
@@ -192,5 +196,6 @@ router.post("/register", async (req, res) => {
     res.status(500).json({ message: "เกิดข้อผิดพลาด" });
   }
 });
+
 
 module.exports = router;
