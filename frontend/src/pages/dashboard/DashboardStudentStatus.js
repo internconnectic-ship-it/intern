@@ -8,6 +8,7 @@ const DashboardStudentStatus = () => {
   const [applications, setApplications] = useState([]);
   const [confirmedStatus, setConfirmedStatus] = useState({});
   const [hasConfirmed, setHasConfirmed] = useState(false);
+  const [confirmedJobId, setConfirmedJobId] = useState(null);
   const navigate = useNavigate();
 
   const formatDate = (dateStr) => dateStr?.split('T')[0];
@@ -65,24 +66,20 @@ const DashboardStudentStatus = () => {
 
     alert('✅ ยืนยันการฝึกงานสำเร็จ');
     setHasConfirmed(true);
-    setConfirmedStatus({ [jobId]: true });
+    setConfirmedJobId(jobId);
 
     setApplications((prev) =>
       prev.map((app) =>
         app.job_posting_id === jobId
-          ? { ...app, confirmed: -1 }
-          : { ...app, confirmed: 1 }
+          ? { ...app, confirmed: 1 }
+          : { ...app, confirmed: 0 }
       )
     );
   } catch (err) {
     console.error('❌ ยืนยันล้มเหลว:', err);
-    const message =
-      err.response?.data?.message || 'เกิดข้อผิดพลาดในการยืนยันการฝึกงาน';
-    alert('❌ ' + message);
+    alert('❌ ' + (err.response?.data?.message || 'เกิดข้อผิดพลาด'));
   }
 };
-
-
   return (
     <div className="min-h-screen bg-[#9AE5F2] text-[#063D8C]">
       <Header />
@@ -146,17 +143,18 @@ const DashboardStudentStatus = () => {
                         </button>
                       </td>
                       <td className="px-4 py-3 border-b border-[#E6F0FF] text-center">
-                        {app.confirmed === 1 ? (
-                          // ✅ แถวที่กดยืนยัน
+                        {app.confirmed === 1 && app.job_posting_id === confirmedJobId ? (
+                          // กรณี confirm ตำแหน่งนี้
                           <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold px-3 py-1.5">
-                            <input type="checkbox" checked readOnly className="accent-emerald-600" />
-                            ยืนยันแล้ว
+                            ✅ นิสิตยืนยันฝึกงานแล้ว
                           </span>
-                        ) : app.confirmed === -1 ? (
-                          // ❌ แถวอื่น หลัง confirm แล้ว → ต้องเป็น "-"
-                          <span className="text-[#465d71]">-</span>
-                        ) : app.status === 'รับ' ? (
-                          // 🔘 ยังไม่ confirm และ status = "รับ"
+                        ) : app.confirmed === 1 && app.company_id !== applications.find(a => a.job_posting_id === confirmedJobId)?.company_id ? (
+                          // ถ้า confirm บริษัทอื่น
+                          <span className="inline-flex items-center gap-2 rounded-full bg-red-50 border border-red-200 text-red-700 text-sm font-semibold px-3 py-1.5">
+                            🚨 นิสิตได้ยืนยันสถานประกอบการอื่นไปแล้ว
+                          </span>
+                        ) : app.status === 'รับ' && !hasConfirmed ? (
+                          // ปุ่มกดยืนยัน (เฉพาะถ้ายังไม่เคย confirm)
                           <button
                             onClick={() => handleConfirm(app.job_posting_id)}
                             className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-1.5 shadow-sm"
