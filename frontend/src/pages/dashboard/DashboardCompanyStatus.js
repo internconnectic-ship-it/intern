@@ -109,7 +109,7 @@ const DashboardCompanyStatus = () => {
                   <p><strong>ตำแหน่งที่สมัคร:</strong> {app.position}</p>
                   <p><strong>ประเภทงาน:</strong> {app.business_type}</p>
 
-                  {app.confirmed === 1 && (
+                  {app.confirmed === 1 ? (
                     app.company_id === company_id ? (
                       <p className="text-green-600 font-semibold mt-2">
                         ✅ นิสิตยืนยันฝึกงานแล้ว
@@ -119,7 +119,7 @@ const DashboardCompanyStatus = () => {
                         🚨 นิสิตได้ยืนยันสถานประกอบการอื่นไปแล้ว
                       </p>
                     )
-                  )}
+                  ) : null}
                 </div>
 
                 {/* แก้ไขสถานะ ล่างขวา */}
