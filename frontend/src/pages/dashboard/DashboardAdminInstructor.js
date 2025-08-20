@@ -8,7 +8,7 @@ const DashboardAdminInstructor = () => {
   const [instructors, setInstructors] = useState([]);
 
   useEffect(() => {
-    axios.get(`${API_URL}/api/instructor`)
+    api.get(`${API_URL}/api/instructor`)
       .then((res) => setInstructors(res.data))
       .catch((err) =>
         console.error("❌ ดึงข้อมูล instructors ล้มเหลว:", err)
