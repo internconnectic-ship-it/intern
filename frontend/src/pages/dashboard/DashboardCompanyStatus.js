@@ -108,14 +108,18 @@ const DashboardCompanyStatus = () => {
                   </p>
                   <p><strong>ตำแหน่งที่สมัคร:</strong> {app.position}</p>
                   <p><strong>ประเภทงาน:</strong> {app.business_type}</p>
-                    {app.confirmed_position ? (
-                      String(app.confirmed_position) === String(app.position) ? (
-                        <p className="text-green-600 font-semibold mt-2">
-                          ✅ นิสิตยืนยันฝึกงานแล้ว
-                        </p>
+                    {app.confirmed_company_id ? (
+                      String(app.confirmed_company_id) === String(company_id) ? (
+                        // บริษัทเดียวกัน
+                        String(app.confirmed_position) === String(app.position) ? (
+                          <p className="text-green-600 font-semibold mt-2">
+                            ✅ นิสิตยืนยันฝึกงานแล้ว
+                          </p>
+                        ) : null
                       ) : (
+                        // บริษัทอื่น
                         <p className="text-red-600 font-semibold mt-2">
-                          🚨 นิสิตได้ยืนยันประกาศงานอื่นแล้ว
+                          🚨 นิสิตได้ยืนยันสถานประกอบการอื่นไปแล้ว
                         </p>
                       )
                     ) : null}

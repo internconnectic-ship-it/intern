@@ -220,11 +220,9 @@ router.get('/applications/:company_id', async (req, res) => {
       JOIN job_posting jp ON a.job_posting_id = jp.job_posting_id
       JOIN student s ON a.student_id = s.student_id
       LEFT JOIN internship i 
-        ON a.student_id = i.student_id 
-        AND jp.company_id = i.company_id  
+        ON a.student_id = i.student_id
       WHERE jp.company_id = ?
       ORDER BY a.apply_date DESC;
-
     `, [company_id]);
 
 
