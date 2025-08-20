@@ -261,11 +261,14 @@ router.get('/all', async (req, res) => {
         END AS final_status,
         e.evaluation_result,                       -- 1/0 (ที่อัปเดตตอน submit)
         sup.supervisor_name,
-        c.company_name
+        c.company_name,
+        i.start_date   AS intern_start_date,       -- 🆕
+        i.end_date     AS intern_end_date          -- 🆕
       FROM evaluation e
-      JOIN student s ON e.student_id = s.student_id
+      JOIN student s     ON e.student_id = s.student_id
       LEFT JOIN supervisor sup ON e.supervisor_id = sup.supervisor_id
-      LEFT JOIN company c ON e.company_id = c.company_id
+      LEFT JOIN company c      ON e.company_id = c.company_id
+      LEFT JOIN internship i   ON e.internship_id = i.internship_id   -- 🆕 join internship
     `);
     res.json(rows);
   } catch (err) {
@@ -273,6 +276,7 @@ router.get('/all', async (req, res) => {
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการโหลดข้อมูล' });
   }
 });
+
 
 // ✅ PUT: อัปเดตผลการประเมิน (ให้สิทธิ์อาจารย์เซ็ตผลรวม/แก้ไข)
 router.put('/:evaluation_id', async (req, res) => {
