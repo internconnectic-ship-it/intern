@@ -39,8 +39,8 @@ const DashboardAdminInstructor = () => {
           <tbody>
             {instructors.map((inst, i) => (
               <tr key={i} className="border-t text-center">
-                <td className="p-2">{inst.Instructor_id}</td>
-                <td className="p-2">{inst.Instructor_name}</td>
+                <td className="p-2">{inst.instructor_id}</td>
+                <td className="p-2">{inst.instructor_name}</td>
                 <td className="p-2">{inst.email}</td>
                 <td className="p-2">{inst.faculty || "-"}</td>
                 <td className="p-2">{inst.department || "-"}</td>
