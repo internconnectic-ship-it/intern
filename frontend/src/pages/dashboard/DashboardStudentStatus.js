@@ -144,24 +144,22 @@ const DashboardStudentStatus = () => {
                         </button>
                       </td>
                       <td className="px-4 py-3 border-b border-[#E6F0FF] text-center">
-                        {hasConfirmed ? (
-                          confirmedStatus[app.job_posting_id] ? (
-                            // ✅ แถวที่ confirm จริง
-                            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold px-3 py-1.5">
-                              <input
-                                type="checkbox"
-                                checked
-                                readOnly
-                                className="accent-emerald-600"
-                              />
-                              ยืนยันแล้ว
-                            </span>
-                          ) : (
-                            // ❌ แถวอื่น → ต้องเป็น "-"
-                            <span className="text-[#465d71]">-</span>
-                          )
+                        {confirmedStatus[app.job_posting_id] ? (
+                          // ✅ ถ้าเป็น job ที่ confirm แล้ว
+                          <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold px-3 py-1.5">
+                            <input
+                              type="checkbox"
+                              checked
+                              readOnly
+                              className="accent-emerald-600"
+                            />
+                            ยืนยันแล้ว
+                          </span>
+                        ) : hasConfirmed ? (
+                          // ❌ ถ้ายืนยันที่อื่นแล้ว อันนี้ต้องขึ้น "-"
+                          <span className="text-[#465d71]">-</span>
                         ) : app.status === 'รับ' ? (
-                          // กรณียังไม่เคย confirm และสถานะ = "รับ"
+                          // 🔘 ยังไม่ confirm และ status = "รับ" → โชว์ปุ่ม
                           <button
                             onClick={() => handleConfirm(app.job_posting_id)}
                             className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-1.5 shadow-sm"
@@ -169,6 +167,7 @@ const DashboardStudentStatus = () => {
                             ยืนยันฝึกงาน
                           </button>
                         ) : (
+                          // อื่น ๆ → "-"
                           <span className="text-[#465d71]">-</span>
                         )}
                       </td>
