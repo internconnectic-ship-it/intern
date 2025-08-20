@@ -211,19 +211,20 @@ router.get('/applications/:company_id', async (req, res) => {
   try {
     const [rows] = await db.promise().query(`
       SELECT 
-        a.*, 
-        s.student_name, s.email, s.phone_number, s.major, s.faculty, 
-        jp.position, jp.business_type,
-        i.company_id AS confirmed_company_id,
-        i.job_posting_id AS confirmed_job_posting_id
-      FROM application a
-      JOIN job_posting jp ON a.job_posting_id = jp.job_posting_id
-      JOIN student s ON a.student_id = s.student_id
-      LEFT JOIN internship i 
-        ON a.student_id = i.student_id 
-        AND a.job_posting_id = i.job_posting_id  
-      WHERE jp.company_id = ?
-      ORDER BY a.apply_date DESC
+      a.*, 
+      s.student_name, s.email, s.phone_number, s.major, s.faculty, 
+      jp.position, jp.business_type,
+      i.company_id AS confirmed_company_id,
+      i.internship_position AS confirmed_position
+    FROM application a
+    JOIN job_posting jp ON a.job_posting_id = jp.job_posting_id
+    JOIN student s ON a.student_id = s.student_id
+    LEFT JOIN internship i 
+      ON a.student_id = i.student_id 
+      AND jp.company_id = i.company_id       
+      AND jp.position = i.internship_position 
+    WHERE jp.company_id = ?
+    ORDER BY a.apply_date DESC;
     `, [company_id]);
 
 
