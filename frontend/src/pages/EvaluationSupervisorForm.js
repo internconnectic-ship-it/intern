@@ -29,6 +29,29 @@ const EvaluationSupervisorForm = () => {
     qna: 10
   };
 
+  // 🔹 โหลดข้อมูลที่เคยกรอกมาแสดง
+  useEffect(() => {
+    const fetchEvaluation = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/evaluation/${id}?role=supervisor`);
+        if (res.data) {
+          setScore({
+            quality: res.data.score_quality || '',
+            behavior: res.data.score_behavior || '',
+            skill: res.data.score_skill || '',
+            personality: res.data.score_presentation || '',
+            content: res.data.score_content || '',
+            qna: res.data.score_answer || '',
+            comment: res.data.supervisor_comment || ''
+          });
+        }
+      } catch (err) {
+        console.log("ℹ️ ยังไม่มีข้อมูลประเมินของ supervisor สำหรับนิสิตนี้");
+      }
+    };
+    fetchEvaluation();
+  }, [id, API_URL]);
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === 'comment') {
