@@ -236,8 +236,8 @@ router.get('/all', async (req, res) => {
         e.student_id,
         s.student_name,
         s.profile_image,
-        s.intern_start_date,   -- ✅ ดึงจาก student
-        s.intern_end_date,     -- ✅ ดึงจาก student
+        s.intern_start_date,
+        s.intern_end_date,
         e.supervisor_score,                        -- 0–100
         e.company_score,                           -- ดิบ 0–120
         -- บริษัทเป็นเปอร์เซ็นต์ (0–100)
