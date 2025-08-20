@@ -6,8 +6,8 @@ import { useNavigate } from 'react-router-dom';
 const DashboardStudentStatus = () => {
   const studentId = localStorage.getItem('studentId');
   const [applications, setApplications] = useState([]);
-  // const [confirmedStatus, setConfirmedStatus] = useState({});
-  // const [hasConfirmed, setHasConfirmed] = useState(false);
+  const [confirmedStatus, setConfirmedStatus] = useState({});
+  const [hasConfirmed, setHasConfirmed] = useState(false);
   const [confirmedJobId, setConfirmedJobId] = useState(null);
   const navigate = useNavigate();
 
@@ -59,14 +59,12 @@ const DashboardStudentStatus = () => {
 
   const handleConfirm = async (jobId) => {
   try {
-    await api.post('/api/internship/confirm', {
+    await axios.post(`${API_URL}/api/internship/confirm`, {
       student_id: studentId,
       job_posting_id: jobId,
     });
 
-    alert('✅ ยืนยันการฝึกงานสำเร็จ');
-    setConfirmedJobId(jobId); // เก็บว่า confirm ตัวนี้แล้ว
-
+    // อัปเดต state ให้มี confirm แค่ job ที่เลือก
     setApplications((prev) =>
       prev.map((app) =>
         app.job_posting_id === jobId
@@ -75,13 +73,9 @@ const DashboardStudentStatus = () => {
       )
     );
   } catch (err) {
-    console.error('❌ ยืนยันล้มเหลว:', err);
-    const message =
-      err.response?.data?.message || 'เกิดข้อผิดพลาดในการยืนยันการฝึกงาน';
-    alert('❌ ' + message);
+    console.error("❌ ยืนยันฝึกงานล้มเหลว:", err);
   }
 };
-
   return (
     <div className="min-h-screen bg-[#9AE5F2] text-[#063D8C]">
       <Header />
