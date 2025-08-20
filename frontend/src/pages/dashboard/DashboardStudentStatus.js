@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const DashboardStudentStatus = () => {
   const studentId = localStorage.getItem('studentId');
   const [applications, setApplications] = useState([]);
-  //const [confirmedStatus, setConfirmedStatus] = useState({});
+  const [confirmedStatus, setConfirmedStatus] = useState({});
   const [hasConfirmed, setHasConfirmed] = useState(false);
   const navigate = useNavigate();
 
