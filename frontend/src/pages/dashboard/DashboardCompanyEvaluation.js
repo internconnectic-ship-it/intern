@@ -66,7 +66,7 @@ const DashboardCompanyEvaluation = () => {
               {/* ปุ่ม */}
               <div className="mt-4">
                     <button
-                      onClick={() => handleEvaluate(s.student_id)}
+                      onClick={() => handleEvaluate(student.student_id)}
                       className={`rounded-full text-white text-sm font-semibold px-4 py-2 shadow-sm ${
                         student.evaluation_status === 'completed'
                           ? 'bg-[#225EC4] hover:bg-[#1b55b5]'
