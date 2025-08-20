@@ -56,25 +56,32 @@ const DashboardStudentStatus = () => {
   };
 
   const handleConfirm = async (jobId) => {
-    try {
-      await api.post('/api/internship/confirm', {
-        student_id: studentId,
-        job_posting_id: jobId,
-      });
-      alert('✅ ยืนยันการฝึกงานสำเร็จ');
-      setConfirmedStatus((prev) => ({ ...prev, [jobId]: true }));
-      setApplications((prevApps) =>
-        prevApps.map((app) =>
-          app.job_posting_id === jobId ? { ...app, confirmed: 1 } : app
-        )
-      );
-    } catch (err) {
-      console.error('❌ ยืนยันล้มเหลว:', err);
-      const message =
-        err.response?.data?.message || 'เกิดข้อผิดพลาดในการยืนยันการฝึกงาน';
-      alert('❌ ' + message);
-    }
-  };
+  try {
+    await api.post('/api/internship/confirm', {
+      student_id: studentId,
+      job_posting_id: jobId,
+    });
+    alert('✅ ยืนยันการฝึกงานสำเร็จ');
+
+    // ✅ อัปเดต confirmedStatus
+    setConfirmedStatus({ [jobId]: true });
+
+    // ✅ อัปเดต applications
+    setApplications((prevApps) =>
+      prevApps.map((app) =>
+        app.job_posting_id === jobId
+          ? { ...app, confirmed: 1 } // อันที่ยืนยัน
+          : { ...app, confirmed: -1 } // อื่น ๆ กลายเป็น -
+      )
+    );
+  } catch (err) {
+    console.error('❌ ยืนยันล้มเหลว:', err);
+    const message =
+      err.response?.data?.message || 'เกิดข้อผิดพลาดในการยืนยันการฝึกงาน';
+    alert('❌ ' + message);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-[#9AE5F2] text-[#063D8C]">
@@ -149,7 +156,7 @@ const DashboardStudentStatus = () => {
                             />
                             ยืนยันแล้ว
                           </span>
-                        ) : app.status === 'รับ' ? (
+                        ) : app.status === 'รับ' && app.confirmed !== -1 ? (
                           <button
                             onClick={() => handleConfirm(app.job_posting_id)}
                             className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-1.5 shadow-sm"
@@ -160,6 +167,7 @@ const DashboardStudentStatus = () => {
                           <span className="text-[#465d71]">-</span>
                         )}
                       </td>
+
                     </tr>
                   ))}
                 </tbody>
