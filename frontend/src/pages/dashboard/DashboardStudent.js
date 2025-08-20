@@ -93,7 +93,7 @@ const DashboardStudent = () => {
               className="bg-white border border-[#E6F0FF] rounded-2xl shadow-sm p-5 flex gap-4 items-start hover:shadow-md transition"
             >
               <img
-                src={img(job.company_logo)}
+                src={job.company_logo}
                 alt="logo"
                 className="w-20 h-20 object-cover rounded-2xl border border-[#E6F0FF] bg-white"
               />
