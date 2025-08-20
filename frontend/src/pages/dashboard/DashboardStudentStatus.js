@@ -144,17 +144,17 @@ const DashboardStudentStatus = () => {
                       </td>
                       <td className="px-4 py-3 border-b border-[#E6F0FF] text-center">
                         {app.confirmed === 1 && app.job_posting_id === confirmedJobId ? (
-                          // กรณี confirm ตำแหน่งนี้
+                          // 1) ยืนยันโพสต์นี้แล้ว
                           <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold px-3 py-1.5">
                             ✅ นิสิตยืนยันฝึกงานแล้ว
                           </span>
                         ) : app.confirmed === 1 && app.company_id !== applications.find(a => a.job_posting_id === confirmedJobId)?.company_id ? (
-                          // ถ้า confirm บริษัทอื่น
+                          // 2) ยืนยันไปแล้ว แต่เป็นบริษัทอื่น
                           <span className="inline-flex items-center gap-2 rounded-full bg-red-50 border border-red-200 text-red-700 text-sm font-semibold px-3 py-1.5">
                             🚨 นิสิตได้ยืนยันสถานประกอบการอื่นไปแล้ว
                           </span>
                         ) : app.status === 'รับ' && !hasConfirmed ? (
-                          // ปุ่มกดยืนยัน (เฉพาะถ้ายังไม่เคย confirm)
+                          // 3) ยังไม่เคย confirm และบริษัทนี้รับแล้ว → ปุ่มกดยืนยัน
                           <button
                             onClick={() => handleConfirm(app.job_posting_id)}
                             className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-1.5 shadow-sm"
@@ -162,10 +162,11 @@ const DashboardStudentStatus = () => {
                             ยืนยันฝึกงาน
                           </button>
                         ) : (
-                          // กรณีอื่น ๆ
+                          // 4) กรณีอื่น ๆ → ไม่ขึ้นอะไร
                           <span className="text-[#465d71]">-</span>
                         )}
                       </td>
+
                     </tr>
                   ))}
                 </tbody>
