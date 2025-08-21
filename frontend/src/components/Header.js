@@ -15,8 +15,8 @@ const DEFAULT_PROFILE =
 const Header = () => {
   const role = localStorage.getItem("role");
   const userId = localStorage.getItem(`${role}Id`);
-  const [profileImage, setProfileImage] = useState("default-profile.png");
-  //const [profileImage, setProfileImage] = useState(DEFAULT_PROFILE);
+  //const [profileImage, setProfileImage] = useState("default-profile.png");
+  const [profileImage, setProfileImage] = useState(DEFAULT_PROFILE);
   const [userName, setUserName] = useState("ผู้ใช้");
   const navigate = useNavigate();
 
@@ -39,12 +39,12 @@ const Header = () => {
           role === "admin" ? data.admin_name :
           "ผู้ใช้";
 
-        setProfileImage(image || "default-profile.png");
+        setProfileImage(image || "DEFAULT_PROFILE");
         setUserName(name || "ผู้ใช้");
       })
       .catch(err => {
         console.error("โหลดข้อมูลผู้ใช้ล้มเหลว:", err);
-        setProfileImage("default-profile.png");
+        setProfileImage("DEFAULT_PROFILE");
       });
   }
 }, [role, userId]);
