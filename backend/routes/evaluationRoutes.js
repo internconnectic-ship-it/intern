@@ -218,7 +218,6 @@ router.post('/submit', async (req, res) => {
   }
 });
 
-
 // ✅ GET: ดึงข้อมูลการประเมินของนักศึกษา (รวม + details)
 router.get('/:student_id', async (req, res) => {
   const { student_id } = req.params;
@@ -355,8 +354,32 @@ router.get('/details/:student_id/:role', async (req, res) => {
     res.status(500).json({ message: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
   }
 });
-
-    
-
+// routes/evaluationRoutes.js
+router.get('/all', async (req, res) => {
+  try {
+    const [rows] = await db.promise().query(`
+      SELECT 
+        e.evaluation_id,
+        e.student_id,
+        s.student_name,
+        s.profile_image,
+        e.supervisor_score,
+        e.company_score,
+        LEAST((e.company_score / 120) * 100, 100) AS company_score_pct,
+        CASE 
+          WHEN e.company_score IS NOT NULL AND e.supervisor_score IS NOT NULL
+            THEN (LEAST((e.company_score / 120) * 100, 100) * 0.60) 
+               + (LEAST(e.supervisor_score, 100) * 0.40)
+          ELSE NULL
+        END AS final_score
+      FROM evaluation e
+      JOIN student s ON e.student_id = s.student_id
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error("❌ evaluation/all error:", err);
+    res.status(500).json({ message: "ดึงข้อมูลล้มเหลว" });
+  }
+});
 
 module.exports = router;
