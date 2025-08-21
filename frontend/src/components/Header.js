@@ -15,8 +15,8 @@ const DEFAULT_PROFILE =
 const Header = () => {
   const role = localStorage.getItem("role");
   const userId = localStorage.getItem(`${role}Id`);
-  //const [profileImage, setProfileImage] = useState("default-profile.png");
-  const [profileImage, setProfileImage] = useState(DEFAULT_PROFILE);
+  const [profileImage, setProfileImage] = useState("default-profile.png");
+  //const [profileImage, setProfileImage] = useState(DEFAULT_PROFILE);
   const [userName, setUserName] = useState("ผู้ใช้");
   const navigate = useNavigate();
 
