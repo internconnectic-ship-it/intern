@@ -11,7 +11,8 @@ const RegisterPage = () => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    business_type: ''
   });
 
   const navigate = useNavigate();
@@ -47,7 +48,8 @@ const RegisterPage = () => {
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        role
+        role,
+        ...(role === "company" && { business_type: formData.business_type })
       });
       alert('✅ สมัครสมาชิกสำเร็จ');
       navigate('/login');
@@ -178,6 +180,24 @@ const RegisterPage = () => {
                     required
                   />
                 </div>
+
+                {role === 'company' && (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      ประเภทธุรกิจ
+                    </label>
+                    <input
+                      type="text"
+                      name="business_type"
+                      value={formData.business_type}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 rounded-lg border bg-white
+                                 border-[#6EC7E2] focus:outline-none focus:ring-4
+                                 focus:ring-[#95FCF2] focus:border-[#225EC4]"
+                      required
+                    />
+                  </div>
+                )}
               </>
             )}
 
