@@ -256,12 +256,16 @@ router.get('/:student_id', async (req, res) => {
 // ✅ GET: ดึงข้อมูลคะแนนดิบจาก evaluation_company_details
 router.get('/company-details/:student_id', async (req, res) => {
   const { student_id } = req.params;
+  console.log("GET /company-details/", student_id); // debug
   try {
     const [rows] = await db.promise().query(
       `SELECT * FROM evaluation_company_details WHERE student_id = ?`,
       [student_id]
     );
-    res.json(rows[0] || null);
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ message: 'ไม่พบข้อมูลการประเมินบริษัทของนิสิตนี้' });
+    }
+    res.json(rows[0]);
   } catch (err) {
     console.error('❌ ดึงข้อมูล company details ล้มเหลว:', err);
     res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
@@ -271,6 +275,7 @@ router.get('/company-details/:student_id', async (req, res) => {
 // ✅ GET: ดึงข้อมูลคะแนนดิบจาก evaluation_supervisor_details
 router.get('/supervisor-details/:student_id', async (req, res) => {
   const { student_id } = req.params;
+  console.log("GET /supervisor-details/", student_id); // debug student_id
   try {
     const [rows] = await db.promise().query(
       `SELECT * FROM evaluation_supervisor_details WHERE student_id = ?`,
