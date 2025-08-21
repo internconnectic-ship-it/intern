@@ -354,7 +354,7 @@ router.get('/details/:student_id/:role', async (req, res) => {
     res.status(500).json({ message: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
   }
 });
-// 📌 GET: ดึงข้อมูลการประเมินทั้งหมด + join student
+// ✅ GET: รวมผลการประเมินแบบคำนวณใหม่ (มี final_score / final_status)
 router.get('/all', async (req, res) => {
   try {
     const [rows] = await db.promise().query(`
@@ -363,30 +363,41 @@ router.get('/all', async (req, res) => {
         e.student_id,
         s.student_name,
         s.profile_image,
-        i.internship_id,
-        i.company_id,
-        i.internship_position,
-        i.start_date AS intern_start_date,
-        i.end_date AS intern_end_date,
-        e.supervisor_score,
-        e.company_score,
-        -- บริษัทคิดเปอร์เซ็นต์
+        e.supervisor_score,                        -- 0–100
+        e.company_score,                           -- ดิบ 0–120
+        -- บริษัทเป็นเปอร์เซ็นต์ (0–100)
         LEAST((e.company_score / 120) * 100, 100) AS company_score_pct,
-        -- คะแนนรวม (ถ้ามีทั้งสองฝั่ง)
+        -- คะแนนรวมถ่วงน้ำหนัก 60/40 (0–100) เมื่อมีครบสองฝั่ง
         CASE 
           WHEN e.company_score IS NOT NULL AND e.supervisor_score IS NOT NULL
             THEN (LEAST((e.company_score / 120) * 100, 100) * 0.60) 
                + (LEAST(e.supervisor_score, 100) * 0.40)
           ELSE NULL
-        END AS final_score
+        END AS final_score,
+        -- สถานะ: pass/fail/pending
+        CASE 
+          WHEN e.company_score IS NOT NULL AND e.supervisor_score IS NOT NULL
+               AND (
+                 (LEAST((e.company_score / 120) * 100, 100) * 0.60)
+               + (LEAST(e.supervisor_score, 100) * 0.40)
+               ) >= 70
+            THEN 'pass'
+          WHEN e.company_score IS NOT NULL AND e.supervisor_score IS NOT NULL
+            THEN 'fail'
+          ELSE 'pending'
+        END AS final_status,
+        e.evaluation_result,                       -- 1/0 (ที่อัปเดตตอน submit)
+        sup.supervisor_name,
+        c.company_name
       FROM evaluation e
-      JOIN internship i ON e.student_id = i.student_id
+      JOIN student s ON e.student_id = s.student_id
+      LEFT JOIN supervisor sup ON e.supervisor_id = sup.supervisor_id
+      LEFT JOIN company c ON e.company_id = c.company_id
     `);
-
     res.json(rows);
   } catch (err) {
-    console.error("❌ error get /api/evaluation/all:", err);
-    res.status(500).json({ message: "server error" });
+    console.error('❌ ดึงข้อมูลการประเมินล้มเหลว:', err);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการโหลดข้อมูล' });
   }
 });
 
