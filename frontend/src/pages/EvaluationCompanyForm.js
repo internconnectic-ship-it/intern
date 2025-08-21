@@ -19,11 +19,11 @@ const EvaluationCompanyForm = () => {
   }, [id]);
 
   useEffect(() => {
-    // ดึงคะแนนเดิมจาก backend
     axios.get(`${API_URL}/api/evaluation/company-details/${id}`)
       .then(res => {
         const data = res.data;
         if (data) {
+          setCompanyComment(data.comment || data.company_comment || '');
           setScores({
             p1: data.p1, p2: data.p2, p3: data.p3, p4: data.p4, p5: data.p5,
             p6: data.p6, p7: data.p7, p8: data.p8, p9: data.p9, p10: data.p10,
@@ -34,10 +34,17 @@ const EvaluationCompanyForm = () => {
             late_days: data.late_days,
             absent_uninformed: data.absent_uninformed
           });
-          setCompanyComment(data.comment || '');
         }
       })
-      .catch(err => console.error('❌ โหลดคะแนน company details ไม่สำเร็จ:', err));
+      .catch(err => {
+        if (err.response?.status === 404) {
+          // ไม่พบข้อมูลเดิม ให้ใช้ค่า default
+          setScores({});
+          setCompanyComment('');
+        } else {
+          console.error('❌ โหลดคะแนน company details ไม่สำเร็จ:', err);
+        }
+      });
   }, [id]);
 
   const handleChange = (e) => {

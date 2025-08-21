@@ -45,7 +45,22 @@ const EvaluationSupervisorForm = () => {
           });
         }
       })
-      .catch(err => console.error('❌ โหลดคะแนน supervisor details ไม่สำเร็จ:', err));
+      .catch(err => {
+        if (err.response?.status === 404) {
+          // ไม่พบข้อมูลเดิม ให้ใช้ค่า default
+          setScore({
+            quality: '',
+            behavior: '',
+            skill: '',
+            personality: '',
+            content: '',
+            qna: '',
+            comment: ''
+          });
+        } else {
+          console.error('❌ โหลดคะแนน supervisor details ไม่สำเร็จ:', err);
+        }
+      });
   }, [id, API_URL]);
 
   const handleChange = (e) => {
