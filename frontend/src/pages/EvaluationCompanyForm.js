@@ -45,8 +45,11 @@ const EvaluationCompanyForm = () => {
 
   // ✅ ฟังก์ชันเปลี่ยนค่า
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setScores(prev => ({ ...prev, [name]: parseInt(value) }));
+    const { name, value, type } = e.target;
+    setScores(prev => ({
+      ...prev,
+      [name]: type === "radio" ? parseInt(value) : value === "" ? "" : parseInt(value)
+    }));
   };
 
   // ✅ คำนวณคะแนนรวม (120)
