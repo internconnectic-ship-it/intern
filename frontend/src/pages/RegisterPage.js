@@ -117,6 +117,24 @@ const RegisterPage = () => {
                   />
                 </div>
 
+                {role === 'company' && (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                      ประเภทธุรกิจ
+                    </label>
+                    <input
+                      type="text"
+                      name="business_type"
+                      value={formData.business_type}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 rounded-lg border bg-white
+                                 border-[#6EC7E2] focus:outline-none focus:ring-4
+                                 focus:ring-[#95FCF2] focus:border-[#225EC4]"
+                      required
+                    />
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
                     ชื่อ
@@ -180,24 +198,6 @@ const RegisterPage = () => {
                     required
                   />
                 </div>
-
-                {role === 'company' && (
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
-                      ประเภทธุรกิจ
-                    </label>
-                    <input
-                      type="text"
-                      name="business_type"
-                      value={formData.business_type}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 rounded-lg border bg-white
-                                 border-[#6EC7E2] focus:outline-none focus:ring-4
-                                 focus:ring-[#95FCF2] focus:border-[#225EC4]"
-                      required
-                    />
-                  </div>
-                )}
               </>
             )}
 
