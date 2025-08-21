@@ -153,7 +153,7 @@ router.post('/submit', async (req, res) => {
           absent_personal=VALUES(absent_personal),
           late_days=VALUES(late_days),
           absent_uninformed=VALUES(absent_uninformed),
-          comment=VALUES(comment)
+          company_comment=VALUES(comment)
       `, [
         evaluation_id, student_id, company_id,
         p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,
