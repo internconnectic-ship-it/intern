@@ -12,15 +12,15 @@ router.get('/summary', async (req, res) => {
       'SELECT COUNT(*) AS count FROM company'
     );
 
-    // ✅ นับตามค่าที่เก็บใน student.evaluation_result
+    // ✅ นับจาก evaluation.evaluation_result
     const [[passed]] = await db.promise().query(
-      'SELECT COUNT(*) AS count FROM student WHERE evaluation_result = 1'
+      'SELECT COUNT(*) AS count FROM evaluation WHERE evaluation_result = 1'
     );
     const [[failed]] = await db.promise().query(
-      'SELECT COUNT(*) AS count FROM student WHERE evaluation_result = 2'
+      'SELECT COUNT(*) AS count FROM evaluation WHERE evaluation_result = 2'
     );
     const [[pending]] = await db.promise().query(
-      'SELECT COUNT(*) AS count FROM student WHERE evaluation_result = 0'
+      'SELECT COUNT(*) AS count FROM evaluation WHERE evaluation_result = 0'
     );
 
     res.json({
@@ -28,7 +28,6 @@ router.get('/summary', async (req, res) => {
       companyCount: companies.count,
       passedCount: passed.count,
       failedCount: failed.count,
-      pendingCount: pending.count, 
     });
   } catch (err) {
     console.error("❌ summary error:", err);
