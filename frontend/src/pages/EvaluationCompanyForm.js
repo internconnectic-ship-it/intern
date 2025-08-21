@@ -15,7 +15,7 @@ const EvaluationCompanyForm = () => {
 
   // ✅ โหลดข้อมูลเก่า (evaluation + details)
   useEffect(() => {
-    axios.get(`${API_URL}/api/evaluation/${id}?role=company`)
+    axios.get(`${API_URL}/api/evaluation/company/students/${companyId}`)
       .then(res => {
         const data = res.data;
         if (data) {

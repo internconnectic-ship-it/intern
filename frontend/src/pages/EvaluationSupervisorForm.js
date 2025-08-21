@@ -32,7 +32,7 @@ const EvaluationSupervisorForm = () => {
 
   // ✅ โหลดข้อมูลเก่า
   useEffect(() => {
-    axios.get(`${API_URL}/api/evaluation/${id}?role=supervisor`)
+    axios.get(`${API_URL}/api/evaluation/students/${supervisorId}`)
       .then(res => {
         const data = res.data;
         if (data) {
