@@ -143,7 +143,7 @@ router.post('/submit', async (req, res) => {
           p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,
           w1,w2,w3,w4,w5,w6,w7,w8,w9,w10,
           absent_sick, absent_personal, late_days, absent_uninformed, company_comment
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         ON DUPLICATE KEY UPDATE
           p1=VALUES(p1), p2=VALUES(p2), p3=VALUES(p3), p4=VALUES(p4), p5=VALUES(p5),
           p6=VALUES(p6), p7=VALUES(p7), p8=VALUES(p8), p9=VALUES(p9), p10=VALUES(p10),
