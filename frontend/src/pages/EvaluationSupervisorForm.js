@@ -30,9 +30,10 @@ const EvaluationSupervisorForm = () => {
     qna: 10
   };
 
-  // ✅ โหลดข้อมูลเก่า
+  // ✅ โหลดข้อมูลคะแนนดิบจาก evaluation_supervisor_details
   useEffect(() => {
-    axios.get(`${API_URL}/api/evaluation/students/${supervisorId}`)
+    if (!id) return;
+    axios.get(`${API_URL}/api/evaluation/supervisor-details/${id}`)
       .then(res => {
         const data = res.data;
         if (data) {
@@ -47,7 +48,7 @@ const EvaluationSupervisorForm = () => {
           });
         }
       })
-      .catch(err => console.error('❌ โหลดคะแนนเก่าไม่สำเร็จ:', err));
+      .catch(err => console.error('❌ โหลดคะแนน supervisor details ไม่สำเร็จ:', err));
   }, [id, API_URL]);
 
   const handleChange = (e) => {

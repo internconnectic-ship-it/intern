@@ -15,7 +15,8 @@ const EvaluationCompanyForm = () => {
 
   // ✅ โหลดข้อมูลเก่า (evaluation + details)
   useEffect(() => {
-    axios.get(`${API_URL}/api/evaluation/company/students/${companyId}`)
+    // ดึงคะแนนดิบจาก evaluation_company_details
+    axios.get(`${API_URL}/api/evaluation/company-details/${id}`)
       .then(res => {
         const data = res.data;
         if (data) {
@@ -35,7 +36,7 @@ const EvaluationCompanyForm = () => {
           });
         }
       })
-      .catch(err => console.error('❌ โหลดคะแนนเก่าไม่สำเร็จ:', err));
+      .catch(err => console.error('❌ โหลดคะแนน company details ไม่สำเร็จ:', err));
 
     // โหลดข้อมูลนิสิตไว้แสดง header
     axios.get(`${API_URL}/api/student/${id}`)
