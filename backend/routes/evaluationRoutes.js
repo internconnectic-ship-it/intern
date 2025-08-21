@@ -363,6 +363,11 @@ router.get('/all', async (req, res) => {
         e.student_id,
         s.student_name,
         s.profile_image,
+        i.internship_id,
+        i.company_id,
+        i.internship_position,
+        i.start_date AS intern_start_date,
+        i.end_date AS intern_end_date,
         e.supervisor_score,
         e.company_score,
         -- บริษัทคิดเปอร์เซ็นต์
@@ -375,6 +380,7 @@ router.get('/all', async (req, res) => {
           ELSE NULL
         END AS final_score
       FROM evaluation e
+      JOIN internship i ON e.student_id = i.student_id
       JOIN student s ON e.student_id = s.student_id
     `);
 
