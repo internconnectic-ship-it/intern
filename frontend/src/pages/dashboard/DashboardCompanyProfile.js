@@ -4,6 +4,7 @@ import api from "../../axios"; // ✅ ใช้ instance แทน axios ตร�
 import Header from '../../components/Header';
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const DEFAULT_PROFILE = "https://res.cloudinary.com/dpwevo7co/image/upload/v1755761541/default-profile_m6uhw1.png";
 
 const DashboardCompanyProfile = () => {
   const [company, setCompany] = useState({
@@ -126,7 +127,8 @@ const DashboardCompanyProfile = () => {
               src={
                 company.company_logo
                   ? company.company_logo
-                  : '/default-profile.png'}
+                  : DEFAULT_PROFILE
+              }
               alt="โลโก้บริษัท"
               className="w-20 h-20 rounded-full object-cover border-4 border-[#6EC7E2]"
             />

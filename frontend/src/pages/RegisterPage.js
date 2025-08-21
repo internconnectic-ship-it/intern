@@ -49,6 +49,7 @@ const RegisterPage = () => {
         email: formData.email,
         password: formData.password,
         role,
+        // business_type จะถูกส่งไป backend เฉพาะกรณีสมัครสถานประกอบการ
         ...(role === "company" && { business_type: formData.business_type })
       });
       alert('✅ สมัครสมาชิกสำเร็จ');
