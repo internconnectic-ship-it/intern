@@ -10,7 +10,7 @@ import SupervisorMenu from './headers/SupervisorMenu';
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const DEFAULT_PROFILE =
-  "https://res.cloudinary.com/dpwevo7co/image/upload/v1755761541/default-profile_m6uhw1.png"
+  "https://res.cloudinary.com/dpwevo7co/image/upload/v1755761541/default-profile.png"
 
 const Header = () => {
   const role = localStorage.getItem("role");
