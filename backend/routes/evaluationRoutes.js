@@ -381,7 +381,6 @@ router.get('/all', async (req, res) => {
         END AS final_score
       FROM evaluation e
       JOIN internship i ON e.student_id = i.student_id
-      JOIN student s ON e.student_id = s.student_id
     `);
 
     res.json(rows);
