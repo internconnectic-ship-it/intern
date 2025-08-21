@@ -14,7 +14,7 @@ const DashboardInstructorScores = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await api.get(`${API_URL}/api/evaluation/all`)
+        const res = await axios.get(`${API_URL}/api/evaluation/all`)
         console.log("📌 ข้อมูลจาก backend:", res.data);
         const rows = Array.isArray(res.data) ? res.data : [];
         console.log("📌 ข้อมูลจาก rows:", rows);
