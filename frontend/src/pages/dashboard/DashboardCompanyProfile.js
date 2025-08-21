@@ -205,7 +205,7 @@ const DashboardCompanyProfile = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium">รหัสผ่านปัจจุบัน</label>
-              <input type="password" name="currentPassword" value={passwordForm.currentPassword} onChange={handlePasswordChange} className="w-full border rounded px-3 py-2" />
+              <input type="password" name="currentPassword" value={passwordForm.currentPassword} onChange={handlePasswordChange} autoComplete="new-password" className="w-full border rounded px-3 py-2" />
             </div>
             <div>
               <label className="block text-sm font-medium">รหัสผ่านใหม่</label>
