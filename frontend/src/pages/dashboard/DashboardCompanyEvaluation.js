@@ -66,14 +66,14 @@ const DashboardCompanyEvaluation = () => {
               {/* ปุ่มประเมิน/แก้ไข */}
                   <div className="mt-4">
                     <button
-                      onClick={() => handleEvaluate(s.student_id)}
+                      onClick={() => handleEvaluate(student.student_id)}
                       className={`rounded-full text-white text-sm font-semibold px-4 py-2 shadow-sm ${
-                        s.evaluation_status === 'completed'
+                        student.evaluation_status === 'completed'
                           ? 'bg-[#225EC4] hover:bg-[#1b55b5]'
                           : 'bg-emerald-600 hover:bg-emerald-700'
                       }`}
                     >
-                      {s.evaluation_status === 'completed' ? 'แก้ไขคะแนน' : 'ประเมิน'}
+                      {student.evaluation_status === 'completed' ? 'แก้ไขคะแนน' : 'ประเมิน'}
                     </button>
                   </div>
             </div>
