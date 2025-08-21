@@ -1,7 +1,10 @@
 // backend/server.js
 const express = require('express');
 const cors = require('cors');
-const path = require('path'); // ✅ ต้องมี
+const path = require('path');
+require('dotenv').config();
+
+// ✅ import routes
 const authRoutes = require('./routes/authRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const companyRoutes = require('./routes/companyRoutes');
@@ -14,15 +17,27 @@ const internshipRoutes = require('./routes/internshipRoutes');
 const evaluationRoutes = require('./routes/evaluationRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const changePasswordRoutes = require('./routes/changePasswordRoutes');
-require('dotenv').config();
 
 const app = express();
- app.use(cors());
-// app.use(cors({
-//   origin: "https://intern-connect160.netlify.app", // frontend domain
-//   methods: ["GET", "POST", "PUT", "DELETE"],
-//   credentials: true
-// }));
+
+// ✅ กำหนด origin ที่อนุญาต
+const allowedOrigins = [
+  "http://localhost:3000",                // dev
+  "https://intern-connect160.netlify.app" // production
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // ✅ กำหนดเส้นทาง API
