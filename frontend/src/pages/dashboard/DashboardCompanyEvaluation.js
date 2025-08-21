@@ -12,7 +12,7 @@ const DashboardCompanyEvaluation = () => {
     const fetchStudents = async () => {
       try {
         const company_id = localStorage.getItem('companyId');
-        const res = await api.get(`/api/evaluation/students/${company_id}`);
+        const res = await api.get(`/api/evaluation/company/students/${company_id}`);
         setStudents(res.data);
       } catch (err) {
         console.error("❌ ดึงรายชื่อนิสิตล้มเหลว:", err);
