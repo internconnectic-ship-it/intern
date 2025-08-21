@@ -282,5 +282,38 @@ router.get('/supervisor-details/:student_id', async (req, res) => {
     res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
   }
 });
+// ✅ GET: รายชื่อนิสิตของบริษัท (สำหรับหน้า DashboardCompanyEvaluation)
+router.get('/company/students/:company_id', async (req, res) => {
+  const { company_id } = req.params;
+
+  try {
+    const [rows] = await db.promise().query(
+      `SELECT 
+         s.student_id,
+         s.student_name,
+         s.email,
+         s.age,
+         s.phone_number,
+         s.university,
+         s.profile_image,
+         COALESCE(e.company_score, NULL) AS evaluation_score,
+         CASE 
+           WHEN e.company_score IS NOT NULL THEN 'completed'
+           ELSE 'pending'
+         END AS evaluation_status
+       FROM internship i
+       JOIN student s ON i.student_id = s.student_id
+       LEFT JOIN evaluation e ON s.student_id = e.student_id
+       WHERE i.company_id = ?`,
+      [company_id]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error('❌ ดึงรายชื่อนิสิตของบริษัทล้มเหลว:', err);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงรายชื่อนิสิต' });
+  }
+});
+
 
 module.exports = router;
