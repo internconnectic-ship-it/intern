@@ -130,29 +130,36 @@ router.post('/submit', async (req, res) => {
     }
 
     // ✅ หลังบันทึก: ดึงคะแนนล่าสุดมา "คำนวณแบบใหม่" และอัปเดต evaluation_result เมื่อมีครบสองฝั่ง
-    const [rows] = await db.promise().query(
-      `SELECT supervisor_score, company_score FROM evaluation WHERE student_id = ?`,
-      [student_id]
-    );
+const [rows] = await db.promise().query(
+  `SELECT supervisor_score, company_score FROM evaluation WHERE student_id = ?`,
+  [student_id]
+);
 
-    if (rows.length > 0) {
-      const sup = rows[0].supervisor_score;   // 0–100
-      const compRaw = rows[0].company_score;  // 0–120
+if (rows.length > 0) {
+  const sup = rows[0].supervisor_score;   // 0–100
+  const compRaw = rows[0].company_score;  // 0–120
 
-      if (sup != null && compRaw != null) {
-        const compPct = companyToPct(compRaw);
-        const supPct  = clampSupervisor(sup);
+  if (sup != null && compRaw != null) {
+    const compPct = companyToPct(compRaw);
+    const supPct  = clampSupervisor(sup);
 
-        // ถ่วงน้ำหนัก: บริษัท 60% + อาจารย์ 40%
-        const finalScore = (compPct * 0.60) + (supPct * 0.40);
+    // ถ่วงน้ำหนัก: บริษัท 60% + อาจารย์ 40%
+    const finalScore = (compPct * 0.60) + (supPct * 0.40);
 
-        const pass = finalScore >= 70 ? 1 : 0; // 1=ผ่าน, 0=ไม่ผ่าน
-        await db.promise().query(
-          `UPDATE evaluation SET evaluation_result = ? WHERE student_id = ?`,
-          [pass, student_id]
-        );
-      }
+    let result = 0; // default = pending
+    if (finalScore >= 70) {
+      result = 1; // ผ่าน
+    } else {
+      result = 2; // ไม่ผ่าน
     }
+
+    await db.promise().query(
+      `UPDATE evaluation SET evaluation_result = ? WHERE student_id = ?`,
+      [result, student_id]
+    );
+  }
+}
+
 
     res.status(200).json({ message: '✅ บันทึกผลการประเมินสำเร็จ' });
   } catch (err) {
