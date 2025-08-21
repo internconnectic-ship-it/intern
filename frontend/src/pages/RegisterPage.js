@@ -18,7 +18,11 @@ const RegisterPage = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    try {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    } catch (err) {
+      console.error("เกิดข้อผิดพลาดใน handleChange:", err);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -26,6 +30,11 @@ const RegisterPage = () => {
 
     if (!role) {
       alert('❗ กรุณาเลือกประเภทผู้ใช้ก่อน');
+      return;
+    }
+
+    if (role === "company" && !formData.business_type) {
+      alert('❗ กรุณากรอกประเภทธุรกิจ');
       return;
     }
 
