@@ -43,15 +43,16 @@ const RegisterPage = () => {
     }
 
     try {
-      await axios.post(`${API_URL}/api/auth/register`, {
+      const payload = {
         id: formData.id,
         name: formData.name,
         email: formData.email,
         password: formData.password,
         role,
-        // business_type จะถูกส่งไป backend เฉพาะกรณีสมัครสถานประกอบการ
         ...(role === "company" && { business_type: formData.business_type })
-      });
+      };
+      console.log("ส่งข้อมูลสมัครสมาชิก:", payload); // debug payload
+      await axios.post(`${API_URL}/api/auth/register`, payload);
       alert('✅ สมัครสมาชิกสำเร็จ');
       navigate('/login');
     } catch (err) {
