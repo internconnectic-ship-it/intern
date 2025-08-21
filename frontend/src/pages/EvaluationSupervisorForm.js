@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
@@ -28,6 +28,26 @@ const EvaluationSupervisorForm = () => {
     content: 20,
     qna: 10
   };
+
+  // ✅ โหลดข้อมูลเก่า
+  useEffect(() => {
+    axios.get(`${API_URL}/api/evaluation/${id}?role=supervisor`)
+      .then(res => {
+        const data = res.data;
+        if (data) {
+          setScore({
+            quality: data.score_quality || '',
+            behavior: data.score_behavior || '',
+            skill: data.score_skill || '',
+            personality: data.score_personality || '',
+            content: data.score_content || '',
+            qna: data.score_qna || '',
+            comment: data.comment || data.supervisor_comment || ''
+          });
+        }
+      })
+      .catch(err => console.error('❌ โหลดคะแนนเก่าไม่สำเร็จ:', err));
+  }, [id, API_URL]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -88,7 +108,6 @@ const EvaluationSupervisorForm = () => {
           <h2 className="text-2xl font-extrabold text-left text-[#130347] mb-4">
             แบบประเมินนิสิตโดยอาจารย์นิเทศ
           </h2>
-          
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <SectionTitle>📘 ตารางที่ 1: นิเทศงาน</SectionTitle>
