@@ -23,7 +23,7 @@ const EvaluationCompanyForm = () => {
       .then(res => {
         const data = res.data;
         if (data) {
-          setCompanyComment(data.comment || data.company_comment || '');
+          setCompanyComment(data.company_comment || '');
           setScores({
             p1: data.p1, p2: data.p2, p3: data.p3, p4: data.p4, p5: data.p5,
             p6: data.p6, p7: data.p7, p8: data.p8, p9: data.p9, p10: data.p10,
@@ -32,7 +32,8 @@ const EvaluationCompanyForm = () => {
             absent_sick: data.absent_sick,
             absent_personal: data.absent_personal,
             late_days: data.late_days,
-            absent_uninformed: data.absent_uninformed
+            absent_uninformed: data.absent_uninformed,
+            company_comment: data.company_comment || ''
           });
         }
       })
