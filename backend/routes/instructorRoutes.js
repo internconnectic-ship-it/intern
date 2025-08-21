@@ -261,7 +261,7 @@ router.get('/', async (req, res) => {
 ======================================================= */
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
-  console.log("✅ เข้ามาแล้ว");
+  console.log("✅ เข้ามาแล้ว profile");
   try {
     const [rows] = await db.promise().query(
       "SELECT * FROM instructor WHERE instructor_id = ?",
