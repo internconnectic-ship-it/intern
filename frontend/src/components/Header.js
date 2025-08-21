@@ -39,12 +39,12 @@ const Header = () => {
           role === "admin" ? data.admin_name :
           "ผู้ใช้";
 
-        setProfileImage(image || "DEFAULT_PROFILE");
+        setProfileImage(image ? image : DEFAULT_PROFILE);
         setUserName(name || "ผู้ใช้");
       })
       .catch(err => {
         console.error("โหลดข้อมูลผู้ใช้ล้มเหลว:", err);
-        setProfileImage("DEFAULT_PROFILE");
+        setProfileImage(DEFAULT_PROFILE);
       });
   }
 }, [role, userId]);
