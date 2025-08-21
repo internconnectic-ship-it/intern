@@ -134,7 +134,7 @@ router.post('/submit', async (req, res) => {
       [student_id]
     );
     const evaluation_id = rowEval[0].evaluation_id;
-
+    console.log("📦 req.body =", req.body);
     // 🔹 3) insert/update details ตาม role
     if (role === 'company') {
       await db.promise().query(`
