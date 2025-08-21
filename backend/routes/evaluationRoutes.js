@@ -46,9 +46,9 @@ router.post('/submit', async (req, res) => {
 
   let supervisor_score = null; // 0–100
   let company_raw = null;      // 0–120
-
   const today = evaluation_date || new Date().toISOString().split('T')[0];
 
+  // ✅ คำนวณคะแนนรวมฝั่ง supervisor
   if (role === 'supervisor') {
     supervisor_score =
       parseFloat(score_quality || 0) +
@@ -58,20 +58,24 @@ router.post('/submit', async (req, res) => {
       parseFloat(score_content || 0) +
       parseFloat(score_answer || 0);
     supervisor_score = clampSupervisor(supervisor_score);
-  } else if (role === 'company') {
+  }
+
+  // ✅ คำนวณคะแนนรวมฝั่ง company
+  if (role === 'company') {
     company_raw = parseFloat(company_score ?? 0);
     if (Number.isNaN(company_raw) || company_raw < 0) company_raw = 0;
     if (company_raw > 120) company_raw = 120;
   }
 
   try {
-    // 🔹 1) insert/update evaluation
+    // 🔹 1) insert/update evaluation (ตารางหลัก)
     const [existing] = await db.promise().query(
       `SELECT * FROM evaluation WHERE student_id = ?`,
       [student_id]
     );
 
     if (existing.length > 0) {
+      // update
       let query = `UPDATE evaluation SET `;
       const params = [];
 
@@ -83,32 +87,24 @@ router.post('/submit', async (req, res) => {
           instructor_id = ?, 
           supervisor_evaluation_date = ?
         `;
-        params.push(
-          supervisor_score,
-          supervisor_comment || null,
-          supervisor_id || null,
-          instructor_id || null,
-          today
-        );
-      } else if (role === 'company') {
+        params.push(supervisor_score, supervisor_comment || null, supervisor_id || null, instructor_id || null, today);
+      }
+
+      if (role === 'company') {
         query += `
           company_score = ?, 
           company_comment = ?, 
           company_id = ?, 
           company_evaluation_date = ?
         `;
-        params.push(
-          company_raw,
-          company_comment || null,
-          company_id || null,
-          today
-        );
+        params.push(company_raw, company_comment || null, company_id || null, today);
       }
 
       query += ` WHERE student_id = ?`;
       params.push(student_id);
       await db.promise().query(query, params);
     } else {
+      // insert
       await db.promise().query(
         `INSERT INTO evaluation (
           student_id, supervisor_id, company_id, instructor_id,
@@ -139,7 +135,7 @@ router.post('/submit', async (req, res) => {
     );
     const evaluation_id = rowEval[0].evaluation_id;
 
-    // 🔹 3) insert/update details
+    // 🔹 3) insert/update details ตาม role
     if (role === 'company') {
       await db.promise().query(`
         INSERT INTO evaluation_company_details (
@@ -221,6 +217,7 @@ router.post('/submit', async (req, res) => {
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการบันทึกผล' });
   }
 });
+
 
 // ✅ GET: ดึงข้อมูลการประเมินของนักศึกษา (รวม + details)
 router.get('/:student_id', async (req, res) => {
