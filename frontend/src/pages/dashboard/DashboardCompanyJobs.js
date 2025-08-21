@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from "../../axios"; // ✅ ใช้ instance แทน axios ตรง ๆ
 import Header from '../../components/Header';
 
@@ -18,7 +18,23 @@ const JobPostForm = () => {
     phone_number: '',
   });
 
+  // ดึง business_type จาก company
+  useEffect(() => {
+    const companyId = localStorage.getItem('companyId');
+    if (!companyId) return;
+    api.get(`/api/company/${companyId}`)
+      .then(res => {
+        setJob(prev => ({
+          ...prev,
+          business_type: res.data.business_type || ''
+        }));
+      })
+      .catch(() => {});
+  }, []);
+
   const handleChange = (e) => {
+    // ไม่ให้แก้ business_type
+    if (e.target.name === "business_type") return;
     setJob({ ...job, [e.target.name]: e.target.value });
   };
 
