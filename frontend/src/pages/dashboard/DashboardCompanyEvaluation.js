@@ -9,17 +9,16 @@ const DashboardCompanyEvaluation = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const company_id = localStorage.getItem('companyId');
-        const res = await api.get(`/api/evaluation/company/students/${company_id}`);
-        setStudents(res.data);
-      } catch (err) {
-        console.error("❌ ดึงรายชื่อนิสิตล้มเหลว:", err);
-      }
-    };
-    fetchStudents();
-  }, []);
+  const fetchStudents = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/evaluation/company/students/${companyId}`);
+      setStudents(res.data);
+    } catch (err) {
+      console.error("❌ ดึงรายชื่อนิสิตล้มเหลว:", err);
+    }
+  };
+  fetchStudents();
+}, [companyId]);
 
   const handleEvaluate = (student_id) => {
     navigate(`/evaluation/${student_id}`);
