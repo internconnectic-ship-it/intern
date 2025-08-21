@@ -63,21 +63,19 @@ const DashboardCompanyEvaluation = () => {
               <p className="text-sm text-gray-600">อีเมล: {student.email}</p>
               <p className="text-sm text-gray-600">{student.university}</p>
 
-              {/* ปุ่ม */}
-              <div className="mt-4">
-                {student.evaluation_status === 'completed' ? (
-                  <span className="bg-green-100 text-green-600 px-4 py-1 rounded-full text-sm font-semibold">
-                    ประเมินเสร็จสิ้น
-                  </span>
-                ) : (
-                  <button
-                    onClick={() => handleEvaluate(student.student_id)}
-                    className="bg-[#225EC4] hover:bg-[#1b55b5] text-white px-5 py-2 rounded-full shadow-md transition"
-                  >
-                    ประเมินคะแนน
-                  </button>
-                )}
-              </div>
+              {/* ปุ่มประเมิน/แก้ไข */}
+                  <div className="mt-4">
+                    <button
+                      onClick={() => handleEvaluate(s.student_id)}
+                      className={`rounded-full text-white text-sm font-semibold px-4 py-2 shadow-sm ${
+                        s.evaluation_status === 'completed'
+                          ? 'bg-[#225EC4] hover:bg-[#1b55b5]'
+                          : 'bg-emerald-600 hover:bg-emerald-700'
+                      }`}
+                    >
+                      {s.evaluation_status === 'completed' ? 'แก้ไขคะแนน' : 'ประเมิน'}
+                    </button>
+                  </div>
             </div>
           ))}
         </div>
