@@ -256,7 +256,6 @@ router.get('/:student_id', async (req, res) => {
 // ✅ GET: ดึงข้อมูลคะแนนดิบจาก evaluation_company_details
 router.get('/company-details/:student_id', async (req, res) => {
   const { student_id } = req.params;
-  console.log("GET /company-details/", student_id); // debug student_id
   try {
     const [rows] = await db.promise().query(
       `SELECT * FROM evaluation_company_details WHERE student_id = ?`,
@@ -272,7 +271,6 @@ router.get('/company-details/:student_id', async (req, res) => {
 // ✅ GET: ดึงข้อมูลคะแนนดิบจาก evaluation_supervisor_details
 router.get('/supervisor-details/:student_id', async (req, res) => {
   const { student_id } = req.params;
-  console.log("GET /supervisor-details/", student_id); // debug student_id
   try {
     const [rows] = await db.promise().query(
       `SELECT * FROM evaluation_supervisor_details WHERE student_id = ?`,
