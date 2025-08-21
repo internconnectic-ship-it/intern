@@ -25,7 +25,10 @@ const EvaluationCompanyForm = () => {
         const data = res.data;
         if (data) {
           setScores({
-            p1: data.p1, p2: data.p2, /* ... */, w10: data.w10,
+            p1: data.p1, p2: data.p2, p3: data.p3, p4: data.p4, p5: data.p5,
+            p6: data.p6, p7: data.p7, p8: data.p8, p9: data.p9, p10: data.p10,
+            w1: data.w1, w2: data.w2, w3: data.w3, w4: data.w4, w5: data.w5,
+            w6: data.w6, w7: data.w7, w8: data.w8, w9: data.w9, w10: data.w10,
             absent_sick: data.absent_sick,
             absent_personal: data.absent_personal,
             late_days: data.late_days,
