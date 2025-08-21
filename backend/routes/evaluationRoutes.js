@@ -20,7 +20,7 @@ const clampSupervisor = (v) => {
   return Math.min(100, n);
 };
 
-// ✅ POST: บันทึกผลการประเมิน (เก็บดิบเหมือนเดิม + คิดผลรวมแบบใหม่)
+// ✅ POST: บันทึกผลการประเมิน (รวม + เก็บย่อย)
 router.post('/submit', async (req, res) => {
   const {
     student_id,
@@ -41,7 +41,7 @@ router.post('/submit', async (req, res) => {
   } = req.body;
 
   let supervisor_score = null; // 0–100
-  let company_raw = null;      // 0–120 (เก็บดิบในตาราง)
+  let company_raw = null;      // 0–120
 
   const today = evaluation_date || new Date().toISOString().split('T')[0];
 
@@ -56,21 +56,24 @@ router.post('/submit', async (req, res) => {
       parseFloat(score_answer || 0);
     supervisor_score = clampSupervisor(supervisor_score);
   } else if (role === 'company') {
-    // รับคะแนนดิบเต็ม 120 (อาจมาจาก req.body.company_score)
-    company_raw = parseFloat(company_score ?? req.body.company_score ?? 0);
+    company_raw = parseFloat(company_score ?? 0);
     if (Number.isNaN(company_raw) || company_raw < 0) company_raw = 0;
     if (company_raw > 120) company_raw = 120;
   }
 
-  console.log("POST /submit payload:", req.body); // log ข้อมูลที่รับเข้ามา
+  console.log("POST /submit payload:", req.body);
 
   try {
+    // ✅ บันทึกลง evaluation
     const [existing] = await db.promise().query(
-      `SELECT * FROM evaluation WHERE student_id = ?`,
+      `SELECT evaluation_id FROM evaluation WHERE student_id = ?`,
       [student_id]
     );
 
+    let evaluation_id;
     if (existing.length > 0) {
+      evaluation_id = existing[0].evaluation_id;
+
       let query = `UPDATE evaluation SET `;
       const params = [];
 
@@ -108,7 +111,7 @@ router.post('/submit', async (req, res) => {
       params.push(student_id);
       await db.promise().query(query, params);
     } else {
-      await db.promise().query(
+      const [insertResult] = await db.promise().query(
         `INSERT INTO evaluation (
           student_id, supervisor_id, company_id, instructor_id,
           supervisor_score, company_score,
@@ -124,44 +127,76 @@ router.post('/submit', async (req, res) => {
           role === 'company' ? company_raw : null,
           supervisor_comment || null,
           company_comment || null,
-          0, // ค่าเริ่มต้น (ยังไม่ตัดสิน)
+          0,
           role === 'supervisor' ? today : null,
           role === 'company' ? today : null
         ]
       );
+      evaluation_id = insertResult.insertId;
     }
 
-    // ✅ หลังบันทึก: ดึงคะแนนล่าสุดมา "คำนวณแบบใหม่" และอัปเดต evaluation_result เมื่อมีครบสองฝั่ง
-const [rows] = await db.promise().query(
-  `SELECT supervisor_score, company_score FROM evaluation WHERE student_id = ?`,
-  [student_id]
-);
-
-if (rows.length > 0) {
-  const sup = rows[0].supervisor_score;   // 0–100
-  const compRaw = rows[0].company_score;  // 0–120
-
-  if (sup != null && compRaw != null) {
-    const compPct = companyToPct(compRaw);
-    const supPct  = clampSupervisor(sup);
-
-    // ถ่วงน้ำหนัก: บริษัท 60% + อาจารย์ 40%
-    const finalScore = (compPct * 0.60) + (supPct * 0.40);
-
-    let result = 0; // default = pending
-    if (finalScore >= 70) {
-      result = 1; // ผ่าน
-    } else {
-      result = 2; // ไม่ผ่าน
+    // ✅ บันทึกคะแนนย่อย
+    if (role === 'supervisor') {
+      await db.promise().query(
+        `INSERT INTO evaluation_supervisor_details 
+          (student_id, evaluation_id, quality, behavior, skill, personality, content, qna, comment)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE 
+           quality=VALUES(quality), behavior=VALUES(behavior), skill=VALUES(skill),
+           personality=VALUES(personality), content=VALUES(content), qna=VALUES(qna),
+           comment=VALUES(comment)`,
+        [
+          student_id,
+          evaluation_id,
+          score_quality, score_behavior, score_skill,
+          score_presentation, score_content, score_answer,
+          supervisor_comment
+        ]
+      );
+    } else if (role === 'company') {
+      await db.promise().query(
+        `INSERT INTO evaluation_company_details 
+          (student_id, evaluation_id, company_score, comment)
+         VALUES (?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE 
+           company_score=VALUES(company_score), comment=VALUES(comment)`,
+        [
+          student_id,
+          evaluation_id,
+          company_raw,
+          company_comment
+        ]
+      );
     }
 
-    await db.promise().query(
-      `UPDATE evaluation SET evaluation_result = ? WHERE student_id = ?`,
-      [result, student_id]
+    // ✅ หลังบันทึก: อัปเดตผลรวม final
+    const [rows] = await db.promise().query(
+      `SELECT supervisor_score, company_score FROM evaluation WHERE student_id = ?`,
+      [student_id]
     );
-  }
-}
 
+    if (rows.length > 0) {
+      const sup = rows[0].supervisor_score;
+      const compRaw = rows[0].company_score;
+
+      if (sup != null && compRaw != null) {
+        const compPct = companyToPct(compRaw);
+        const supPct = clampSupervisor(sup);
+        const finalScore = (compPct * 0.60) + (supPct * 0.40);
+
+        let result = 0;
+        if (finalScore >= 70) {
+          result = 1;
+        } else {
+          result = 2;
+        }
+
+        await db.promise().query(
+          `UPDATE evaluation SET evaluation_result = ? WHERE student_id = ?`,
+          [result, student_id]
+        );
+      }
+    }
 
     res.status(200).json({ message: '✅ บันทึกผลการประเมินสำเร็จ' });
   } catch (err) {
