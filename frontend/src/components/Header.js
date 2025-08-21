@@ -9,10 +9,14 @@ import AdminMenu from './headers/AdminMenu';
 import SupervisorMenu from './headers/SupervisorMenu';
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
+const DEFAULT_PROFILE =
+  "https://res.cloudinary.com/dpwevo7co/image/upload/v1755761541/default-profile_m6uhw1.png"
+
 const Header = () => {
   const role = localStorage.getItem("role");
   const userId = localStorage.getItem(`${role}Id`);
-  const [profileImage, setProfileImage] = useState("default-profile.png");
+  //const [profileImage, setProfileImage] = useState("default-profile.png");
+  const [profileImage, setProfileImage] = useState(DEFAULT_PROFILE);
   const [userName, setUserName] = useState("ผู้ใช้");
   const navigate = useNavigate();
 
