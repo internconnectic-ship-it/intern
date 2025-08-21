@@ -137,30 +137,27 @@ router.post('/submit', async (req, res) => {
 
     // 🔹 3) insert/update details ตาม role
     if (role === 'company') {
-      await db.promise().query(`
-        INSERT INTO evaluation_company_details (
+      await db.promise().query(
+        `INSERT INTO evaluation_company_details (
           evaluation_id, student_id, company_id,
           p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,
           w1,w2,w3,w4,w5,w6,w7,w8,w9,w10,
           absent_sick, absent_personal, late_days, absent_uninformed, comment
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-        ON DUPLICATE KEY UPDATE
-          p1=VALUES(p1), p2=VALUES(p2), p3=VALUES(p3), p4=VALUES(p4), p5=VALUES(p5),
-          p6=VALUES(p6), p7=VALUES(p7), p8=VALUES(p8), p9=VALUES(p9), p10=VALUES(p10),
-          w1=VALUES(w1), w2=VALUES(w2), w3=VALUES(w3), w4=VALUES(w4), w5=VALUES(w5),
-          w6=VALUES(w6), w7=VALUES(w7), w8=VALUES(w8), w9=VALUES(w9), w10=VALUES(w10),
-          absent_sick=VALUES(absent_sick),
-          absent_personal=VALUES(absent_personal),
-          late_days=VALUES(late_days),
-          absent_uninformed=VALUES(absent_uninformed),
-          comment=VALUES(comment)
-      `, [
-        evaluation_id, student_id, company_id,
-        p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,
-        w1,w2,w3,w4,w5,w6,w7,w8,w9,w10,
-        absent_sick, absent_personal, late_days, absent_uninformed,
-        company_comment
-      ]);
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        [
+          evaluation_id, student_id, company_id,
+          formData.p1, formData.p2, formData.p3, formData.p4, formData.p5,
+          formData.p6, formData.p7, formData.p8, formData.p9, formData.p10,
+          formData.w1, formData.w2, formData.w3, formData.w4, formData.w5,
+          formData.w6, formData.w7, formData.w8, formData.w9, formData.w10,
+          formData.absent_sick || 0,
+          formData.absent_personal || 0,
+          formData.late_days || 0,
+          formData.absent_uninformed || 0,
+          formData.comment || null
+        ]
+      );
+
     }
 
     if (role === 'supervisor') {
@@ -356,7 +353,7 @@ router.get('/details/:student_id/:role', async (req, res) => {
   }
 });
 
-    
+
 
 
 module.exports = router;
