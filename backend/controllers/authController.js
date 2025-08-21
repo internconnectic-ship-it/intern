@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 });
 
 exports.register = async (req, res) => {
-  const { id, name, email, password, role } = req.body;
+  const { id, name, email, password, role, business_type } = req.body;
 
   if (!id || !name || !email || !password || !role) {
     return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
