@@ -14,15 +14,26 @@ const internshipRoutes = require('./routes/internshipRoutes');
 const evaluationRoutes = require('./routes/evaluationRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const changePasswordRoutes = require('./routes/changePasswordRoutes');
+const allowedOrigins = [
+  "http://localhost:3000",                 // เวลา dev
+  "https://intern-connect160.netlify.app"  // domain ของ Netlify จริง
+];
 require('dotenv').config();
 
 const app = express();
- app.use(cors());
-// app.use(cors({
-//   origin: "https://intern-connect160.netlify.app", // frontend domain
-//   methods: ["GET", "POST", "PUT", "DELETE"],
-//   credentials: true
-// }));
+//app.use(cors());
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(express.json());
 
 // ✅ กำหนดเส้นทาง API
@@ -37,6 +48,11 @@ app.use('/api/job_posting', jobPostRoutes);
 app.use('/api/internship', internshipRoutes);
 app.use('/api/evaluation', evaluationRoutes);
 app.use('/api/reports', reportRoutes);
+app.options("*", cors());
+app.use((req, res, next) => {
+  console.log("🌐 Request from:", req.headers.origin, req.method, req.path);
+  next();
+});
 
 // ✅ เส้นทางไฟล์ static (สำหรับรูป/ไฟล์ upload)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
