@@ -153,7 +153,7 @@ router.post('/submit', async (req, res) => {
           absent_personal=VALUES(absent_personal),
           late_days=VALUES(late_days),
           absent_uninformed=VALUES(absent_uninformed),
-          company_comment=VALUES(comment)
+          company_comment=VALUES(company_comment)
       `, [
         evaluation_id, student_id, company_id,
         p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,
@@ -168,7 +168,7 @@ router.post('/submit', async (req, res) => {
         INSERT INTO evaluation_supervisor_details (
           evaluation_id, student_id, supervisor_id, instructor_id,
           score_quality, score_behavior, score_skill,
-          score_personality, score_content, score_qna, comment
+          score_personality, score_content, score_qna, supervisor_comment
         ) VALUES (?,?,?,?,?,?,?,?,?,?,?)
         ON DUPLICATE KEY UPDATE
           score_quality=VALUES(score_quality),
@@ -177,7 +177,7 @@ router.post('/submit', async (req, res) => {
           score_personality=VALUES(score_personality),
           score_content=VALUES(score_content),
           score_qna=VALUES(score_qna),
-          comment=VALUES(comment)
+          supervisor_comment=VALUES(supervisor_comment)
       `, [
         evaluation_id, student_id, supervisor_id, instructor_id,
         score_quality, score_behavior, score_skill,
