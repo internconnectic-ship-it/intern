@@ -18,7 +18,7 @@ const JobPostForm = () => {
     phone_number: '',
   });
 
-  // ดึง business_type จาก company
+  // ดึงข้อมูลจาก company
   useEffect(() => {
     const companyId = localStorage.getItem('companyId');
     if (!companyId) return;
@@ -26,15 +26,21 @@ const JobPostForm = () => {
       .then(res => {
         setJob(prev => ({
           ...prev,
-          business_type: res.data.business_type || ''
+          business_type: res.data.business_type || '',
+          address: res.data.address || '',
+          google_maps_link: res.data.google_maps_link || '',
+          email: res.data.contact_email || '',
+          phone_number: res.data.phone_number || ''
         }));
       })
       .catch(() => {});
   }, []);
 
   const handleChange = (e) => {
-    // ไม่ให้แก้ business_type
-    if (e.target.name === "business_type") return;
+    // ไม่ให้แก้ business_type, address, google_maps_link, email, phone_number
+    if (
+      ["business_type", "address", "google_maps_link", "email", "phone_number"].includes(e.target.name)
+    ) return;
     setJob({ ...job, [e.target.name]: e.target.value });
   };
 
@@ -112,68 +118,154 @@ const JobPostForm = () => {
             className="bg-white p-8 rounded-xl shadow-md"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                { label: 'ตำแหน่งที่เปิดรับ', name: 'position' },
-                { label: 'ประเภทธุรกิจ', name: 'business_type' },
-                { label: 'รายละเอียดงาน', name: 'job_description' },
-                { label: 'คุณสมบัติที่ต้องการ', name: 'requirements' },
-                { label: 'ค่าตอบแทน (บาท/เดือน)', name: 'compensation', type: 'number', step: '0.01' },
-                { label: 'จำนวนที่รับสมัคร', name: 'max_positions', type: 'number' },
-                { label: 'ที่อยู่บริษัท', name: 'address' },
-              ].map(({ label, name, type = 'text', step }) => (
-                <div key={name}>
-                  <label className="block font-semibold mb-1 text-[#465d71]">{label}</label>
-                  <input
-                    name={name}
-                    type={type}
-                    step={step}
-                    value={job[name]}
-                    onChange={handleChange}
-                    className="w-full border rounded px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#6EC7E2]"
-                    required
-                  />
-                </div>
-              ))}
-
-              {/* ฟิลด์ Google Maps Link พร้อมคำอธิบาย */}
+              {/* ตำแหน่งที่เปิดรับ */}
               <div>
-                <label className="block font-semibold mb-1 text-[#465d71]">
-                  Google Maps Link
-                </label>
-                
+                <label className="block font-semibold mb-1 text-[#465d71]">ตำแหน่งที่เปิดรับ</label>
+                <input
+                  name="position"
+                  type="text"
+                  value={job.position}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                  required
+                />
+              </div>
+              {/* ประเภทธุรกิจ */}
+              <div>
+                <label className="block font-semibold mb-1 text-[#465d71]">ประเภทธุรกิจ</label>
+                <input
+                  name="business_type"
+                  type="text"
+                  value={job.business_type}
+                  disabled
+                  className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-500"
+                  required
+                />
+              </div>
+              {/* รายละเอียดงาน */}
+              <div>
+                <label className="block font-semibold mb-1 text-[#465d71]">รายละเอียดงาน</label>
+                <input
+                  name="job_description"
+                  type="text"
+                  value={job.job_description}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                  required
+                />
+              </div>
+              {/* คุณสมบัติที่ต้องการ */}
+              <div>
+                <label className="block font-semibold mb-1 text-[#465d71]">คุณสมบัติที่ต้องการ</label>
+                <input
+                  name="requirements"
+                  type="text"
+                  value={job.requirements}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                  required
+                />
+              </div>
+              {/* ค่าตอบแทน */}
+              <div>
+                <label className="block font-semibold mb-1 text-[#465d71]">ค่าตอบแทน (บาท/เดือน)</label>
+                <input
+                  name="compensation"
+                  type="number"
+                  step="0.01"
+                  value={job.compensation}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                  required
+                />
+              </div>
+              {/* จำนวนที่รับสมัคร */}
+              <div>
+                <label className="block font-semibold mb-1 text-[#465d71]">จำนวนที่รับสมัคร</label>
+                <input
+                  name="max_positions"
+                  type="number"
+                  value={job.max_positions}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                  required
+                />
+              </div>
+              {/* ที่อยู่บริษัท */}
+              <div>
+                <label className="block font-semibold mb-1 text-[#465d71]">ที่อยู่บริษัท</label>
+                <input
+                  name="address"
+                  type="text"
+                  value={job.address}
+                  disabled
+                  className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-500"
+                  required
+                />
+              </div>
+              {/* Google Maps Link */}
+              <div>
+                <label className="block font-semibold mb-1 text-[#465d71]">Google Maps Link</label>
                 <input
                   name="google_maps_link"
                   type="text"
                   value={job.google_maps_link}
-                  onChange={handleChange}
-                  placeholder="https://www.google.com/maps/embed?pb=..."
-                  className="w-full border rounded px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                  disabled
+                  className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-500"
                   required
                 />
                 <p className="text-xs text-gray-500 mb-1">
                   กดปุ่ม "แชร์" → เลือก "ฝังแผนที่" และคัดลอกลิงก์ที่อยู่ใน iframe src="..."
                 </p>
               </div>
-
-              {[
-                { label: 'วันที่เริ่มรับสมัคร', name: 'start_date', type: 'date' },
-                { label: 'วันสิ้นสุดรับสมัคร', name: 'end_date', type: 'date' },
-                { label: 'อีเมลสำหรับติดต่อ', name: 'email', type: 'email' },
-                { label: 'เบอร์โทรศัพท์', name: 'phone_number' },
-              ].map(({ label, name, type = 'text', step }) => (
-                <div key={name}>
-                  <label className="block font-semibold mb-1 text-[#465d71]">{label}</label>
-                  <input
-                    name={name}
-                    type={type}
-                    step={step}
-                    value={job[name]}
-                    onChange={handleChange}
-                    className="w-full border rounded px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#6EC7E2]"
-                    required
-                  />
-                </div>
-              ))}
+              {/* วันที่เริ่มรับสมัคร */}
+              <div>
+                <label className="block font-semibold mb-1 text-[#465d71]">วันที่เริ่มรับสมัคร</label>
+                <input
+                  name="start_date"
+                  type="date"
+                  value={job.start_date}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                  required
+                />
+              </div>
+              {/* วันสิ้นสุดรับสมัคร */}
+              <div>
+                <label className="block font-semibold mb-1 text-[#465d71]">วันสิ้นสุดรับสมัคร</label>
+                <input
+                  name="end_date"
+                  type="date"
+                  value={job.end_date}
+                  onChange={handleChange}
+                  className="w-full border rounded px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#6EC7E2]"
+                  required
+                />
+              </div>
+              {/* อีเมลสำหรับติดต่อ */}
+              <div>
+                <label className="block font-semibold mb-1 text-[#465d71]">อีเมลสำหรับติดต่อ</label>
+                <input
+                  name="email"
+                  type="email"
+                  value={job.email}
+                  disabled
+                  className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-500"
+                  required
+                />
+              </div>
+              {/* เบอร์โทรศัพท์ */}
+              <div>
+                <label className="block font-semibold mb-1 text-[#465d71]">เบอร์โทรศัพท์</label>
+                <input
+                  name="phone_number"
+                  type="text"
+                  value={job.phone_number}
+                  disabled
+                  className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-500"
+                  required
+                />
+              </div>
             </div>
 
             <div className="mt-6">
