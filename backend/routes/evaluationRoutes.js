@@ -356,7 +356,7 @@ router.get('/details/:student_id/:role', async (req, res) => {
 });
 // ✅ GET: รวมผลการประเมินแบบคำนวณใหม่ (มี final_score / final_status)
 router.get('/all', async (req, res) => {
-  
+  console.log("✅ เข้ามาแล้ว /api/evaluation/all");
   try {
     const [rows] = await db.promise().query(`
       SELECT 
