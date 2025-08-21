@@ -218,7 +218,7 @@ router.post('/submit', async (req, res) => {
   }
 });
 
-// ✅ GET: ดึงข้อมูลการประเมินของนักศึกษา (รวม + details)
+  // ✅ GET: ดึงข้อมูลการประเมินของนักศึกษา (รวม + details)
 router.get('/:student_id', async (req, res) => {
   const { student_id } = req.params;
   const { role } = req.query;
@@ -356,17 +356,18 @@ router.get('/details/:student_id/:role', async (req, res) => {
 });
 // ✅ GET: รวมผลการประเมินแบบคำนวณใหม่ (มี final_score / final_status)
 router.get('/all', async (req, res) => {
-  console.log("✅ เข้ามาแล้ว /api/evaluation/all");
   try {
     const [rows] = await db.promise().query(`
       SELECT 
         e.evaluation_id,
-        e.student_id,
+        s.student_id,
         s.student_name,
         s.profile_image,
-        e.supervisor_score,                      
-        e.company_score,                           
+        e.supervisor_score,                        -- 0–100
+        e.company_score,                           -- ดิบ 0–120
+        -- บริษัทเป็นเปอร์เซ็นต์ (0–100)
         LEAST((e.company_score / 120) * 100, 100) AS company_score_pct,
+        -- คะแนนรวมถ่วงน้ำหนัก 60/40 (0–100) เมื่อมีครบสองฝั่ง
         CASE 
           WHEN e.company_score IS NOT NULL AND e.supervisor_score IS NOT NULL
             THEN (LEAST((e.company_score / 120) * 100, 100) * 0.60) 
@@ -385,14 +386,14 @@ router.get('/all', async (req, res) => {
             THEN 'fail'
           ELSE 'pending'
         END AS final_status,
-        e.evaluation_result,                
+        e.evaluation_result,                       -- 1/0 (ที่อัปเดตตอน submit)
         sup.supervisor_name,
         c.company_name
-      FROM evaluation e
-      JOIN student s ON e.student_id = s.student_id
+      FROM student s
+      LEFT JOIN evaluation e ON e.student_id = s.student_id
       LEFT JOIN supervisor sup ON e.supervisor_id = sup.supervisor_id
-      LEFT JOIN company c ON e.company_id = c.company_id`);
-    console.log("📌 rows =", rows); 
+      LEFT JOIN company c ON e.company_id = c.company_id
+    `);
     res.json(rows);
   } catch (err) {
     console.error('❌ ดึงข้อมูลการประเมินล้มเหลว:', err);
