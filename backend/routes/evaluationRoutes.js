@@ -395,6 +395,7 @@ router.get('/all', async (req, res) => {
       LEFT JOIN supervisor sup ON e.supervisor_id = sup.supervisor_id
       LEFT JOIN company c ON e.company_id = c.company_id
     `);
+    console.log("📌 rows =", rows); 
     res.json(rows);
   } catch (err) {
     console.error('❌ ดึงข้อมูลการประเมินล้มเหลว:', err);
