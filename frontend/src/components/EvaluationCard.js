@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const EvaluationCard = ({ student = {} }) => {
   const navigate = useNavigate();
@@ -11,36 +10,32 @@ const EvaluationCard = ({ student = {} }) => {
     profile_image,
     supervisor_name = '-',
     company_name = '-',
-    supervisor_score: supRaw,   // 0–100
-    company_score: compRaw,     // ดิบ 0–120
-    company_score_pct,
-    final_score,
-    // 🆕 ฟิลด์ใหม่จากตาราง internship
-    intern_start_date,
-    intern_end_date,
+    supervisor_score: supRaw,   // 0–100 (null ถ้ายังไม่กรอก)
+    company_score: compRaw,     // ดิบ 0–120 (null ถ้ายังไม่กรอก)
+    company_score_pct,          // 0–100 (อาจไม่มีจาก API)
+    final_score,                // 0–100 (อาจไม่มีจาก API)
+    // final_status   // ไม่ใช้ตัดสิน เพื่อกันกรณีฝั่งหนึ่งยังไม่ได้กรอก
   } = student || {};
 
   // --- Helpers ---
   const toNum = (v) => (v === null || v === undefined || isNaN(Number(v)) ? null : Number(v));
   const clamp = (v, min, max) => (v == null ? null : Math.max(min, Math.min(max, v)));
   const fmt = (v, d = 1) => (v == null || Number.isNaN(+v) ? '-' : Number(v).toFixed(d));
-  const fmtDate = (dateStr) => {
-    if (!dateStr) return "-";
-    const d = new Date(dateStr);
-    return d.toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" });
-  };
 
   // --- Normalize values ---
-  const sup = clamp(toNum(supRaw), 0, 100);
-  const comp120 = clamp(toNum(compRaw), 0, 120);
+  const sup = clamp(toNum(supRaw), 0, 100);      // 0..100 or null
+  const comp120 = clamp(toNum(compRaw), 0, 120); // 0..120 or null
   const compPct =
     toNum(company_score_pct) != null
       ? clamp(Number(company_score_pct), 0, 100)
       : comp120 != null
-      ? (comp120 / 120) * 100
-      : null;
+        ? (comp120 / 120) * 100
+        : null;
 
-  const bothProvided = (sup != null && sup > 0) && (comp120 != null && comp120 > 0);
+  // --- Final score (เฉพาะเมื่อมีคะแนนทั้งสองฝั่ง) ---
+  const bothProvided =
+    (sup != null && sup > 0) &&           // ✅ เปลี่ยน > 0 เป็น sup != null ถ้าต้องการนับ 0 ว่า “กรอกแล้ว”
+    (comp120 != null && comp120 > 0);     // ✅ เช่นเดียวกัน: comp120 != null เพื่อให้นับ 0 เป็นกรอกแล้ว
 
   const computedFinal = (sup != null && compPct != null)
     ? compPct * 0.6 + sup * 0.4
@@ -64,7 +59,7 @@ const EvaluationCard = ({ student = {} }) => {
     navigate(`/student-detail/${student_id}`);
   };
 
-  const imgSrc = profile_image; 
+  const imgSrc = profile_image;
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-blue-200 p-5 mb-5 flex flex-col md:flex-row md:items-center gap-6 text-black">
@@ -89,11 +84,6 @@ const EvaluationCard = ({ student = {} }) => {
             <p>คะแนนที่ได้ : {fmt(sup, 0)} / 100 คะแนน</p>
             <p className="mt-2">สถานประกอบการ 60% : {company_name}</p>
             <p>คะแนนที่ได้ : {fmt(comp120, 0)} / 120 คะแนน</p>
-
-            {/* 🆕 แสดงช่วงเวลาฝึกงาน */}
-            <p className="mt-2">วันที่เริ่มฝึกงาน: {fmtDate(intern_start_date)}</p>
-            <p>วันที่สิ้นสุดฝึกงาน: {fmtDate(intern_end_date)}</p>
-
             <p className="mt-2 font-medium">
               สรุปรวม (เกณฑ์ผ่าน ≥ 70%) : {fScore == null ? '-' : `${fmt(fScore, 1)}%`} 
             </p>
@@ -101,6 +91,7 @@ const EvaluationCard = ({ student = {} }) => {
         </div>
       </div>
 
+      {/* ตำแหน่งเดิมของดรอปดาว → แสดง Badge */}
       <div className="ml-auto">
         <span className={`px-4 py-2 rounded font-medium ${badge.cls}`}>
           {badge.text}
