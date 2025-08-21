@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import api from "../../axios";  // ใช้ instance เดียวกัน
 import Header from '../../components/Header';
 import EvaluationCard from '../../components/EvaluationCard';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +12,7 @@ const DashboardInstructorScores = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get('/api/evaluation/all');
+        const res = await api.get('/api/evaluation/all');
         const rows = Array.isArray(res.data) ? res.data : [];
         setStudents(rows.filter(r => r && typeof r === 'object'));
       } catch (err) {
