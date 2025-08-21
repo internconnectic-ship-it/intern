@@ -14,9 +14,10 @@ const DashboardInstructorScores = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await api.get(`/api/evaluation/all`)
+        const res = await api.get(`/api/evaluation/submit`)
         console.log("📌 ข้อมูลจาก backend:", res.data);
         const rows = Array.isArray(res.data) ? res.data : [];
+        console.log("📌 ข้อมูลจาก rows:", rows);
         setStudents(rows.filter(r => r && typeof r === 'object'));
       } catch (err) {
         console.error('❌ โหลดข้อมูลล้มเหลว:', err);

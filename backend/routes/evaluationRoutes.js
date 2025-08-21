@@ -364,11 +364,9 @@ router.get('/all', async (req, res) => {
         e.student_id,
         s.student_name,
         s.profile_image,
-        e.supervisor_score,                        -- 0–100
-        e.company_score,                           -- ดิบ 0–120
-        -- บริษัทเป็นเปอร์เซ็นต์ (0–100)
+        e.supervisor_score,                      
+        e.company_score,                           
         LEAST((e.company_score / 120) * 100, 100) AS company_score_pct,
-        -- คะแนนรวมถ่วงน้ำหนัก 60/40 (0–100) เมื่อมีครบสองฝั่ง
         CASE 
           WHEN e.company_score IS NOT NULL AND e.supervisor_score IS NOT NULL
             THEN (LEAST((e.company_score / 120) * 100, 100) * 0.60) 
@@ -391,10 +389,9 @@ router.get('/all', async (req, res) => {
         sup.supervisor_name,
         c.company_name
       FROM evaluation e
-      LEFT JOIN student s ON e.student_id = s.student_id
+      JOIN student s ON e.student_id = s.student_id
       LEFT JOIN supervisor sup ON e.supervisor_id = sup.supervisor_id
-      LEFT JOIN company c ON e.company_id = c.company_id
-    `);
+      LEFT JOIN company c ON e.company_id = c.company_id`);
     console.log("📌 rows =", rows); 
     res.json(rows);
   } catch (err) {
