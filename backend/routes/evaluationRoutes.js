@@ -387,11 +387,11 @@ router.get('/all', async (req, res) => {
             THEN 'fail'
           ELSE 'pending'
         END AS final_status,
-        e.evaluation_result,                       -- 1/0 (ที่อัปเดตตอน submit)
+        e.evaluation_result,                
         sup.supervisor_name,
         c.company_name
       FROM evaluation e
-      JOIN student s ON e.student_id = s.student_id
+      LEFT JOIN student s ON e.student_id = s.student_id
       LEFT JOIN supervisor sup ON e.supervisor_id = sup.supervisor_id
       LEFT JOIN company c ON e.company_id = c.company_id
     `);
