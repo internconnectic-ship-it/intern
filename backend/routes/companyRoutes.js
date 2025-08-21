@@ -23,7 +23,7 @@ router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const {
     company_name,
-    business_type, // ✅ รับ business_type จาก req.body
+    business_type,
     website,
     contact_email,
     contact_name,
@@ -37,7 +37,7 @@ router.put('/:id', async (req, res) => {
     await db.promise().query(
       `UPDATE company SET 
         company_name = ?, 
-        business_type = ?, // ✅ บันทึก business_type ลงตาราง company
+        business_type = ?, 
         website = ?, 
         contact_email = ?, 
         contact_name = ?, 
@@ -57,35 +57,5 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// 📌 POST: สร้างข้อมูลบริษัทใหม่ (ใช้ตอนสมัครสมาชิก)
-router.post('/', async (req, res) => {
-  const {
-    company_id,
-    company_name,
-    business_type,
-    website,
-    contact_email,
-    contact_name,
-    phone_number,
-    address,
-    google_maps_link,
-    company_logo
-  } = req.body;
-
-  try {
-    await db.promise().query(
-      `INSERT INTO company (
-        company_id, company_name, business_type, website, contact_email,
-        contact_name, phone_number, address, google_maps_link, company_logo
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [company_id, company_name, business_type, website, contact_email,
-       contact_name, phone_number, address, google_maps_link, company_logo]
-    );
-    res.json({ message: "✅ สร้างข้อมูลบริษัทเรียบร้อย" });
-  } catch (err) {
-    console.error("❌ Create company failed:", err);
-    res.status(500).json({ message: "Create company failed" });
-  }
-});
 
 module.exports = router;

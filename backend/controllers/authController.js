@@ -50,16 +50,16 @@ exports.register = async (req, res) => {
       );
     } 
     // สำหรับ role 'company'
-    else if (role === 'company') {
-      await db.promise().query(
-        `INSERT INTO company (
-          company_id, company_name, contact_email, contact_name,
-          phone_number, business_type, address, created_date
-        ) VALUES (?, ?, ?, '', '', '', '', CURDATE())`,
+      else if (role === 'company') {
+    await db.promise().query(
+      `INSERT INTO company (
+        company_id, company_name, contact_email, contact_name,
+        phone_number, business_type, address, created_date
+      ) VALUES (?, ?, ?, '', '', ?, '', CURDATE())`,
+      [id, name, email, business_type]
+    );
+  }
 
-        [id, name, email]
-      );
-    }
 
     // สำหรับ role อื่นๆ เช่น instructor, supervisor, admin
     else if (role === 'instructor') {
