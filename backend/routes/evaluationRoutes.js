@@ -311,6 +311,52 @@ router.get('/company/students/:company_id', async (req, res) => {
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงรายชื่อนิสิต' });
   }
 });
+//ดึงข้อมูลเดิมมาแสดงในฟอร์ม
+router.get('/details/:student_id/:role', async (req, res) => {
+  const { student_id, role } = req.params;
+
+  try {
+    // 1) ดึงข้อมูลจากตารางหลักก่อน
+    const [evaluationRows] = await db.promise().query(
+      `SELECT * FROM evaluation WHERE student_id = ?`,
+      [student_id]
+    );
+
+    if (evaluationRows.length === 0) {
+      return res.json({ message: "ยังไม่มีข้อมูลการประเมิน", data: null });
+    }
+
+    const evaluation = evaluationRows[0];
+    let details = null;
+
+    // 2) ถ้า role เป็น company → ดึงรายละเอียดจาก evaluation_company_details
+    if (role === "company") {
+      const [rows] = await db.promise().query(
+        `SELECT * FROM evaluation_company_details 
+         WHERE evaluation_id = ? AND student_id = ? AND company_id = ?`,
+        [evaluation.evaluation_id, student_id, evaluation.company_id]
+      );
+      details = rows.length > 0 ? rows[0] : null;
+    }
+
+    // 3) ถ้า role เป็น supervisor → ดึงรายละเอียดจาก evaluation_supervisor_details
+    if (role === "supervisor") {
+      const [rows] = await db.promise().query(
+        `SELECT * FROM evaluation_supervisor_details 
+         WHERE evaluation_id = ? AND student_id = ? AND supervisor_id = ?`,
+        [evaluation.evaluation_id, student_id, evaluation.supervisor_id]
+      );
+      details = rows.length > 0 ? rows[0] : null;
+    }
+
+    res.json({ message: "✅ ดึงข้อมูลสำเร็จ", evaluation, details });
+  } catch (err) {
+    console.error("❌ GET /details error:", err);
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
+  }
+});
+
+    
 
 
 module.exports = router;

@@ -47,6 +47,7 @@ const EvaluationCompanyForm = () => {
       });
   }, [id]);
 
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setScores(prev => ({ ...prev, [name]: parseInt(value) }));
