@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 const DashboardInstructorScores = () => {
   const [students, setStudents] = useState([]);
   const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     const fetchData = async () => {
