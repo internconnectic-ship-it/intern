@@ -12,7 +12,7 @@ const DashboardInstructorScores = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await api.get(`${API_URL}/api/evaluation/all`);
+        const res = await api.get('/api/evaluation/all');
         const rows = Array.isArray(res.data) ? res.data : [];
         setStudents(rows.filter(r => r && typeof r === 'object'));
       } catch (err) {
