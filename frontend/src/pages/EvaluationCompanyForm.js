@@ -13,7 +13,7 @@ const EvaluationCompanyForm = () => {
   const [scores, setScores] = useState({});
   const [companyComment, setCompanyComment] = useState('');
 
-useEffect(() => {
+  useEffect(() => {
     axios.get(`${API_URL}/api/student/${id}`)
       .then(res => setStudent(res.data))
       .catch(err => console.error('❌ โหลดนิสิตล้มเหลว:', err));
@@ -48,6 +48,15 @@ useEffect(() => {
         }
       });
   }, [id]);
+
+  const [form, setForm] = useState({
+    absent_sick: 0,
+    absent_personal: 0,
+    late_days: 0,
+    absent_uninformed: 0,
+    company_comment: "",
+  });
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({
