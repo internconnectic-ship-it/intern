@@ -363,7 +363,7 @@ router.get('/details/:student_id/:role', async (req, res) => {
 router.get('/all', async (req, res) => {
   try {
     console.log("🔥 เรียก /api/evaluation/all แล้ว");
-    const result = await db.promise().query(`
+    const [rows] = await db.promise().query(`
       SELECT 
         e.evaluation_id,
         e.student_id,
@@ -401,8 +401,8 @@ router.get('/all', async (req, res) => {
       LEFT JOIN company c ON e.company_id = c.company_id
     `);
 
-    console.log("📌 Raw query result:", result);
-    res.json(result);   // ❗ ต้องเป็น rows ไม่ใช่ null
+    console.log("📌 Raw query result:", rows);
+    res.json([rows]);   // ❗ ต้องเป็น rows ไม่ใช่ null
   } catch (err) {
     console.error("❌ Error fetching evaluations:", err);
     res.status(500).json({ message: err.message });
