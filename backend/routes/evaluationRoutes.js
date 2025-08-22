@@ -376,7 +376,7 @@ router.get('/company/students/:company_id', async (req, res) => {
        WHERE i.company_id = ?`,
       [company_id]
     );
-
+    console.log("📌 Backend rows:", rows); 
     res.json(rows);
   } catch (err) {
     console.error('❌ ดึงรายชื่อนิสิตของบริษัทล้มเหลว:', err);
