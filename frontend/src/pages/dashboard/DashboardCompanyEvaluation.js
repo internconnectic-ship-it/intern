@@ -62,7 +62,11 @@ const DashboardCompanyEvaluation = () => {
               <p className="text-sm text-gray-600">เบอร์โทร: {student.phone_number}</p>
               <p className="text-sm text-gray-600">อีเมล: {student.email}</p>
               <p className="text-sm text-gray-600">{student.university}</p>
-              <Row label="วันที่สิ้นสุดฝึกงาน" value={fmt(student.intern_end_date)} />
+              {/* 🔹 วันสิ้นสุดการฝึกงาน */}
+              <p className="text-sm text-gray-600">
+                กรุณาประเมินก่อน: {formatDate(student.intern_end_date)}
+              </p>
+
            
 
               {/* ปุ่มประเมิน/แก้ไข */}
