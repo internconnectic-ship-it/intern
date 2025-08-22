@@ -368,24 +368,24 @@ router.get('/all', async (req, res) => {
         s.student_id,
         s.student_name,
         s.profile_image,
-        c.company_name,
-        sup.supervisor_name,
-        ins.Instructor_name,
+        c.company_name AS company_name,
+        sup.supervisor_name AS supervisor_name,
+        ins.Instructor_name AS instructor_name,
         e.supervisor_score,
         e.company_score,
         LEAST((e.company_score / 120) * 100, 100) AS company_score_pct,
         CASE 
           WHEN e.company_score IS NOT NULL AND e.supervisor_score IS NOT NULL
             THEN (LEAST((e.company_score / 120) * 100, 100) * 0.60) 
-               + (LEAST(e.supervisor_score, 100) * 0.40)
+              + (LEAST(e.supervisor_score, 100) * 0.40)
           ELSE NULL
         END AS final_score,
         CASE 
           WHEN e.company_score IS NOT NULL AND e.supervisor_score IS NOT NULL
-               AND (
-                 (LEAST((e.company_score / 120) * 100, 100) * 0.60)
-               + (LEAST(e.supervisor_score, 100) * 0.40)
-               ) >= 70
+              AND (
+                (LEAST((e.company_score / 120) * 100, 100) * 0.60)
+              + (LEAST(e.supervisor_score, 100) * 0.40)
+              ) >= 70
             THEN 'ผ่าน'
           WHEN e.company_score IS NOT NULL AND e.supervisor_score IS NOT NULL
             THEN 'ไม่ผ่าน'
@@ -396,7 +396,8 @@ router.get('/all', async (req, res) => {
       LEFT JOIN internship i ON s.student_id = i.student_id
       LEFT JOIN company c ON i.company_id = c.company_id
       LEFT JOIN supervisor sup ON i.supervisor_id = sup.supervisor_id
-      LEFT JOIN instructor ins ON i.instructor_id = ins.instructor_id
+      LEFT JOIN instructor ins ON i.instructor_id = ins.instructor_id;
+
     `);
 
     console.log("✅ /api/evaluation/all rows:", rows);
