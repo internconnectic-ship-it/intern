@@ -113,6 +113,32 @@ router.post('/submit', async (req, res) => {
   // ✅ คำนวณคะแนนรวมฝั่ง company
   console.log("🏢 company_score =", company_score);
   if (role === 'company') {
+    // ✅ คำนวณคะแนนรวมฝั่ง company
+if (role === 'company') {
+  // รวมคะแนน radio personality (p1..p10) + work (w1..w10)
+  const pTotal = [
+    p1,p2,p3,p4,p5,p6,p7,p8,p9,p10
+  ].map(v => parseInt(v) || 0).reduce((a,b) => a+b, 0);
+
+  const wTotal = [
+    w1,w2,w3,w4,w5,w6,w7,w8,w9,w10
+  ].map(v => parseInt(v) || 0).reduce((a,b) => a+b, 0);
+
+  // หักคะแนนตามการขาด ลา สาย
+  const deductions =
+    (parseInt(absent_sick)       || 0) * 2 +
+    (parseInt(absent_personal)   || 0) * 2 +
+    (parseInt(late_days)         || 0) * 1 +
+    (parseInt(absent_uninformed) || 0) * 4;
+
+  company_raw = pTotal + wTotal - deductions;
+
+  if (company_raw < 0) company_raw = 0;
+  if (company_raw > 120) company_raw = 120;
+
+  console.log("🏢 คำนวณ company_score =", company_raw);
+  }
+
     company_raw = parseFloat(company_score ?? 0);
     if (Number.isNaN(company_raw) || company_raw < 0) company_raw = 0;
     if (company_raw > 120) company_raw = 120;
