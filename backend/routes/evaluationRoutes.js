@@ -402,7 +402,7 @@ router.get('/all', async (req, res) => {
     `);
 
     console.log("📌 Raw query result:", rows);
-    res.json([rows]);   // ❗ ต้องเป็น rows ไม่ใช่ null
+     res.json(rows);   // ❗ ต้องเป็น rows ไม่ใช่ null
   } catch (err) {
     console.error("❌ Error fetching evaluations:", err);
     res.status(500).json({ message: err.message });
