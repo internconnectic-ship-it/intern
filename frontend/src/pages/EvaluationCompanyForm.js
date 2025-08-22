@@ -163,25 +163,22 @@ useEffect(() => {
               { label: "ลากิจ", name: "absent_personal", score: 2 },
               { label: "มาทำงานสาย", name: "late_days", score: 1 },
               { label: "ขาดงานโดยไม่ทราบสาเหตุ", name: "absent_uninformed", score: 4 }
-            ].map((item, i) => (
+            ].map((item, i) => (   // ✅ ต้องเป็น item
               <div key={i} className="mb-2 flex items-center">
                 <label className="w-40">{item.label}:</label>
                 <input
                   type="number"
-                  name={item.name}
+                  name={item.name}                     // ✅ ถูกต้องแล้ว
+                  value={form[item.name] || ""}
                   min={0}
                   step={1}
-                  value={form[item.name] || ""}   // ✅ bind state
-                  onChange={handleChange}
                   placeholder="วัน"
                   className="border p-1 w-20 rounded"
+                  onChange={handleChange}
                 />
-                <span className="ml-2 text-gray-500">
-                  หักวันละ {item.score} คะแนน
-                </span>
+                <span className="ml-2 text-gray-500">หักวันละ {item.score} คะแนน</span>
               </div>
             ))}
-
             <h3 className="font-bold text-[#130347] mt-6 mb-3">ความคิดเห็นเพิ่มเติม</h3>
             <textarea
               className="border p-2 w-full rounded"
