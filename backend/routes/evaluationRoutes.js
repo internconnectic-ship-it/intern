@@ -95,9 +95,22 @@ router.post('/submit', async (req, res) => {
           company_score = ?, 
           company_comment = ?, 
           company_id = ?, 
-          company_evaluation_date = ?
+          company_evaluation_date = ?,
+          absent_sick = ?, 
+          absent_personal = ?, 
+          late_days = ?, 
+          absent_uninformed = ?
         `;
-        params.push(company_raw, company_comment || null, company_id || null, today);
+        params.push(
+          company_raw,
+          company_comment || null,
+          company_id || null,
+          today,
+          absent_sick || 0,
+          absent_personal || 0,
+          late_days || 0,
+          absent_uninformed || 0
+        );
       }
 
       query += ` WHERE student_id = ?`;
@@ -110,8 +123,9 @@ router.post('/submit', async (req, res) => {
           student_id, supervisor_id, company_id, instructor_id,
           supervisor_score, company_score,
           supervisor_comment, company_comment,
-          evaluation_result, supervisor_evaluation_date, company_evaluation_date
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          evaluation_result, supervisor_evaluation_date, company_evaluation_date,
+          absent_sick, absent_personal, late_days, absent_uninformed
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           student_id,
           supervisor_id || null,
@@ -123,7 +137,11 @@ router.post('/submit', async (req, res) => {
           company_comment || null,
           0,
           role === 'supervisor' ? today : null,
-          role === 'company' ? today : null
+          role === 'company' ? today : null,
+          role === 'company' ? (absent_sick || 0) : 0,
+          role === 'company' ? (absent_personal || 0) : 0,
+          role === 'company' ? (late_days || 0) : 0,
+          role === 'company' ? (absent_uninformed || 0) : 0
         ]
       );
     }
@@ -135,6 +153,7 @@ router.post('/submit', async (req, res) => {
     );
     const evaluation_id = rowEval[0].evaluation_id;
     console.log("📦 req.body =", req.body);
+
     // 🔹 3) insert/update details ตาม role
     if (role === 'company') {
       await db.promise().query(`
@@ -218,7 +237,8 @@ router.post('/submit', async (req, res) => {
   }
 });
 
-  // ✅ GET: ดึงข้อมูลการประเมินของนักศึกษา (รวม + details)
+
+// ✅ GET: ดึงข้อมูลการประเมินของนักศึกษา (รวม + details)
 router.get('/:student_id', async (req, res) => {
   const { student_id } = req.params;
   const { role } = req.query;
@@ -278,6 +298,7 @@ router.get('/supervisor-details/:student_id', async (req, res) => {
     res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
   }
 });
+
 // ✅ GET: รายชื่อนิสิตของบริษัท (สำหรับหน้า DashboardCompanyEvaluation)
 router.get('/company/students/:company_id', async (req, res) => {
   const { company_id } = req.params;
@@ -310,6 +331,7 @@ router.get('/company/students/:company_id', async (req, res) => {
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงรายชื่อนิสิต' });
   }
 });
+
 //ดึงข้อมูลเดิมมาแสดงในฟอร์ม
 router.get('/details/:student_id/:role', async (req, res) => {
   const { student_id, role } = req.params;
@@ -354,6 +376,7 @@ router.get('/details/:student_id/:role', async (req, res) => {
     res.status(500).json({ message: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
   }
 });
+
 // ✅ GET: รวมผลการประเมินแบบคำนวณใหม่ (มี final_score / final_status)
 router.get('/all', async (req, res) => {
   console.log("✅ เข้ามาแล้ว all");

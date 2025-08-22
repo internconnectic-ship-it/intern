@@ -55,17 +55,25 @@ const EvaluationCompanyForm = () => {
   };
 
   const calcTotalScore = () => {
-    let total = 0;
-    for (let i = 1; i <= 10; i++) total += parseInt(scores[`p${i}`]) || 0;
-    for (let i = 1; i <= 10; i++) total += parseInt(scores[`w${i}`]) || 0;
-    const weights = [2, 2, 1, 4];
-    let penalty = 0;
-    for (let i = 0; i < 4; i++) {
-      penalty += (parseInt(scores[`absent_days${i}`]) || 0) * weights[i];
-    }
-    total += Math.max(0, 20 - penalty);
-    return total;
-  };
+  let total = 0;
+
+  // รวมคะแนนหัวข้อ 1 (p1..p10) และหัวข้อ 2 (w1..w10)
+  for (let i = 1; i <= 10; i++) total += parseInt(scores[`p${i}`]) || 0;
+  for (let i = 1; i <= 10; i++) total += parseInt(scores[`w${i}`]) || 0;
+
+  // หักคะแนนจากการลา/สาย/ขาดงาน
+  const penalty =
+    (parseInt(scores.absent_sick) || 0) * 2 +
+    (parseInt(scores.absent_personal) || 0) * 2 +
+    (parseInt(scores.late_days) || 0) * 1 +
+    (parseInt(scores.absent_uninformed) || 0) * 4;
+
+  // เหลือคะแนนส่วนเวลา (20 - penalty)
+  total += Math.max(0, 20 - penalty);
+
+  return total;
+};
+
 
   const handleSubmit = async () => {
     for (let i = 1; i <= 10; i++) {
@@ -169,6 +177,7 @@ const EvaluationCompanyForm = () => {
                   step={1}
                   placeholder="วัน"
                   className="border p-1 w-20 rounded"
+                  value={scores[item.name] || 0} 
                   onChange={handleChange}
                 />
                 <span className="ml-2 text-gray-500">หักวันละ {item.score} คะแนน</span>
