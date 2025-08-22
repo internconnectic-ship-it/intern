@@ -298,15 +298,17 @@ router.get('/:student_id', async (req, res) => {
     let query;
     if (role === 'company') {
       query = `
-        SELECT e.*, d.* 
+        SELECT e.*, d.* ,s.*
         FROM evaluation e
-        LEFT JOIN evaluation_company_details d ON e.evaluation_id = d.evaluation_id
+        LEFT JOIN evaluation_company_details d ON e.evaluation_id = d.evaluation_id 
+        left JOIN student s ON e.student_id = s.student_id
         WHERE e.student_id = ?`;
     } else if (role === 'supervisor') {
       query = `
-        SELECT e.*, d.* 
+        SELECT e.*, d.* ,s.*
         FROM evaluation e
         LEFT JOIN evaluation_supervisor_details d ON e.evaluation_id = d.evaluation_id
+        left JOIN student s ON e.student_id = s.student_id
         WHERE e.student_id = ?`;
     } else {
       query = `SELECT * FROM evaluation WHERE student_id = ?`;
