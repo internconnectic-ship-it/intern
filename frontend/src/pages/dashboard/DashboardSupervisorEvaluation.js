@@ -48,20 +48,23 @@ const DashboardSupervisorEvaluation = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const supervisor_id = localStorage.getItem('supervisorId');
-        const res = await api.get(`/api/evaluation/students/${supervisor_id}`);
-        setStudents(Array.isArray(res.data) ? res.data : []);
-      } catch (err) {
-        console.error('❌ ดึงรายชื่อนิสิตล้มเหลว:', err);
-        setStudents([]);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  uuseEffect(() => {
+  (async () => {
+    try {
+      const supervisor_id = localStorage.getItem("supervisorId"); // ✅ ดึงค่าที่เซฟไว้ตอน login
+      console.log("📌 supervisor_id =", supervisor_id);          // debug
+      const res = await api.get(`/api/evaluation/students/${supervisor_id}`);
+      setStudents(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error('❌ ดึงรายชื่อนิสิตล้มเหลว:', err);
+      setStudents([]);
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, []);
+
+
 
   const handleEvaluate = (student_id) => navigate(`/evaluation/${student_id}`);
 
