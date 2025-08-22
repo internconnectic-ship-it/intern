@@ -157,12 +157,14 @@ useEffect(() => {
             <h3 className="font-bold text-[#130347] mt-6 mb-3">
               3. ประเมินเวลาในการปฏิบัติงาน (หักคะแนนจาก 20)
             </h3>
-            {[{ label: "ลาป่วย", name: "absent_sick", score: 2 },
+            {[
+              { label: "ลาป่วย", name: "absent_sick", score: 2 },
               { label: "ลากิจ", name: "absent_personal", score: 2 },
               { label: "มาทำงานสาย", name: "late_days", score: 1 },
-              { label: "ขาดงานโดยไม่ทราบสาเหตุ", name: "absent_uninformed", score: 4 }].map((label, i) => (
+              { label: "ขาดงานโดยไม่ทราบสาเหตุ", name: "absent_uninformed", score: 4 }
+            ].map((item, i) => (
               <div key={i} className="mb-2 flex items-center">
-                <label className="w-40">{label}:</label>
+                <label className="w-40">{item.label}:</label>
                 <input
                   type="number"
                   name={item.name}
@@ -172,10 +174,9 @@ useEffect(() => {
                   className="border p-1 w-20 rounded"
                   onChange={handleChange}
                 />
-                <span className="ml-2 text-gray-500">หักวันละ {[2, 2, 1, 4][i]} คะแนน</span>
+                <span className="ml-2 text-gray-500">หักวันละ {item.score} คะแนน</span>
               </div>
             ))}
-
             <h3 className="font-bold text-[#130347] mt-6 mb-3">ความคิดเห็นเพิ่มเติม</h3>
             <textarea
               className="border p-2 w-full rounded"
