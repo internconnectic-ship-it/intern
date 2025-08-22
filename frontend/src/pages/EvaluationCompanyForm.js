@@ -47,6 +47,11 @@ useEffect(() => {
         }
       });
   }, [id]);
+  const handleChange = (e) => { 
+      const { name, value } = e.target; setScores(prev => 
+        ({ ...prev, [name]: parseInt(value) })
+      ); 
+    };
 
   const calcTotalScore = () => {
     let total = 0;
