@@ -223,6 +223,9 @@ router.post('/submit', async (req, res) => {
         else result = 2;
 
         // อัพเดตตารางหลัก
+        console.log("📌 UPDATE evaluation params:", {
+          company_score, company_comment, company_id, today, evaluation_id
+        });
         await db.promise().query(
           `UPDATE evaluation 
           SET company_score=?, company_comment=?, company_id=?, company_evaluation_date=? 
@@ -230,6 +233,12 @@ router.post('/submit', async (req, res) => {
           [company_score, company_comment, company_id, today, evaluation_id]
         );
         // อัพเดตรายละเอียด (อยู่ใน evaluation_company_details)
+        console.log("📌 UPDATE evaluation_company_details params:", {
+          p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,
+          w1, w2, w3, w4, w5, w6, w7, w8, w9, w10,
+          absent_sick, absent_personal, late_days, absent_uninformed,
+          evaluation_id, student_id
+        });
         await db.promise().query(
           `UPDATE evaluation_company_details 
           SET p1=?, p2=?, p3=?, p4=?, p5=?, p6=?, p7=?, p8=?, p9=?, p10=?, 
