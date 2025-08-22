@@ -363,6 +363,40 @@ router.get('/company/students/:company_id', async (req, res) => {
   }
 });
 
+// ✅ GET: รายชื่อนิสิตของ supervisor (สำหรับหน้า DashboardSupervisorEvaluation)
+router.get('/students/:supervisor_id', async (req, res) => {
+  const { supervisor_id } = req.params;
+
+  try {
+    const [rows] = await db.promise().query(
+      `SELECT 
+         s.student_id,
+         s.student_name,
+         s.email,
+         s.phone_number,
+         s.university,
+         s.profile_image,
+         COALESCE(e.supervisor_score, NULL) AS evaluation_score,
+         CASE 
+           WHEN e.supervisor_score IS NOT NULL THEN 'completed'
+           ELSE 'pending'
+         END AS evaluation_status
+       FROM internship i
+       JOIN student s ON i.student_id = s.student_id
+       LEFT JOIN evaluation e ON s.student_id = e.student_id
+       WHERE i.supervisor_id = ? AND i.internship_status = 'confirmed'`,
+      [supervisor_id]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error('❌ ดึงรายชื่อนิสิตของ supervisor ล้มเหลว:', err);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงรายชื่อนิสิต' });
+  }
+});
+
+
+
 //ดึงข้อมูลเดิมมาแสดงในฟอร์ม
 router.get('/details/:student_id/:role', async (req, res) => {
   const { student_id, role } = req.params;
