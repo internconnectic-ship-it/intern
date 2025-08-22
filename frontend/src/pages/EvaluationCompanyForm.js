@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 const EvaluationCompanyForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -13,41 +13,10 @@ const EvaluationCompanyForm = () => {
   const [companyComment, setCompanyComment] = useState('');
 
   useEffect(() => {
-    axios.get(`${API_URL}/api/student/${id}`)
+    axios.get(`http://localhost:5000/api/student/${id}`)
       .then(res => setStudent(res.data))
       .catch(err => console.error('❌ โหลดนิสิตล้มเหลว:', err));
   }, [id]);
-
-  useEffect(() => {
-    axios.get(`${API_URL}/api/evaluation/company-details/${id}`)
-      .then(res => {
-        const data = res.data;
-        if (data) {
-          setCompanyComment(data.company_comment || '');
-          setScores({
-            p1: data.p1, p2: data.p2, p3: data.p3, p4: data.p4, p5: data.p5,
-            p6: data.p6, p7: data.p7, p8: data.p8, p9: data.p9, p10: data.p10,
-            w1: data.w1, w2: data.w2, w3: data.w3, w4: data.w4, w5: data.w5,
-            w6: data.w6, w7: data.w7, w8: data.w8, w9: data.w9, w10: data.w10,
-            absent_sick: data.absent_sick,
-            absent_personal: data.absent_personal,
-            late_days: data.late_days,
-            absent_uninformed: data.absent_uninformed,
-            company_comment: data.company_comment || ''
-          });
-        }
-      })
-      .catch(err => {
-        if (err.response?.status === 404) {
-          // ไม่พบข้อมูลเดิม ให้ใช้ค่า default
-          setScores({});
-          setCompanyComment('');
-        } else {
-          console.error('❌ โหลดคะแนน company details ไม่สำเร็จ:', err);
-        }
-      });
-  }, [id]);
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,25 +24,17 @@ const EvaluationCompanyForm = () => {
   };
 
   const calcTotalScore = () => {
-  let total = 0;
-
-  // รวมคะแนนหัวข้อ 1 (p1..p10) และหัวข้อ 2 (w1..w10)
-  for (let i = 1; i <= 10; i++) total += parseInt(scores[`p${i}`]) || 0;
-  for (let i = 1; i <= 10; i++) total += parseInt(scores[`w${i}`]) || 0;
-
-  // หักคะแนนจากการลา/สาย/ขาดงาน
-  const penalty =
-    (parseInt(scores.absent_sick) || 0) * 2 +
-    (parseInt(scores.absent_personal) || 0) * 2 +
-    (parseInt(scores.late_days) || 0) * 1 +
-    (parseInt(scores.absent_uninformed) || 0) * 4;
-
-  // เหลือคะแนนส่วนเวลา (20 - penalty)
-  total += Math.max(0, 20 - penalty);
-
-  return total;
-};
-
+    let total = 0;
+    for (let i = 1; i <= 10; i++) total += parseInt(scores[`p${i}`]) || 0;
+    for (let i = 1; i <= 10; i++) total += parseInt(scores[`w${i}`]) || 0;
+    const weights = [2, 2, 1, 4];
+    let penalty = 0;
+    for (let i = 0; i < 4; i++) {
+      penalty += (parseInt(scores[`absent_days${i}`]) || 0) * weights[i];
+    }
+    total += Math.max(0, 20 - penalty);
+    return total;
+  };
 
   const handleSubmit = async () => {
     for (let i = 1; i <= 10; i++) {
@@ -85,13 +46,13 @@ const EvaluationCompanyForm = () => {
 
     const totalScore = calcTotalScore();
     try {
-      await axios.post(`${API_URL}/api/evaluation/submit`, {
+      await axios.post('http://localhost:5000/api/evaluation/submit', {
         student_id: id,
-        company_id: companyId,
-        role: 'company',
-        ...scores,
+        company_score: totalScore,
         company_comment: companyComment,
-        evaluation_date: new Date().toISOString().split('T')[0]
+        company_id: companyId,
+        evaluation_date: new Date().toISOString().split('T')[0],
+        role: 'company'
       });
       alert("✅ ส่งแบบประเมินสำเร็จ");
       navigate('/company/evaluation');
@@ -162,27 +123,22 @@ const EvaluationCompanyForm = () => {
             <h3 className="font-bold text-[#130347] mt-6 mb-3">
               3. ประเมินเวลาในการปฏิบัติงาน (หักคะแนนจาก 20)
             </h3>
-            {[
-              { label: "ลาป่วย", name: "absent_sick", score: 2 },
-              { label: "ลากิจ", name: "absent_personal", score: 2 },
-              { label: "มาทำงานสาย", name: "late_days", score: 1 },
-              { label: "ขาดงานโดยไม่ทราบสาเหตุ", name: "absent_uninformed", score: 4 }
-            ].map((item, i) => (
+            {["ลาป่วย", "ลากิจ", "มาทำงานสาย", "ขาดงานโดยไม่ทราบสาเหตุ"].map((label, i) => (
               <div key={i} className="mb-2 flex items-center">
-                <label className="w-40">{item.label}:</label>
+                <label className="w-40">{label}:</label>
                 <input
                   type="number"
-                  name={item.name}   // ✅ ตรงกับ DB
+                  name={`absent_days${i}`}
                   min={0}
                   step={1}
                   placeholder="วัน"
                   className="border p-1 w-20 rounded"
-                  value={scores[item.name] || 0} 
                   onChange={handleChange}
                 />
-                <span className="ml-2 text-gray-500">หักวันละ {item.score} คะแนน</span>
+                <span className="ml-2 text-gray-500">หักวันละ {[2, 2, 1, 4][i]} คะแนน</span>
               </div>
             ))}
+
             <h3 className="font-bold text-[#130347] mt-6 mb-3">ความคิดเห็นเพิ่มเติม</h3>
             <textarea
               className="border p-2 w-full rounded"
