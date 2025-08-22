@@ -20,6 +20,55 @@ const clampSupervisor = (v) => {
   return Math.min(100, n);
 };
 
+router.get('/all', async (req, res) => {
+  try {
+    console.log("🔥 เรียก /api/evaluation/all แล้ว");
+    const [rows] = await db.promise().query(`
+      SELECT 
+        e.evaluation_id,
+        e.student_id,
+        s.student_name,
+        s.profile_image,
+        e.supervisor_score,                        -- 0–100
+        e.company_score,                           -- ดิบ 0–120
+        -- บริษัทเป็นเปอร์เซ็นต์ (0–100)
+        LEAST((e.company_score / 120) * 100, 100) AS company_score_pct,
+        -- คะแนนรวมถ่วงน้ำหนัก 60/40 (0–100) เมื่อมีครบสองฝั่ง
+        CASE 
+          WHEN e.company_score IS NOT NULL AND e.supervisor_score IS NOT NULL
+            THEN (LEAST((e.company_score / 120) * 100, 100) * 0.60) 
+               + (LEAST(e.supervisor_score, 100) * 0.40)
+          ELSE NULL
+        END AS final_score,
+        -- สถานะ: pass/fail/pending
+        CASE 
+          WHEN e.company_score IS NOT NULL AND e.supervisor_score IS NOT NULL
+               AND (
+                 (LEAST((e.company_score / 120) * 100, 100) * 0.60)
+               + (LEAST(e.supervisor_score, 100) * 0.40)
+               ) >= 70
+            THEN 'pass'
+          WHEN e.company_score IS NOT NULL AND e.supervisor_score IS NOT NULL
+            THEN 'fail'
+          ELSE 'pending'
+        END AS final_status,
+        e.evaluation_result,                       -- 1/0 (ที่อัปเดตตอน submit)
+        sup.supervisor_name,
+        c.company_name
+      FROM evaluation e
+      JOIN student s ON e.student_id = s.student_id
+      LEFT JOIN supervisor sup ON e.supervisor_id = sup.supervisor_id
+      LEFT JOIN company c ON e.company_id = c.company_id
+    `);
+
+    console.log("📌 Raw query result:", rows);
+     res.json(rows);   // ❗ ต้องเป็น rows ไม่ใช่ null
+  } catch (err) {
+    console.error("❌ Error fetching evaluations:", err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // ✅ POST: บันทึกผลการประเมิน (รวม + details)
 router.post('/submit', async (req, res) => {
   console.log("📦 req.body =", req.body);
@@ -360,53 +409,6 @@ router.get('/details/:student_id/:role', async (req, res) => {
 });
 
 // routes/evaluationRoutes.js
-router.get('/all', async (req, res) => {
-  try {
-    console.log("🔥 เรียก /api/evaluation/all แล้ว");
-    const [rows] = await db.promise().query(`
-      SELECT 
-        e.evaluation_id,
-        e.student_id,
-        s.student_name,
-        s.profile_image,
-        e.supervisor_score,                        -- 0–100
-        e.company_score,                           -- ดิบ 0–120
-        -- บริษัทเป็นเปอร์เซ็นต์ (0–100)
-        LEAST((e.company_score / 120) * 100, 100) AS company_score_pct,
-        -- คะแนนรวมถ่วงน้ำหนัก 60/40 (0–100) เมื่อมีครบสองฝั่ง
-        CASE 
-          WHEN e.company_score IS NOT NULL AND e.supervisor_score IS NOT NULL
-            THEN (LEAST((e.company_score / 120) * 100, 100) * 0.60) 
-               + (LEAST(e.supervisor_score, 100) * 0.40)
-          ELSE NULL
-        END AS final_score,
-        -- สถานะ: pass/fail/pending
-        CASE 
-          WHEN e.company_score IS NOT NULL AND e.supervisor_score IS NOT NULL
-               AND (
-                 (LEAST((e.company_score / 120) * 100, 100) * 0.60)
-               + (LEAST(e.supervisor_score, 100) * 0.40)
-               ) >= 70
-            THEN 'pass'
-          WHEN e.company_score IS NOT NULL AND e.supervisor_score IS NOT NULL
-            THEN 'fail'
-          ELSE 'pending'
-        END AS final_status,
-        e.evaluation_result,                       -- 1/0 (ที่อัปเดตตอน submit)
-        sup.supervisor_name,
-        c.company_name
-      FROM evaluation e
-      JOIN student s ON e.student_id = s.student_id
-      LEFT JOIN supervisor sup ON e.supervisor_id = sup.supervisor_id
-      LEFT JOIN company c ON e.company_id = c.company_id
-    `);
 
-    console.log("📌 Raw query result:", rows);
-     res.json(rows);   // ❗ ต้องเป็น rows ไม่ใช่ null
-  } catch (err) {
-    console.error("❌ Error fetching evaluations:", err);
-    res.status(500).json({ message: err.message });
-  }
-});
 
 module.exports = router;
