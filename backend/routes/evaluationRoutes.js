@@ -87,7 +87,6 @@ router.post('/submit', async (req, res) => {
     company_comment,
     evaluation_date,
     role,
-    company_score,
     // 🟦 ฟิลด์ดิบของบริษัท
     p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,
     w1,w2,w3,w4,w5,w6,w7,w8,w9,w10,
@@ -114,8 +113,7 @@ router.post('/submit', async (req, res) => {
   console.log("🏢 company_score =", company_score);
   if (role === 'company') {
     // ✅ คำนวณคะแนนรวมฝั่ง company
-if (role === 'company') {
-  // รวมคะแนน radio personality (p1..p10) + work (w1..w10)
+  // // รวมคะแนน radio personality (p1..p10) + work (w1..w10)
   const pTotal = [
     p1,p2,p3,p4,p5,p6,p7,p8,p9,p10
   ].map(v => parseInt(v) || 0).reduce((a,b) => a+b, 0);
@@ -137,12 +135,6 @@ if (role === 'company') {
   if (company_raw > 120) company_raw = 120;
 
   console.log("🏢 คำนวณ company_score =", company_raw);
-  }
-
-    company_raw = parseFloat(company_score ?? 0);
-    if (Number.isNaN(company_raw) || company_raw < 0) company_raw = 0;
-    if (company_raw > 120) company_raw = 120;
-    
   }
 
   try {
