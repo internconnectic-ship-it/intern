@@ -298,17 +298,15 @@ router.get('/:student_id', async (req, res) => {
     let query;
     if (role === 'company') {
       query = `
-        SELECT e.*, d.* ,s.*
+        SELECT e.*, d.*
         FROM evaluation e
         LEFT JOIN evaluation_company_details d ON e.evaluation_id = d.evaluation_id 
-        left JOIN student s ON e.student_id = s.student_id
         WHERE e.student_id = ?`;
     } else if (role === 'supervisor') {
       query = `
-        SELECT e.*, d.* ,s.*
+        SELECT e.*, d.*
         FROM evaluation e
         LEFT JOIN evaluation_supervisor_details d ON e.evaluation_id = d.evaluation_id
-        left JOIN student s ON e.student_id = s.student_id
         WHERE e.student_id = ?`;
     } else {
       query = `SELECT * FROM evaluation WHERE student_id = ?`;
@@ -366,6 +364,7 @@ router.get('/company/students/:company_id', async (req, res) => {
          s.phone_number,
          s.university,
          s.profile_image,
+         s.intern_end_date,
          COALESCE(e.company_score, NULL) AS evaluation_score,
          CASE 
            WHEN e.company_score IS NOT NULL THEN 'completed'
