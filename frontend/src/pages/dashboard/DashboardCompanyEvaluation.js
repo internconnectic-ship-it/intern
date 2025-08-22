@@ -62,6 +62,7 @@ const DashboardCompanyEvaluation = () => {
               <p className="text-sm text-gray-600">เบอร์โทร: {student.phone_number}</p>
               <p className="text-sm text-gray-600">อีเมล: {student.email}</p>
               <p className="text-sm text-gray-600">{student.university}</p>
+              <p className="text-sm text-gray-600">***กรุณาประเมินก่อนวันที่:{student.intern_end_date}</p>
 
               {/* ปุ่มประเมิน/แก้ไข */}
                   <div className="mt-4">
