@@ -12,16 +12,41 @@ const EvaluationCompanyForm = () => {
   const [scores, setScores] = useState({});
   const [companyComment, setCompanyComment] = useState('');
 
-  useEffect(() => {
-    axios.get(`http://localhost:5000/api/student/${id}`)
+useEffect(() => {
+    axios.get(`${API_URL}/api/student/${id}`)
       .then(res => setStudent(res.data))
       .catch(err => console.error('❌ โหลดนิสิตล้มเหลว:', err));
   }, [id]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setScores(prev => ({ ...prev, [name]: parseInt(value) }));
-  };
+  useEffect(() => {
+    axios.get(`${API_URL}/api/evaluation/company-details/${id}`)
+      .then(res => {
+        const data = res.data;
+        if (data) {
+          setCompanyComment(data.company_comment || '');
+          setScores({
+            p1: data.p1, p2: data.p2, p3: data.p3, p4: data.p4, p5: data.p5,
+            p6: data.p6, p7: data.p7, p8: data.p8, p9: data.p9, p10: data.p10,
+            w1: data.w1, w2: data.w2, w3: data.w3, w4: data.w4, w5: data.w5,
+            w6: data.w6, w7: data.w7, w8: data.w8, w9: data.w9, w10: data.w10,
+            absent_sick: data.absent_sick,
+            absent_personal: data.absent_personal,
+            late_days: data.late_days,
+            absent_uninformed: data.absent_uninformed,
+            company_comment: data.company_comment || ''
+          });
+        }
+      })
+      .catch(err => {
+        if (err.response?.status === 404) {
+          // ไม่พบข้อมูลเดิม ให้ใช้ค่า default
+          setScores({});
+          setCompanyComment('');
+        } else {
+          console.error('❌ โหลดคะแนน company details ไม่สำเร็จ:', err);
+        }
+      });
+  }, [id]);
 
   const calcTotalScore = () => {
     let total = 0;
@@ -46,13 +71,13 @@ const EvaluationCompanyForm = () => {
 
     const totalScore = calcTotalScore();
     try {
-      await axios.post('http://localhost:5000/api/evaluation/submit', {
+      await axios.post(`${API_URL}/api/evaluation/submit`, {
         student_id: id,
-        company_score: totalScore,
-        company_comment: companyComment,
         company_id: companyId,
-        evaluation_date: new Date().toISOString().split('T')[0],
-        role: 'company'
+        role: 'company',
+        ...scores,
+        company_comment: companyComment,
+        evaluation_date: new Date().toISOString().split('T')[0]
       });
       alert("✅ ส่งแบบประเมินสำเร็จ");
       navigate('/company/evaluation');
