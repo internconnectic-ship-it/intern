@@ -36,6 +36,12 @@ const EvaluationCompanyForm = () => {
             absent_uninformed: data.absent_uninformed,
             company_comment: data.company_comment || ''
           });
+          setForm({
+            absent_sick: data.absent_sick || 0,
+            absent_personal: data.absent_personal || 0,
+            late_days: data.late_days || 0,
+            absent_uninformed: data.absent_uninformed || 0
+          });
         }
       })
       .catch(err => {
