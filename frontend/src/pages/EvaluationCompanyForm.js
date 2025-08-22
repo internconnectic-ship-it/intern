@@ -94,6 +94,7 @@ const EvaluationCompanyForm = () => {
         company_id: companyId,
         role: 'company',
         ...scores,
+        ...form,
         company_comment: companyComment,
         evaluation_date: new Date().toISOString().split('T')[0]
       });

@@ -42,11 +42,8 @@ router.post('/submit', async (req, res) => {
     // 🟦 ฟิลด์ดิบของบริษัท
     p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,
     w1,w2,w3,w4,w5,w6,w7,w8,w9,w10,
+    absent_sick, absent_personal, late_days, absent_uninformed
   } = req.body;
-  const absent_sick = parseInt(req.body.absent_sick ?? 0, 10);
-  const absent_personal = parseInt(req.body.absent_personal ?? 0, 10);
-  const late_days = parseInt(req.body.late_days ?? 0, 10);
-  const absent_uninformed = parseInt(req.body.absent_uninformed ?? 0, 10);
 
   let supervisor_score = null; // 0–100
   let company_raw = null;      // 0–120
