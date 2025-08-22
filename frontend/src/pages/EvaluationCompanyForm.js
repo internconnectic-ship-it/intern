@@ -56,15 +56,14 @@ const EvaluationCompanyForm = () => {
     absent_uninformed: 0,
     company_comment: "",
   });
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({
-      ...form,
-      [name]: value === "" ? "" : parseInt(value, 10) // เก็บ "" ถ้าว่าง
-    });
+    setForm((prev) => ({
+      ...prev,
+      [name]: value === "" ? 0 : parseInt(value, 10)
+    }));
   };
-
 
 
   const calcTotalScore = () => {
