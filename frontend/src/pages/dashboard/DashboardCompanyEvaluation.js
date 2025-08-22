@@ -62,16 +62,8 @@ const DashboardCompanyEvaluation = () => {
               <p className="text-sm text-gray-600">เบอร์โทร: {student.phone_number}</p>
               <p className="text-sm text-gray-600">อีเมล: {student.email}</p>
               <p className="text-sm text-gray-600">{student.university}</p>
-              <p className="text-sm text-gray-600">
-                กำหนดสิ้นสุดการฝึกงาน:{" "}
-                {student.intern_end_date
-                  ? new Date(student.intern_end_date).toLocaleDateString("th-TH", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })
-                  : "-"}
-              </p>
+              <Row label="วันที่สิ้นสุดฝึกงาน" value={fmt(student.intern_end_date)} />
+           
 
               {/* ปุ่มประเมิน/แก้ไข */}
                   <div className="mt-4">
