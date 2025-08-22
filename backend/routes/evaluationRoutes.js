@@ -217,7 +217,7 @@ router.post('/submit', async (req, res) => {
     if (role === 'supervisor') {
       await db.promise().query(`
         INSERT INTO evaluation_supervisor_details (
-          evaluation_id, student_id, supervisor_id, instructor_id,
+          evaluation_id, student_id, supervisor_id,
           score_quality, score_behavior, score_skill,
           score_personality, score_content, score_qna, supervisor_comment
         ) VALUES (?,?,?,?,?,?,?,?,?,?,?)
@@ -230,7 +230,7 @@ router.post('/submit', async (req, res) => {
           score_qna=VALUES(score_qna),
           supervisor_comment=VALUES(supervisor_comment)
       `, [
-        evaluation_id, student_id, supervisor_id, instructor_id,
+        evaluation_id, student_id, supervisor_id,
         score_quality, score_behavior, score_skill,
         score_presentation, score_content, score_answer,
         supervisor_comment
