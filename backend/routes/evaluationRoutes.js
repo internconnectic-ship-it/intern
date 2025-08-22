@@ -111,6 +111,7 @@ router.post('/submit', async (req, res) => {
   }
 
   // ✅ คำนวณคะแนนรวมฝั่ง company
+  console.log("🏢 company_score =", company_score);
   if (role === 'company') {
     company_raw = parseFloat(company_score ?? 0);
     if (Number.isNaN(company_raw) || company_raw < 0) company_raw = 0;

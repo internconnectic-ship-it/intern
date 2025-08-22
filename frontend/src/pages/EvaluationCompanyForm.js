@@ -104,6 +104,8 @@ const EvaluationCompanyForm = () => {
         company_comment: companyComment,
         evaluation_date: new Date().toISOString().split('T')[0]
       });
+      console.log("คะแนน company ",scores);
+      
       alert("✅ ส่งแบบประเมินสำเร็จ");
       navigate('/company/evaluation');
     } catch (err) {
