@@ -167,7 +167,7 @@ useEffect(() => {
                 <label className="w-40">{item.label}:</label>
                 <input
                   type="number"
-                  name={item.name}
+                  name={item.name}   // ✅ ตรงกับ DB
                   min={0}
                   step={1}
                   placeholder="วัน"
