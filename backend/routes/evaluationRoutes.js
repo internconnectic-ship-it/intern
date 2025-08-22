@@ -220,7 +220,7 @@ router.post('/submit', async (req, res) => {
           evaluation_id, student_id, supervisor_id,
           score_quality, score_behavior, score_skill,
           score_personality, score_content, score_qna, supervisor_comment
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?)
+        ) VALUES (?,?,?,?,?,?,?,?,?,?)
         ON DUPLICATE KEY UPDATE
           score_quality=VALUES(score_quality),
           score_behavior=VALUES(score_behavior),
