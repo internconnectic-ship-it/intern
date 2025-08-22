@@ -86,7 +86,7 @@ const EvaluationCompanyForm = () => {
         return;
       }
     }
-
+     console.log("📦 form to send =", form); 
     const totalScore = calcTotalScore();
     try {
       await axios.post(`${API_URL}/api/evaluation/submit`, {
