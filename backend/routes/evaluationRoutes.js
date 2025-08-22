@@ -237,6 +237,12 @@ router.post('/submit', async (req, res) => {
           `UPDATE evaluation SET evaluation_result = ? WHERE student_id = ?`,
           [result, student_id]
         );
+        await db.promise().query(
+          `UPDATE evaluation_company_details
+          SET absent_sick = ?, absent_personal = ?, late_days = ?, absent_uninformed = ?
+          WHERE student_id = ?`,
+          [absent_sick, absent_personal, late_days, absent_uninformed, student_id]
+        );
       }
     }
 
