@@ -85,6 +85,7 @@ router.post('/submit', async (req, res) => {
     score_answer,
     supervisor_comment,
     company_comment,
+    company_score,
     evaluation_date,
     role,
     // 🟦 ฟิลด์ดิบของบริษัท
