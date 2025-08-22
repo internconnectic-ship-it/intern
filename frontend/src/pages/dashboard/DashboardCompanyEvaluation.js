@@ -73,9 +73,7 @@ const DashboardCompanyEvaluation = () => {
                           : 'bg-emerald-600 hover:bg-emerald-700'
                       }`}
                     >
-                      {student.evaluation_status === 'completed'
-                        ? 'แก้ไขคะแนน'
-                        : 'ประเมิน'}
+                      {student.evaluation_status === 'completed' ? 'ประเมิน' : 'แก้ไขคะแนน'}
                     </button>
                   </div>
             </div>
