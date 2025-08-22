@@ -62,20 +62,11 @@ router.post('/submit', async (req, res) => {
 
   // ✅ คำนวณคะแนนรวมฝั่ง company
   if (role === 'company') {
-  let total = 0;
-  for (let i = 1; i <= 10; i++) total += parseInt(req.body[`p${i}`]) || 0;
-  for (let i = 1; i <= 10; i++) total += parseInt(req.body[`w${i}`]) || 0;
-
-  const penalty =
-    (parseInt(absent_sick) || 0) * 2 +
-    (parseInt(absent_personal) || 0) * 2 +
-    (parseInt(late_days) || 0) * 1 +
-    (parseInt(absent_uninformed) || 0) * 4;
-
-  company_raw = total + Math.max(0, 20 - penalty);
-  if (company_raw > 120) company_raw = 120;
-}
-
+    company_raw = parseFloat(company_score ?? 0);
+    if (Number.isNaN(company_raw) || company_raw < 0) company_raw = 0;
+    if (company_raw > 120) company_raw = 120;
+    
+  }
 
   try {
     // 🔹 1) insert/update evaluation (ตารางหลัก)
@@ -107,14 +98,8 @@ router.post('/submit', async (req, res) => {
           company_id = ?, 
           company_evaluation_date = ?
         `;
-        params.push(
-          company_raw,
-          company_comment || null,
-          company_id || null,
-          today
-        );
+        params.push(company_raw, company_comment || null, company_id || null, today);
       }
-
 
       query += ` WHERE student_id = ?`;
       params.push(student_id);
@@ -142,7 +127,6 @@ router.post('/submit', async (req, res) => {
           role === 'company' ? today : null
         ]
       );
-
     }
 
     // 🔹 2) หา evaluation_id
@@ -152,7 +136,6 @@ router.post('/submit', async (req, res) => {
     );
     const evaluation_id = rowEval[0].evaluation_id;
     console.log("📦 req.body =", req.body);
-
     // 🔹 3) insert/update details ตาม role
     if (role === 'company') {
       await db.promise().query(`
@@ -222,35 +205,9 @@ router.post('/submit', async (req, res) => {
         if (finalScore >= 70) result = 1;
         else result = 2;
 
-        // อัพเดตตารางหลัก
-        console.log("📌 UPDATE evaluation params:", {
-          company_score, company_comment, company_id, today, evaluation_id
-        });
         await db.promise().query(
-          `UPDATE evaluation 
-          SET company_score=?, company_comment=?, company_id=?, company_evaluation_date=? 
-          WHERE evaluation_id=?`,
-          [company_score, company_comment, company_id, today, evaluation_id]
-        );
-        // อัพเดตรายละเอียด (อยู่ใน evaluation_company_details)
-        console.log("📌 UPDATE evaluation_company_details params:", {
-          p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,
-          w1, w2, w3, w4, w5, w6, w7, w8, w9, w10,
-          absent_sick, absent_personal, late_days, absent_uninformed,
-          evaluation_id, student_id
-        });
-        await db.promise().query(
-          `UPDATE evaluation_company_details 
-          SET p1=?, p2=?, p3=?, p4=?, p5=?, p6=?, p7=?, p8=?, p9=?, p10=?, 
-              w1=?, w2=?, w3=?, w4=?, w5=?, w6=?, w7=?, w8=?, w9=?, w10=?, 
-              absent_sick=?, absent_personal=?, late_days=?, absent_uninformed=? 
-          WHERE evaluation_id=? AND student_id=?`,
-          [
-            p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,
-            w1, w2, w3, w4, w5, w6, w7, w8, w9, w10,
-            absent_sick, absent_personal, late_days, absent_uninformed,
-            evaluation_id, student_id
-          ]
+          `UPDATE evaluation SET evaluation_result = ? WHERE student_id = ?`,
+          [result, student_id]
         );
       }
     }
