@@ -395,8 +395,6 @@ router.get('/students/:supervisor_id', async (req, res) => {
   }
 });
 
-
-
 //ดึงข้อมูลเดิมมาแสดงในฟอร์ม
 router.get('/details/:student_id/:role', async (req, res) => {
   const { student_id, role } = req.params;
