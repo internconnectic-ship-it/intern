@@ -52,9 +52,10 @@ useEffect(() => {
     const { name, value } = e.target;
     setForm({
       ...form,
-      [name]: value === "" ? 0 : parseInt(value, 10) // ✅ ถ้าเว้นว่าง = 0
+      [name]: value === "" ? "" : parseInt(value, 10) // เก็บ "" ถ้าว่าง
     });
   };
+
 
 
   const calcTotalScore = () => {
@@ -167,16 +168,20 @@ useEffect(() => {
                 <label className="w-40">{item.label}:</label>
                 <input
                   type="number"
-                  name={item.name}   // ✅ ตรงกับ DB
+                  name={item.name}
                   min={0}
                   step={1}
+                  value={form[item.name] || ""}   // ✅ bind state
+                  onChange={handleChange}
                   placeholder="วัน"
                   className="border p-1 w-20 rounded"
-                  onChange={handleChange}
                 />
-                <span className="ml-2 text-gray-500">หักวันละ {item.score} คะแนน</span>
+                <span className="ml-2 text-gray-500">
+                  หักวันละ {item.score} คะแนน
+                </span>
               </div>
             ))}
+
             <h3 className="font-bold text-[#130347] mt-6 mb-3">ความคิดเห็นเพิ่มเติม</h3>
             <textarea
               className="border p-2 w-full rounded"
