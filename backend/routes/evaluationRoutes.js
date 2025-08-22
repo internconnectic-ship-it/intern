@@ -373,6 +373,7 @@ router.get('/students/:supervisor_id', async (req, res) => {
          s.student_id,
          s.student_name,
          s.email,
+         s.age,
          s.phone_number,
          s.university,
          s.profile_image,
@@ -381,16 +382,16 @@ router.get('/students/:supervisor_id', async (req, res) => {
            WHEN e.supervisor_score IS NOT NULL THEN 'completed'
            ELSE 'pending'
          END AS evaluation_status
-       FROM internship i
-       JOIN student s ON i.student_id = s.student_id
+       FROM supervisor_selection ss
+       JOIN student s ON ss.student_id = s.student_id
        LEFT JOIN evaluation e ON s.student_id = e.student_id
-       WHERE i.supervisor_id = ? AND i.internship_status = 'confirmed'`,
+       WHERE ss.supervisor_id = ?`,
       [supervisor_id]
     );
 
     res.json(rows);
   } catch (err) {
-    console.error('❌ ดึงรายชื่อนิสิตของ supervisor ล้มเหลว:', err);
+    console.error('❌ ดึงรายชื่อนิสิตล้มเหลว:', err);
     res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงรายชื่อนิสิต' });
   }
 });
