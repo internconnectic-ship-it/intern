@@ -33,9 +33,7 @@ const EvaluationCard = ({ student = {} }) => {
         : null;
 
   // --- Final score (เฉพาะเมื่อมีคะแนนทั้งสองฝั่ง) ---
-  const bothProvided =
-    (sup != null && sup > 0) &&           // ✅ เปลี่ยน > 0 เป็น sup != null ถ้าต้องการนับ 0 ว่า “กรอกแล้ว”
-    (comp120 != null && comp120 > 0);     // ✅ เช่นเดียวกัน: comp120 != null เพื่อให้นับ 0 เป็นกรอกแล้ว
+  const bothProvided = (sup != null) && (comp120 != null);
 
   const computedFinal = (sup != null && compPct != null)
     ? compPct * 0.6 + sup * 0.4
