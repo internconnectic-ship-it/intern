@@ -4,18 +4,21 @@ import { useNavigate } from 'react-router-dom';
 const EvaluationCard = ({ student = {} }) => {
   const navigate = useNavigate();
 
-  const {
-    student_id,
-    student_name = '-',
-    profile_image,
-    supervisor_name = '-',
-    company_name = '-',
-    supervisor_score: supRaw,   // 0–100 (null ถ้ายังไม่กรอก)
-    company_score: compRaw,     // ดิบ 0–120 (null ถ้ายังไม่กรอก)
-    company_score_pct,          // 0–100 (อาจไม่มีจาก API)
-    final_score,                // 0–100 (อาจไม่มีจาก API)
-    // final_status   // ไม่ใช้ตัดสิน เพื่อกันกรณีฝั่งหนึ่งยังไม่ได้กรอก
-  } = student || {};
+ const {
+  evaluation_id,
+  student_id,
+  student_name = '-',
+  profile_image,
+  supervisor_name = '-',   // จาก SQL ได้มาแล้ว
+  company_name = '-',      // จาก SQL ได้มาแล้ว
+  supervisor_score: supRaw,
+  company_score: compRaw,
+  company_score_pct,
+  final_score,
+  final_status,
+  evaluation_result
+} = student || {};
+
 
   // --- Helpers ---
   const toNum = (v) => (v === null || v === undefined || isNaN(Number(v)) ? null : Number(v));
