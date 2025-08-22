@@ -105,23 +105,16 @@ router.post('/submit', async (req, res) => {
           company_score = ?, 
           company_comment = ?, 
           company_id = ?, 
-          company_evaluation_date = ?,
-          absent_sick = ?, 
-          absent_personal = ?, 
-          late_days = ?, 
-          absent_uninformed = ?
+          company_evaluation_date = ?
         `;
         params.push(
           company_raw,
           company_comment || null,
           company_id || null,
-          today,
-          absent_sick || 0,
-          absent_personal || 0,
-          late_days || 0,
-          absent_uninformed || 0
+          today
         );
       }
+
 
       query += ` WHERE student_id = ?`;
       params.push(student_id);
@@ -133,9 +126,8 @@ router.post('/submit', async (req, res) => {
           student_id, supervisor_id, company_id, instructor_id,
           supervisor_score, company_score,
           supervisor_comment, company_comment,
-          evaluation_result, supervisor_evaluation_date, company_evaluation_date,
-          absent_sick, absent_personal, late_days, absent_uninformed
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          evaluation_result, supervisor_evaluation_date, company_evaluation_date
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           student_id,
           supervisor_id || null,
@@ -147,13 +139,10 @@ router.post('/submit', async (req, res) => {
           company_comment || null,
           0,
           role === 'supervisor' ? today : null,
-          role === 'company' ? today : null,
-          role === 'company' ? (absent_sick || 0) : 0,
-          role === 'company' ? (absent_personal || 0) : 0,
-          role === 'company' ? (late_days || 0) : 0,
-          role === 'company' ? (absent_uninformed || 0) : 0
+          role === 'company' ? today : null
         ]
       );
+
     }
 
     // 🔹 2) หา evaluation_id
