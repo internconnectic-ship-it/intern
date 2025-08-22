@@ -62,10 +62,20 @@ router.post('/submit', async (req, res) => {
 
   // ✅ คำนวณคะแนนรวมฝั่ง company
   if (role === 'company') {
-    company_raw = parseFloat(company_score ?? 0);
-    if (Number.isNaN(company_raw) || company_raw < 0) company_raw = 0;
-    if (company_raw > 120) company_raw = 120;
-  }
+  let total = 0;
+  for (let i = 1; i <= 10; i++) total += parseInt(req.body[`p${i}`]) || 0;
+  for (let i = 1; i <= 10; i++) total += parseInt(req.body[`w${i}`]) || 0;
+
+  const penalty =
+    (parseInt(absent_sick) || 0) * 2 +
+    (parseInt(absent_personal) || 0) * 2 +
+    (parseInt(late_days) || 0) * 1 +
+    (parseInt(absent_uninformed) || 0) * 4;
+
+  company_raw = total + Math.max(0, 20 - penalty);
+  if (company_raw > 120) company_raw = 120;
+}
+
 
   try {
     // 🔹 1) insert/update evaluation (ตารางหลัก)
