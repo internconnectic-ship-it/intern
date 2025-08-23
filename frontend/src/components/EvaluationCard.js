@@ -89,8 +89,8 @@ const EvaluationCard = ({ student = {} }) => {
             <p className="mt-2 font-medium">
               สรุปรวม (เกณฑ์ผ่าน ≥ 70%) : {fScore == null ? '-' : `${fmt(fScore, 1)}%`} 
             </p>
-            <p className="mt-2 font-medium">
-              *** กรุณาประเมินก่อน: {intern_end_date ? intern_end_date.split('T')[0] : '-'}  ***
+            <p className="text-sm text-gray-600">
+                ***กรุณาประเมินก่อน: {formatDate(student.intern_end_date)} ***
             </p>
           </div>
         </div>
