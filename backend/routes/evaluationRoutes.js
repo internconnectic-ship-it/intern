@@ -29,7 +29,6 @@ router.get('/all', async (req, res) => {
         e.student_id,
         s.student_name,
         s.profile_image,
-        s.intern_end_date,
         e.supervisor_score,                        -- 0–100
         e.company_score,                           -- ดิบ 0–120
         -- บริษัทเป็นเปอร์เซ็นต์ (0–100)
@@ -398,6 +397,7 @@ router.get('/students/:supervisor_id', async (req, res) => {
          s.age,
          s.phone_number,
          s.university,
+         s.intern_end_date,
          s.profile_image,
          COALESCE(e.supervisor_score, NULL) AS evaluation_score,
          CASE 

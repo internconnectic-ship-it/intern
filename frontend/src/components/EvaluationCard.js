@@ -3,15 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 const EvaluationCard = ({ student = {} }) => {
   const navigate = useNavigate();
-
-const formatDate = (dateString) => {
-    if (!dateString) return "-";
-    return new Date(dateString).toLocaleDateString("th-TH", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
   
  const {
   evaluation_id,
@@ -99,9 +90,6 @@ const formatDate = (dateString) => {
             <p>คะแนนที่ได้ : {fmt(comp120, 0)} / 120 คะแนน</p>
             <p className="mt-2 font-medium">
               สรุปรวม (เกณฑ์ผ่าน ≥ 70%) : {fScore == null ? '-' : `${fmt(fScore, 1)}%`} 
-            </p>
-            <p className="text-sm text-gray-600">
-                ***กรุณาประเมินก่อน: {formatDate(intern_end_date)} ***
             </p>
           </div>
         </div>

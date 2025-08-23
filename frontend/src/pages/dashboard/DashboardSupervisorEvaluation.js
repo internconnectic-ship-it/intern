@@ -63,7 +63,14 @@ const DashboardSupervisorEvaluation = () => {
       }
     })();
 }, []);
-
+ const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleDateString("th-TH", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   const handleEvaluate = (student_id) => navigate(`/evaluation/${student_id}`);
 
@@ -154,6 +161,9 @@ const DashboardSupervisorEvaluation = () => {
                     <p>📞 {s.phone_number || '-'}</p>
                     <p>📧 {s.email || '-'}</p>
                     <p>🏫 {s.university || '-'}</p>
+                    <p className="text-sm text-gray-600">
+                      *** กรุณาประเมินก่อน: {formatDate(s.intern_end_date)} ***
+                    </p>
                   
                   </div>
 
