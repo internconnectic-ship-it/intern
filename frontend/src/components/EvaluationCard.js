@@ -15,6 +15,7 @@ const EvaluationCard = ({ student = {} }) => {
   company_score: compRaw,
   company_score_pct,
   final_score,
+  intern_end_date,
   final_status,
   evaluation_result
 } = student || {};
@@ -87,6 +88,9 @@ const EvaluationCard = ({ student = {} }) => {
             <p>คะแนนที่ได้ : {fmt(comp120, 0)} / 120 คะแนน</p>
             <p className="mt-2 font-medium">
               สรุปรวม (เกณฑ์ผ่าน ≥ 70%) : {fScore == null ? '-' : `${fmt(fScore, 1)}%`} 
+            </p>
+            <p className="mt-2 font-medium">
+              *** กรุณาประเมินก่อน: {intern_end_date ? intern_end_date.split('T')[0] : '-'}  ***
             </p>
           </div>
         </div>
