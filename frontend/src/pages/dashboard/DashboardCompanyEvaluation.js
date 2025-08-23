@@ -20,6 +20,14 @@ const DashboardCompanyEvaluation = () => {
     };
     fetchStudents();
   }, []);
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleDateString("th-TH", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   const handleEvaluate = (student_id) => {
     navigate(`/evaluation/${student_id}`);
@@ -64,7 +72,7 @@ const DashboardCompanyEvaluation = () => {
               <p className="text-sm text-gray-600">{student.university}</p>
               {/* 🔹 วันสิ้นสุดการฝึกงาน */}
               <p className="text-sm text-gray-600">
-                กรุณาประเมินก่อน: {formatDate(student.intern_end_date)}
+                *** กรุณาประเมินก่อน: {formatDate(student.intern_end_date)} ***
               </p>
 
            
