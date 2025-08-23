@@ -8,32 +8,24 @@ const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 const DashboardStudentStatus = () => {
   const studentId = localStorage.getItem('studentId');
   const [applications, setApplications] = useState([]);
-    const [confirmedStatus, setConfirmedStatus] = useState({});
-
   const navigate = useNavigate();
 
   const formatDate = (dateStr) => dateStr?.split('T')[0];
 
-  useEffect(() => {
-    if (!studentId) return;
+    useEffect(() => {
+      if (!studentId) return;
 
-    api
-      .get(`/api/student/status/history/${studentId}`)
-      .then((res) => {
-        setApplications(res.data || []);
-        const confirmedMap = {};
-        (res.data || []).forEach((app) => {
-          if (app.status === 'รับ' && app.confirmed === 1) {
-            confirmedMap[app.job_posting_id] = true;
-          }
+      api
+        .get(`/api/student/status/history/${studentId}`)
+        .then((res) => {
+          setApplications(res.data || []);
+        })
+        .catch((err) => {
+          console.error('❌ โหลดข้อมูลล้มเหลว:', err);
+          setApplications([]);
         });
-        setConfirmedStatus(confirmedMap);
-      })
-      .catch((err) => {
-        console.error('❌ โหลดข้อมูลล้มเหลว:', err);
-        setApplications([]);
-      });
-  }, [studentId]);
+    }, [studentId]);
+
 
   const getStatusColor = (status) => {
     switch (status) {
