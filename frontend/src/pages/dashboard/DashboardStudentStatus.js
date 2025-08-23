@@ -8,6 +8,8 @@ const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 const DashboardStudentStatus = () => {
   const studentId = localStorage.getItem('studentId');
   const [applications, setApplications] = useState([]);
+    const [confirmedStatus, setConfirmedStatus] = useState({});
+
   const navigate = useNavigate();
 
   const formatDate = (dateStr) => dateStr?.split('T')[0];
