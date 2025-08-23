@@ -4,6 +4,15 @@ import { useNavigate } from 'react-router-dom';
 const EvaluationCard = ({ student = {} }) => {
   const navigate = useNavigate();
 
+const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleDateString("th-TH", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+  
  const {
   evaluation_id,
   student_id,
@@ -46,6 +55,8 @@ const EvaluationCard = ({ student = {} }) => {
   const fScore = (bothProvided && toNum(final_score) != null)
     ? Number(final_score)
     : (bothProvided ? computedFinal : null);
+    // helper function แปลงวันที่
+
 
   // --- Status ---
   let status = 'pending';
