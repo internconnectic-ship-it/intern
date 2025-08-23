@@ -47,6 +47,14 @@ const DashboardSupervisorEvaluation = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleDateString("th-TH", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   useEffect(() => {
     (async () => {
@@ -63,14 +71,7 @@ const DashboardSupervisorEvaluation = () => {
       }
     })();
 }, []);
- const formatDate = (dateString) => {
-    if (!dateString) return "-";
-    return new Date(dateString).toLocaleDateString("th-TH", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
+ 
 
   const handleEvaluate = (student_id) => navigate(`/evaluation/${student_id}`);
 
