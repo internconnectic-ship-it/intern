@@ -63,13 +63,24 @@ const EvaluationCompanyForm = () => {
     company_comment: "",
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value === "" ? 0 : parseInt(value, 10)
-    }));
-  };
+  // ✅ สำหรับ radio (คะแนน)
+const handleScoreChange = (e) => {
+  const { name, value } = e.target;
+  setScores((prev) => ({
+    ...prev,
+    [name]: parseInt(value, 10)
+  }));
+};
+
+// ✅ สำหรับ input number (วันลา/ขาดงาน)
+const handleFormChange = (e) => {
+  const { name, value } = e.target;
+  setForm((prev) => ({
+    ...prev,
+    [name]: value === "" ? 0 : parseInt(value, 10)
+  }));
+};
+
 
 
   const calcTotalScore = () => {
@@ -137,7 +148,7 @@ const EvaluationCompanyForm = () => {
                     name={`${prefix}${index + 1}`}
                     value={score}
                     checked={scores[`${prefix}${index + 1}`] === score}
-                    onChange={handleChange}
+                    onChange={handleScoreChange}
                   />
                 </td>
               ))}
@@ -185,13 +196,13 @@ const EvaluationCompanyForm = () => {
                 <label className="w-40">{item.label}:</label>
                 <input
                   type="number"
-                  name={item.name}                     // ✅ ถูกต้องแล้ว
+                  name={item.name}                     
                   value={form[item.name] || ""}
                   min={0}
                   step={1}
                   placeholder="วัน"
                   className="border p-1 w-20 rounded"
-                  onChange={handleChange}
+                   onChange={handleFormChange}
                 />
                 <span className="ml-2 text-gray-500">หักวันละ {item.score} คะแนน</span>
               </div>
