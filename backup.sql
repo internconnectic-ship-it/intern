@@ -201,7 +201,11 @@ CREATE TABLE `evaluation_company_details` (
   UNIQUE KEY `unique_eval` (`evaluation_id`,`student_id`,`company_id`),
   UNIQUE KEY `uq_eval_student` (`evaluation_id`,`student_id`),
   CONSTRAINT `evaluation_company_details_ibfk_1` FOREIGN KEY (`evaluation_id`) REFERENCES `evaluation` (`evaluation_id`) ON DELETE CASCADE
+<<<<<<< HEAD
 ) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+=======
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+>>>>>>> 661532ba (commit)
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -238,7 +242,11 @@ CREATE TABLE `evaluation_supervisor_details` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uniq_eval_student_supervisor` (`evaluation_id`,`student_id`,`supervisor_id`),
   CONSTRAINT `evaluation_supervisor_details_ibfk_1` FOREIGN KEY (`evaluation_id`) REFERENCES `evaluation` (`evaluation_id`) ON DELETE CASCADE
+<<<<<<< HEAD
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+=======
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+>>>>>>> 661532ba (commit)
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
