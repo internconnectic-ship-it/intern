@@ -16,7 +16,7 @@ const DashboardStudentStatus = () => {
       if (!studentId) return;
 
       api
-        .get(``)
+        .get(`/api/student/status/history/${studentId}`)
         .then((res) => {
           setApplications(res.data || []);
         })
@@ -52,7 +52,7 @@ const DashboardStudentStatus = () => {
 
   const handleConfirm = async (jobId) => {
   try {
-    await api.post(`${API_URL}`, {
+    await api.post(`${API_URL}/api/internship/confirm`, {
       student_id: studentId,
       job_posting_id: jobId,
     });
