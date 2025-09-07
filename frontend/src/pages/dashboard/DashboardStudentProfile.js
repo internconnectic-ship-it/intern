@@ -40,7 +40,7 @@ const DashboardStudentProfile = () => {
   useEffect(() => {
     if (!studentId) return;
     api
-      .get(`/api/student/${studentId}`)
+      .get(``)
       .then(res => setStudent(res.data || {}))
       .catch(err => console.error('❌ โหลดข้อมูลล้มเหลว', err));
   }, [studentId]);

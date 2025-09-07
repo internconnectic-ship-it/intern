@@ -52,7 +52,7 @@ const DashboardStudentStatus = () => {
 
   const handleConfirm = async (jobId) => {
   try {
-    await api.post(`${API_URL}/api/internship/confirm`, {
+    await api.post(`${API_URL}`, {
       student_id: studentId,
       job_posting_id: jobId,
     });

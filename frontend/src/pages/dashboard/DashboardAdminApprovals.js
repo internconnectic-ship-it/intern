@@ -130,7 +130,7 @@ const DashboardAdminApprovals = () => {
                   <PlaceholderAvatar name={company.company_name} />
                   <div className="flex-1 text-[#130347]">
                     <p className="text-lg font-semibold text-[#130347]">
-                      <strong>ชื่อบริษัท:</strong> {}
+                      <strong>ชื่อบริษัท:</strong> {company.company_name}
                     </p>
                     <div className="mt-1 text-sm space-y-0.5">
                       <p><strong className="text-[#465d71]">รหัสบริษัท:</strong> {company.company_id}</p>
