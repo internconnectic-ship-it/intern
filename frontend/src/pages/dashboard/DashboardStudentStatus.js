@@ -16,7 +16,7 @@ const DashboardStudentStatus = () => {
       if (!studentId) return;
 
       api
-        .get(`/api/student/status/history/${studentId}`)
+        .get(``)
         .then((res) => {
           setApplications(res.data || []);
         })
